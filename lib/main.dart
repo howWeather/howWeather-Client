@@ -1,16 +1,21 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/screens/signSplash.dart';
+import 'package:client/screens/signUp/signUpEmail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/signUp/email',
     routes: [
       GoRoute(
         path: '/',
         builder: (context, state) => SignSplash(),
+      ),
+      GoRoute(
+        path: '/signUp/email',
+        builder: (context, state) => SignUpEmail(),
       ),
     ],
   );
