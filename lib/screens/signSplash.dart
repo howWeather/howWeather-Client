@@ -91,7 +91,7 @@ class SignSplash extends ConsumerWidget {
                 children: [
                   InkWell(
                     onTap: () {
-                      context.go('/signUp/email');
+                      context.push('/signUp/email');
                     },
                     child: Medium_18px(
                       text: "회원가입",

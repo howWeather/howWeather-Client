@@ -18,6 +18,7 @@ class SignUpEmail extends ConsumerWidget {
       final emailDomain = ref.watch(emailDomainProvider);
       return emailId.isNotEmpty && emailDomain.isNotEmpty;
     });
+
     final isAllValid = ref.watch(isAllValidProvider);
 
     return Scaffold(
@@ -28,7 +29,7 @@ class SignUpEmail extends ConsumerWidget {
         centerTitle: true,
         leading: InkWell(
           onTap: () {
-            context.go('/');
+            context.pop();
           },
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
@@ -93,7 +94,7 @@ class SignUpEmail extends ConsumerWidget {
                         color: HowWeatherColor.neutral[200],
                       ),
                       contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     ),
                   ),
                 ),
@@ -138,7 +139,7 @@ class SignUpEmail extends ConsumerWidget {
                         color: HowWeatherColor.neutral[200],
                       ),
                       contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     ),
                   ),
                 ),
@@ -155,7 +156,7 @@ class SignUpEmail extends ConsumerWidget {
     return GestureDetector(
       onTap: isAllValid
           ? () {
-              context.go('/signUp/password');
+              context.push('/signUp/id');
             }
           : null,
       child: Container(
