@@ -1,5 +1,6 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/screens/signSplash.dart';
+import 'package:client/screens/signUp/signUpCheck.dart';
 import 'package:client/screens/signUp/signUpEmail.dart';
 import 'package:client/screens/signUp/signUpId.dart';
 import 'package:client/screens/signUp/signUpNickname.dart';
@@ -11,7 +12,7 @@ import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/signUp/personal',
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
@@ -36,6 +37,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signUp/personal',
         builder: (context, state) => SignUpPersonal(),
+      ),
+      GoRoute(
+        path: '/signUp/check',
+        builder: (context, state) => SignUpCheck(),
       ),
     ],
   );
