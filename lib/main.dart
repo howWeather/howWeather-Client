@@ -4,13 +4,14 @@ import 'package:client/screens/signUp/signUpEmail.dart';
 import 'package:client/screens/signUp/signUpId.dart';
 import 'package:client/screens/signUp/signUpNickname.dart';
 import 'package:client/screens/signUp/signUpPassword.dart';
+import 'package:client/screens/signUp/signUpPersonal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/signUp/nickname',
+    initialLocation: '/signUp/personal',
     routes: [
       GoRoute(
         path: '/',
@@ -31,6 +32,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signUp/nickname',
         builder: (context, state) => SignUpNickname(),
+      ),
+      GoRoute(
+        path: '/signUp/personal',
+        builder: (context, state) => SignUpPersonal(),
       ),
     ],
   );

@@ -13,7 +13,7 @@ final duplicateProvider = StateProvider<String>((ref) => '');
 final isIdFormatValidProvider = Provider<bool>((ref) {
   final id = ref.watch(idProvider);
   final regex = RegExp(
-    r'^[a-zA-Z0-9!@#$%^&*()_+|~=`{}\[\]:";\<>?,.\/]{8,20}$',
+    r'^[a-zA-Z0-9!@#$%^&*()_+|~=`{}\[\]:";\<>?,.\/]{6,20}$',
   );
   return regex.hasMatch(id);
 });
