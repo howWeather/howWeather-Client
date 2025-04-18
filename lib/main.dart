@@ -1,5 +1,11 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/screens/signSplash.dart';
+import 'package:client/screens/signUp/signUpCheck.dart';
+import 'package:client/screens/signUp/signUpEmail.dart';
+import 'package:client/screens/signUp/signUpId.dart';
+import 'package:client/screens/signUp/signUpNickname.dart';
+import 'package:client/screens/signUp/signUpPassword.dart';
+import 'package:client/screens/signUp/signUpPersonal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +17,30 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         builder: (context, state) => SignSplash(),
+      ),
+      GoRoute(
+        path: '/signUp/email',
+        builder: (context, state) => SignUpEmail(),
+      ),
+      GoRoute(
+        path: '/signUp/id',
+        builder: (context, state) => SignUpId(),
+      ),
+      GoRoute(
+        path: '/signUp/password',
+        builder: (context, state) => SignUpPassword(),
+      ),
+      GoRoute(
+        path: '/signUp/nickname',
+        builder: (context, state) => SignUpNickname(),
+      ),
+      GoRoute(
+        path: '/signUp/personal',
+        builder: (context, state) => SignUpPersonal(),
+      ),
+      GoRoute(
+        path: '/signUp/check',
+        builder: (context, state) => SignUpCheck(),
       ),
     ],
   );
