@@ -223,8 +223,8 @@ class SignUpPassword extends ConsumerWidget {
         labelText: "영문, 숫자, 특수문자 포함 8-20자 이내",
         labelStyle: TextStyle(
           fontFamily: 'Pretendard',
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
           color: HowWeatherColor.neutral[200],
         ),
         suffixIcon: (password.isNotEmpty)
@@ -282,8 +282,8 @@ class SignUpPassword extends ConsumerWidget {
         labelText: "비밀번호 재입력",
         labelStyle: TextStyle(
           fontFamily: 'Pretendard',
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
           color: HowWeatherColor.neutral[200],
         ),
         suffixIcon: (checkPassword.isNotEmpty)

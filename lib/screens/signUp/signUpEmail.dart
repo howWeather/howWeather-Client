@@ -89,8 +89,8 @@ class SignUpEmail extends ConsumerWidget {
                       labelText: "이메일 입력",
                       labelStyle: TextStyle(
                         fontFamily: 'Pretendard',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                         color: HowWeatherColor.neutral[200],
                       ),
                       contentPadding:
@@ -134,8 +134,8 @@ class SignUpEmail extends ConsumerWidget {
                       labelText: "선택",
                       labelStyle: TextStyle(
                         fontFamily: 'Pretendard',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                         color: HowWeatherColor.neutral[200],
                       ),
                       contentPadding:

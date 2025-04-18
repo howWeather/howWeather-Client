@@ -2,6 +2,7 @@ import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/screens/signSplash.dart';
 import 'package:client/screens/signUp/signUpEmail.dart';
 import 'package:client/screens/signUp/signUpId.dart';
+import 'package:client/screens/signUp/signUpNickname.dart';
 import 'package:client/screens/signUp/signUpPassword.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +10,7 @@ import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/signUp/password',
+    initialLocation: '/signUp/nickname',
     routes: [
       GoRoute(
         path: '/',
@@ -26,6 +27,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signUp/password',
         builder: (context, state) => SignUpPassword(),
+      ),
+      GoRoute(
+        path: '/signUp/nickname',
+        builder: (context, state) => SignUpNickname(),
       ),
     ],
   );

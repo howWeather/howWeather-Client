@@ -115,8 +115,8 @@ class SignUpId extends ConsumerWidget {
                       labelText: "아이디 입력",
                       labelStyle: TextStyle(
                         fontFamily: 'Pretendard',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                         color: HowWeatherColor.neutral[200],
                       ),
                       contentPadding:
