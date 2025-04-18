@@ -80,6 +80,10 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
+    - family: BagelFatOne
+      fonts:
+        - asset: assets/fonts/BagelFatOne-Regular.ttf
+          weight: 400
     - family: Pretendard
       fonts:
         - asset: assets/fonts/Pretendard-Thin.otf
