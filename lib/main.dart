@@ -6,13 +6,15 @@ import 'package:client/screens/signUp/signUpId.dart';
 import 'package:client/screens/signUp/signUpNickname.dart';
 import 'package:client/screens/signUp/signUpPassword.dart';
 import 'package:client/screens/signUp/signUpPersonal.dart';
+import 'package:client/screens/todayWeather/view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/main',
     routes: [
       GoRoute(
         path: '/',
@@ -42,11 +44,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/signUp/check',
         builder: (context, state) => SignUpCheck(),
       ),
+      GoRoute(
+        path: '/main',
+        builder: (context, state) => WeatherScreen(),
+      ),
     ],
   );
 });
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const ProviderScope(child: HowWeather()));
 }
 
