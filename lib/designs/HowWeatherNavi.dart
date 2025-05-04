@@ -15,7 +15,7 @@ class HowWeatherNaviShell extends StatefulWidget {
 class _HowWeatherNaviShellState extends State<HowWeatherNaviShell> {
   final List<String> _routes = [
     '/home',
-    '/home/closet',
+    '/todaywear',
     '/home/calendar',
     '/home/mypage',
   ];
