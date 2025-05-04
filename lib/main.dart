@@ -7,6 +7,7 @@ import 'package:client/screens/signUp/signUpId.dart';
 import 'package:client/screens/signUp/signUpNickname.dart';
 import 'package:client/screens/signUp/signUpPassword.dart';
 import 'package:client/screens/signUp/signUpPersonal.dart';
+import 'package:client/screens/todayWear/view.dart';
 import 'package:client/screens/todayWeather/view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,7 +16,7 @@ import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/todaywear',
     routes: [
       GoRoute(
         path: '/',
@@ -53,8 +54,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => WeatherScreen(),
           ),
           GoRoute(
-            path: '/home/closet',
-            builder: (context, state) => Placeholder(), // TODO: 추후 대체
+            path: '/todaywear',
+            builder: (context, state) => TodayWear(),
           ),
           GoRoute(
             path: '/home/calendar',
