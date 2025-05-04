@@ -46,3 +46,33 @@ class HourlyWeather {
     );
   }
 }
+
+class DailyWeather {
+  final DateTime dateTime;
+  final int humidity;
+  final String icon;
+  final double maxTemp;
+  final double minTemp;
+
+  DailyWeather({
+    required this.dateTime,
+    required this.humidity,
+    required this.icon,
+    required this.maxTemp,
+    required this.minTemp,
+  });
+
+  factory DailyWeather.fromJson(Map<String, dynamic> json) {
+    final temps = (json['temps'] as Map<String, dynamic>);
+    final humidities = (json['humidities'] as List).cast<int>();
+    final icons = (json['weather_icons'] as List).cast<String>();
+
+    return DailyWeather(
+      dateTime: DateTime.parse(json['date']),
+      humidity: humidities.reduce((a, b) => a + b) ~/ humidities.length,
+      icon: icons.isNotEmpty ? icons[0] : 'default_icon', // 첫 시간대 아이콘 사용
+      maxTemp: temps['max'].toDouble(),
+      minTemp: temps['min'].toDouble(),
+    );
+  }
+}

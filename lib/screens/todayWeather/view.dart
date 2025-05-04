@@ -16,6 +16,7 @@ class WeatherScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final weatherAsync = ref.watch(weatherByLocationProvider);
     final hourlyWeather = ref.watch(hourlyWeatherProvider);
+    final dailyForecast = ref.watch(dailyWeatherProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -35,54 +36,94 @@ class WeatherScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [const Color(0xFF4093EB), const Color(0xFFABDAEF)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color(0xFF4093EB), const Color(0xFFABDAEF)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: Center(
-          child: weatherAsync.when(
-            data: (weather) => Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 50,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Semibold_24px(
-                          text: weather.name,
-                          color: HowWeatherColor.white,
+          child: Center(
+            child: weatherAsync.when(
+              data: (weather) => Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 50,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Semibold_24px(
+                            text: weather.name,
+                            color: HowWeatherColor.white,
+                          ),
+                          Bold_64px(
+                            text: '${weather.temperature.toStringAsFixed(0)}°',
+                            color: HowWeatherColor.white,
+                          ),
+                          Medium_20px(
+                            text: weather.description,
+                            color: HowWeatherColor.white,
+                          ),
+                        ],
+                      ),
+                      Image.network(
+                          scale: 0.8,
+                          'http://openweathermap.org/img/wn/${weather.icon}@2x.png'),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  hourlyWeather.when(
+                    data: (hourlyData) {
+                      return Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: HowWeatherColor.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        Bold_64px(
-                          text: '${weather.temperature}°',
-                          color: HowWeatherColor.white,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Medium_16px(
+                                text: '오늘의 날씨 예보',
+                                color: HowWeatherColor.white,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Divider(
+                                height: 1,
+                                color: HowWeatherColor.white.withOpacity(0.5),
+                              ),
+                            ),
+                            HourlyTemperatureChart(hourlyData: hourlyData),
+                          ],
                         ),
-                        Medium_20px(
-                          text: weather.description,
-                          color: HowWeatherColor.white,
-                        ),
-                      ],
-                    ),
-                    Image.network(
-                        scale: 0.8,
-                        'http://openweathermap.org/img/wn/${weather.icon}@2x.png'),
-                  ],
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                hourlyWeather.when(
-                  data: (hourlyData) {
-                    return Container(
+                      );
+                    },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, st) => Text('에러 발생: $e'),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  dailyForecast.when(
+                    data: (forecastList) => Container(
                       padding:
                           EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
@@ -96,7 +137,7 @@ class WeatherScreen extends ConsumerWidget {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Medium_16px(
-                              text: '오늘의 날씨 예보',
+                              text: '주간 날씨 예보',
                               color: HowWeatherColor.white,
                             ),
                           ),
@@ -107,19 +148,18 @@ class WeatherScreen extends ConsumerWidget {
                               color: HowWeatherColor.white.withOpacity(0.5),
                             ),
                           ),
-                          HourlyTemperatureChart(hourlyData: hourlyData),
+                          WeeklyForecastList(dailyForecast: forecastList),
                         ],
                       ),
-                    );
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (e, st) => Text('에러 발생: $e'),
-                ),
-              ],
+                    ),
+                    loading: () => const CircularProgressIndicator(),
+                    error: (e, _) => Text('에러: $e'),
+                  ),
+                ],
+              ),
+              loading: () => CircularProgressIndicator(),
+              error: (e, _) => Text('에러: $e'),
             ),
-            loading: () => CircularProgressIndicator(),
-            error: (e, _) => Text('에러: $e'),
           ),
         ),
       ),
@@ -219,5 +259,95 @@ class HourlyTemperatureChart extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class WeeklyForecastList extends StatelessWidget {
+  final List<DailyWeather> dailyForecast; // 8개 (어제~6일 뒤)
+
+  const WeeklyForecastList({super.key, required this.dailyForecast});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: dailyForecast.map((data) {
+        final dayLabel = getDayLabel(data.dateTime);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 날짜
+              SizedBox(
+                width: 60,
+                child: Medium_14px(
+                  text: dayLabel,
+                  color: HowWeatherColor.white,
+                ),
+              ),
+              Spacer(),
+              // 습도
+              SizedBox(
+                width: 40,
+                child: Center(
+                  child: Medium_14px(
+                    text: '${data.humidity}%',
+                    color: HowWeatherColor.white.withOpacity(0.6),
+                  ),
+                ),
+              ),
+              // 날씨 아이콘
+              SizedBox(
+                width: 50,
+                child: Image.network(
+                  'http://openweathermap.org/img/wn/${data.icon}@2x.png',
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+              // 최고 기온
+              SizedBox(
+                width: 50,
+                child: Center(
+                  child: Medium_14px(
+                    text: '${data.maxTemp.toStringAsFixed(0)}°',
+                    color: HowWeatherColor.white,
+                  ),
+                ),
+              ),
+              // 최저 기온
+              SizedBox(
+                width: 50,
+                child: Center(
+                  child: Medium_14px(
+                    text: '${data.minTemp.toStringAsFixed(0)}°',
+                    color: HowWeatherColor.white.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  String getDayLabel(DateTime dateTime) {
+    final now = DateTime.now();
+
+    // 날짜 간 비교를 위해 시간 부분 제거
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+    final diff = targetDate.difference(today).inDays;
+
+    if (diff < 0) return '어제';
+    if (diff == 0) return '오늘';
+    if (diff == 1) return '내일';
+
+    // 요일 배열 - Dart에서 weekday는 월요일=1, 일요일=7
+    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    return '${weekdays[dateTime.weekday - 1]}요일';
   }
 }
