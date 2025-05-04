@@ -1,4 +1,5 @@
 import 'package:client/designs/HowWeatherColor.dart';
+import 'package:client/designs/HowWeatherNavi.dart';
 import 'package:client/screens/signSplash.dart';
 import 'package:client/screens/signUp/signUpCheck.dart';
 import 'package:client/screens/signUp/signUpEmail.dart';
@@ -14,7 +15,7 @@ import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
@@ -44,9 +45,26 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/signUp/check',
         builder: (context, state) => SignUpCheck(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => WeatherScreen(),
+      ShellRoute(
+        builder: (context, state, child) => HowWeatherNaviShell(child: child),
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => WeatherScreen(),
+          ),
+          GoRoute(
+            path: '/home/closet',
+            builder: (context, state) => Placeholder(), // TODO: 추후 대체
+          ),
+          GoRoute(
+            path: '/home/calendar',
+            builder: (context, state) => Placeholder(), // TODO: 추후 대체
+          ),
+          GoRoute(
+            path: '/home/mypage',
+            builder: (context, state) => Placeholder(), // TODO: 추후 대체
+          ),
+        ],
       ),
     ],
   );
