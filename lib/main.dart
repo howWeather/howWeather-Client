@@ -14,7 +14,7 @@ import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/main',
+    initialLocation: '/home',
     routes: [
       GoRoute(
         path: '/',
@@ -45,7 +45,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => SignUpCheck(),
       ),
       GoRoute(
-        path: '/main',
+        path: '/home',
         builder: (context, state) => WeatherScreen(),
       ),
     ],
