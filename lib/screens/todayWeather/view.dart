@@ -155,6 +155,9 @@ class WeatherScreen extends ConsumerWidget {
                     loading: () => const CircularProgressIndicator(),
                     error: (e, _) => Text('에러: $e'),
                   ),
+                  SizedBox(
+                    height: 70,
+                  ),
                 ],
               ),
               loading: () => CircularProgressIndicator(),
