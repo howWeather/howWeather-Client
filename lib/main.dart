@@ -1,6 +1,7 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherNavi.dart';
 import 'package:client/screens/calendar/view.dart';
+import 'package:client/screens/register/view.dart';
 import 'package:client/screens/signSplash.dart';
 import 'package:client/screens/signUp/signUpCheck.dart';
 import 'package:client/screens/signUp/signUpEmail.dart';
@@ -18,7 +19,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/calendar',
+    initialLocation: '/calendar/register',
     routes: [
       GoRoute(
         path: '/',
@@ -47,6 +48,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signUp/check',
         builder: (context, state) => SignUpCheck(),
+      ),
+      GoRoute(
+        path: '/calendar/register',
+        builder: (context, state) => Register(),
       ),
       ShellRoute(
         builder: (context, state, child) => HowWeatherNaviShell(child: child),
