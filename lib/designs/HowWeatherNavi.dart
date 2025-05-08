@@ -16,7 +16,7 @@ class _HowWeatherNaviShellState extends State<HowWeatherNaviShell> {
   final List<String> _routes = [
     '/home',
     '/todaywear',
-    '/home/calendar',
+    '/calendar',
     '/home/mypage',
   ];
 
