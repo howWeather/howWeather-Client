@@ -1,5 +1,6 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherNavi.dart';
+import 'package:client/screens/calendar/view.dart';
 import 'package:client/screens/signSplash.dart';
 import 'package:client/screens/signUp/signUpCheck.dart';
 import 'package:client/screens/signUp/signUpEmail.dart';
@@ -13,10 +14,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/todaywear',
+    initialLocation: '/calendar',
     routes: [
       GoRoute(
         path: '/',
@@ -58,8 +60,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => TodayWear(),
           ),
           GoRoute(
-            path: '/home/calendar',
-            builder: (context, state) => Placeholder(), // TODO: 추후 대체
+            path: '/calendar',
+            builder: (context, state) => Calendar(),
           ),
           GoRoute(
             path: '/home/mypage',
@@ -72,6 +74,8 @@ final routerProvider = Provider<GoRouter>((ref) {
 });
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ko_KR', null);
   await dotenv.load(fileName: ".env");
   runApp(const ProviderScope(child: HowWeather()));
 }
