@@ -182,81 +182,111 @@ class HourlyTemperatureChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final minTemp = hourlyData.map((e) => e.temperature).reduce(min) - 5;
     final maxTemp = hourlyData.map((e) => e.temperature).reduce(max) + 5;
+    final tempRange = maxTemp - minTemp;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Container(
         width: hourlyData.length * columnWidth,
-        child: Stack(
+        child: Column(
           children: [
-            // 📌 그래프
-            Positioned(
-              top: 84,
-              left: 26,
-              child: SizedBox(
-                height: graphHeight,
-                width: hourlyData.length * columnWidth * 0.84,
-                child: LineChart(
-                  LineChartData(
-                    minY: minTemp,
-                    maxY: maxTemp,
-                    minX: 0,
-                    maxX: (hourlyData.length - 1) * columnWidth,
-                    titlesData: FlTitlesData(show: false),
-                    gridData: FlGridData(show: false),
-                    borderData: FlBorderData(show: false),
-                    lineBarsData: [
-                      LineChartBarData(
-                        isCurved: true,
-                        spots: hourlyData.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final data = entry.value;
-                          return FlSpot(index * columnWidth, data.temperature);
-                        }).toList(),
-                        color: Colors.white,
-                        barWidth: 1,
-                        dotData: FlDotData(show: true),
-                        belowBarData: BarAreaData(show: false),
-                      )
-                    ],
+            SizedBox(
+              height: 220, // 전체 높이 조정
+              child: Stack(
+                children: [
+                  // 시간, 아이콘, 온도 표시
+                  Positioned.fill(
+                    child: Row(
+                      children: hourlyData.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final data = entry.value;
+                        return SizedBox(
+                          width: columnWidth,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 8),
+                              Medium_14px(
+                                text: '${data.dateTime.hour}시',
+                                color: HowWeatherColor.white.withOpacity(0.5),
+                              ),
+                              const SizedBox(height: 4),
+                              Image.network(
+                                'http://openweathermap.org/img/wn/${data.icon}@2x.png',
+                                width: 30,
+                                height: 30,
+                              ),
+                              const SizedBox(height: 4),
+                              Medium_16px(
+                                text: '${data.temperature.toStringAsFixed(0)}°',
+                                color: HowWeatherColor.white,
+                              ),
+                              const SizedBox(height: 100), // 그래프와 습도 사이 간격 조정
+                              Medium_14px(
+                                text:
+                                    '${data.precipitation.toStringAsFixed(0)}%',
+                                color: HowWeatherColor.white.withOpacity(0.5),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
-                ),
-              ),
-            ),
 
-            // 📌 텍스트, 아이콘, 온도, 습도
-            Row(
-              children: hourlyData.map((data) {
-                return SizedBox(
-                  width: columnWidth,
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 8),
-                      Medium_14px(
-                        text: '${data.dateTime.hour}시',
-                        color: HowWeatherColor.white.withOpacity(0.5),
+                  // 그래프 배치
+                  Positioned(
+                    top: 84, // 온도 표시와 정렬을 위한 상단 위치 조정
+                    left: columnWidth / 2, // 첫 번째 열의 중앙에서 시작
+                    right: columnWidth / 2, // 마지막 열의 중앙에서 끝
+                    height: graphHeight,
+                    child: LineChart(
+                      LineChartData(
+                        minY: minTemp,
+                        maxY: maxTemp,
+                        minX: 0,
+                        maxX: hourlyData.length - 1,
+                        titlesData: FlTitlesData(show: false),
+                        gridData: FlGridData(show: false),
+                        borderData: FlBorderData(show: false),
+                        lineTouchData: LineTouchData(
+                          enabled: true,
+                          touchTooltipData: LineTouchTooltipData(
+                            tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+                          ),
+                        ),
+                        lineBarsData: [
+                          LineChartBarData(
+                            isCurved: true,
+                            spots: hourlyData.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final data = entry.value;
+                              // 각 열의 중앙에 점 배치
+                              return FlSpot(index.toDouble(), data.temperature);
+                            }).toList(),
+                            color: Colors.white,
+                            barWidth: 2,
+                            dotData: FlDotData(
+                              show: true,
+                              getDotPainter: (spot, percent, barData, index) {
+                                return FlDotCirclePainter(
+                                  radius: 4,
+                                  color: Colors.white,
+                                  strokeWidth: 1,
+                                  strokeColor: Colors.blue,
+                                );
+                              },
+                            ),
+                            belowBarData: BarAreaData(
+                              show: false,
+                              color: Colors.blue.withOpacity(0.2),
+                            ),
+                          )
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Image.network(
-                        'http://openweathermap.org/img/wn/${data.icon}@2x.png',
-                        width: 30,
-                        height: 30,
-                      ),
-                      const SizedBox(height: 4),
-                      Medium_16px(
-                        text: '${data.temperature.toStringAsFixed(0)}°',
-                        color: HowWeatherColor.white,
-                      ),
-                      const SizedBox(height: graphHeight),
-                      const SizedBox(height: 8),
-                      Medium_14px(
-                        text: '${data.precipitation.toStringAsFixed(0)}%',
-                        color: HowWeatherColor.white.withOpacity(0.5),
-                      ),
-                    ],
+                    ),
                   ),
-                );
-              }).toList(),
+                ],
+              ),
             ),
           ],
         ),
@@ -266,7 +296,7 @@ class HourlyTemperatureChart extends StatelessWidget {
 }
 
 class WeeklyForecastList extends StatelessWidget {
-  final List<DailyWeather> dailyForecast; // 8개 (어제~6일 뒤)
+  final List<DailyWeather> dailyForecast;
 
   const WeeklyForecastList({super.key, required this.dailyForecast});
 
