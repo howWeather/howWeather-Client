@@ -17,7 +17,7 @@ class _HowWeatherNaviShellState extends State<HowWeatherNaviShell> {
     '/home',
     '/todaywear',
     '/calendar',
-    '/home/mypage',
+    '/mypage',
   ];
 
   int _getSelectedIndex(BuildContext context) {
