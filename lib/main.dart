@@ -1,6 +1,8 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherNavi.dart';
 import 'package:client/screens/calendar/view.dart';
+import 'package:client/screens/mypage/mypage.dart';
+import 'package:client/screens/mypage/profile.dart';
 import 'package:client/screens/register/view.dart';
 import 'package:client/screens/signSplash.dart';
 import 'package:client/screens/signUp/signUpCheck.dart';
@@ -19,7 +21,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/mypage',
     routes: [
       GoRoute(
         path: '/',
@@ -53,6 +55,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/calendar/register',
         builder: (context, state) => Register(),
       ),
+      GoRoute(
+        path: '/mypage/profile',
+        builder: (context, state) => Profile(),
+      ),
       ShellRoute(
         builder: (context, state, child) => HowWeatherNaviShell(child: child),
         routes: [
@@ -69,8 +75,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => Calendar(),
           ),
           GoRoute(
-            path: '/home/mypage',
-            builder: (context, state) => Placeholder(), // TODO: 추후 대체
+            path: '/mypage',
+            builder: (context, state) => MyPage(),
           ),
         ],
       ),
