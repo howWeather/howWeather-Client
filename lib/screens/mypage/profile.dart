@@ -187,7 +187,9 @@ class Profile extends ConsumerWidget {
 
   Widget changeNickname(WidgetRef ref) {
     return TextFormField(
-      onChanged: (value) => ref.read(nicknameProvider.notifier).state = value,
+      onChanged: (value) {
+        ref.read(nicknameProvider.notifier).state = value;
+      },
       style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
