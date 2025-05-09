@@ -29,7 +29,6 @@ class WeatherRepository {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      print(data);
       return Weather.fromJson(data);
     } else {
       throw Exception('위치 기반 날씨 데이터를 가져오지 못했습니다.');
@@ -47,14 +46,20 @@ class WeatherRepository {
       final List list = data['list'];
 
       final now = DateTime.now();
-      final today = now.day;
+      final tomorrow = now.add(Duration(days: 1));
 
-      final todayForecast = list
-          .map((item) => HourlyWeather.fromJson(item))
-          .where((weather) => weather.dateTime.day == today)
-          .toList();
+      final todayOrTomorrowForecast =
+          list.map((item) => HourlyWeather.fromJson(item)).where((weather) {
+        final date = weather.dateTime;
+        return (date.year == now.year &&
+                date.month == now.month &&
+                date.day == now.day) ||
+            (date.year == tomorrow.year &&
+                date.month == tomorrow.month &&
+                date.day == tomorrow.day);
+      }).toList();
 
-      return todayForecast;
+      return todayOrTomorrowForecast;
     } else {
       throw Exception('시간별 날씨 데이터를 가져오지 못했습니다.');
     }
