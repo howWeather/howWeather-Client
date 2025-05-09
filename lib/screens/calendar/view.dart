@@ -3,8 +3,11 @@ import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+final selectedTimeProvider = StateProvider<String?>((ref) => null);
 
 class Calendar extends ConsumerWidget {
   Calendar({super.key});
@@ -63,7 +66,6 @@ class Calendar extends ConsumerWidget {
   Widget MonthCalendar() {
     // 예시 이벤트 목록 ...TODO: api 연결
     final Map<DateTime, List<String>> events = {
-      DateTime.utc(2025, 5, 15): ['Event 1'],
       DateTime.utc(2025, 5, 15): ['Event 1'],
       DateTime.utc(2025, 5, 19): ['Event 1'],
       DateTime.utc(2025, 5, 23): ['Event 2'],
@@ -276,7 +278,17 @@ class Calendar extends ConsumerWidget {
                   ref.read(selectedDayProvider.notifier).state = selected;
                   ref.read(focusedDayProvider.notifier).state = focused;
 
-                  // context.push('/calendar/timetable', extra: selected);
+                  if (isSameDay(selected, DateTime.now())) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Consumer(
+                          builder: (context, ref, _) =>
+                              historyDialog(context, ref),
+                        );
+                      },
+                    );
+                  }
                 },
                 onFormatChanged: (format) {
                   ref.read(calendarFormatProvider.notifier).state = format;
@@ -411,6 +423,100 @@ class Calendar extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget historyDialog(BuildContext context, WidgetRef ref) {
+    String? selectedTime = ref.watch(selectedTimeProvider);
+
+    Widget timeButton(String label, String key) {
+      final isSelected = selectedTime == key;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () {
+            ref.read(selectedTimeProvider.notifier).state = key;
+          },
+          child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? HowWeatherColor.primary[400]
+                  : HowWeatherColor.white,
+              border: Border.all(
+                color: HowWeatherColor.neutral[200]!,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Medium_14px(
+                text: label,
+                color:
+                    isSelected ? HowWeatherColor.white : HowWeatherColor.black,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return AlertDialog(
+      backgroundColor: HowWeatherColor.white,
+      title: Center(child: Semibold_20px(text: "착장 기록 등록")),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              timeButton("오전", "morning"),
+              SizedBox(width: 8),
+              timeButton("오후", "afternoon"),
+              SizedBox(width: 8),
+              timeButton("저녁", "evening"),
+            ],
+          ),
+          SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => context.pop(),
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: HowWeatherColor.neutral[200],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(child: Medium_14px(text: "취소")),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    context.push('/calendar/register');
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: HowWeatherColor.primary[900],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Medium_14px(
+                        text: "등록",
+                        color: HowWeatherColor.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
