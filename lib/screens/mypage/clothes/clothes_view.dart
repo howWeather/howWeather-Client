@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class ClothesEnroll extends ConsumerWidget {
-  ClothesEnroll({super.key});
+class ClothesView extends ConsumerWidget {
+  ClothesView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,7 +14,7 @@ class ClothesEnroll extends ConsumerWidget {
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "의상 등록"),
+        title: Medium_18px(text: "의류 조회"),
         centerTitle: true,
         leading: InkWell(
           onTap: () {

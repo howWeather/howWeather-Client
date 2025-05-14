@@ -60,12 +60,14 @@ class MyPage extends ConsumerWidget {
                 height: 8,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  context.push('/mypage/clothes/view');
+                },
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   child: Medium_18px(
-                    text: "의상 조회",
+                    text: "의류 조회",
                     color: HowWeatherColor.neutral[600],
                   ),
                 ),
@@ -80,7 +82,7 @@ class MyPage extends ConsumerWidget {
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   child: Medium_18px(
-                    text: "의상 수정",
+                    text: "의류 수정",
                     color: HowWeatherColor.neutral[600],
                   ),
                 ),
@@ -97,7 +99,7 @@ class MyPage extends ConsumerWidget {
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   child: Medium_18px(
-                    text: "의상 등록",
+                    text: "의류 등록",
                     color: HowWeatherColor.neutral[600],
                   ),
                 ),

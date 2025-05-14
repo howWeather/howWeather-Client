@@ -1,3 +1,4 @@
+import 'package:client/designs/ClothModal.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:client/screens/todayWeather/viewmodel.dart';
@@ -196,7 +197,8 @@ class Register extends ConsumerWidget {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return ClothModal(context, ref);
+                return ClothModal(context, ref, selectedClothProvider,
+                    selectedClothInfoProvider);
               },
             );
           },
@@ -221,186 +223,6 @@ class Register extends ConsumerWidget {
           child: Image.asset("assets/images/windbreak.png"),
         ),
       ],
-    );
-  }
-
-  Widget ClothModal(BuildContext context, WidgetRef ref) {
-    return AlertDialog(
-      backgroundColor: HowWeatherColor.white,
-      title: Center(child: Semibold_20px(text: "상의 선택하기")),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ClothCard("민소매", ref),
-          SizedBox(
-            height: 12,
-          ),
-          ClothCard("반소매", ref),
-          SizedBox(
-            height: 12,
-          ),
-          ClothCard("긴소매", ref),
-          SizedBox(
-            height: 12,
-          ),
-          ClothCard("니트", ref),
-          SizedBox(
-            height: 12,
-          ),
-          ClothCard("조끼", ref),
-          SizedBox(
-            height: 12,
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: HowWeatherColor.neutral[200],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(child: Medium_14px(text: "취소")),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    context.push('/calendar/register');
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: HowWeatherColor.primary[900],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Medium_14px(
-                        text: "등록",
-                        color: HowWeatherColor.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget ClothCard(text, WidgetRef ref) {
-    final selected = ref.watch(selectedClothProvider);
-
-    final isSelected = selected == text;
-
-    return InkWell(
-      onTap: () {
-        ref.read(selectedClothProvider.notifier).state =
-            isSelected ? null : text;
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        decoration: BoxDecoration(
-          color:
-              isSelected ? HowWeatherColor.primary[50] : HowWeatherColor.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-              color: isSelected
-                  ? HowWeatherColor.neutral[400]!
-                  : HowWeatherColor.neutral[200]!,
-              width: 1),
-        ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Medium_14px(text: text),
-                isSelected
-                    ? SvgPicture.asset("assets/icons/chevron-up.svg")
-                    : SvgPicture.asset("assets/icons/chevron-down.svg"),
-              ],
-            ),
-            isSelected
-                ? Container(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Column(
-                      children: [
-                        ClothInfoCard(ref, HowWeatherColor.black, "얇음"),
-                        ClothInfoCard(ref, HowWeatherColor.black, "보통"),
-                        ClothInfoCard(ref, HowWeatherColor.black, "두꺼움"),
-                      ],
-                    ))
-                : Container(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget ClothInfoCard(WidgetRef ref, color, thickness) {
-    final selected = ref.watch(selectedClothInfoProvider);
-
-    final isSelected = selected == thickness;
-
-    return InkWell(
-      onTap: () {
-        ref.read(selectedClothInfoProvider.notifier).state =
-            isSelected ? null : thickness;
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        margin: EdgeInsets.only(bottom: 8),
-        decoration: BoxDecoration(
-          color: HowWeatherColor.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-              color: isSelected
-                  ? HowWeatherColor.primary[900]!
-                  : HowWeatherColor.white,
-              width: 2),
-        ),
-        child: Row(
-          children: [
-            Medium_14px(text: "색깔"),
-            SizedBox(
-              width: 12,
-            ),
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                border:
-                    Border.all(color: HowWeatherColor.neutral[200]!, width: 2),
-              ),
-            ),
-            Spacer(),
-            Medium_14px(text: "두께"),
-            SizedBox(
-              width: 12,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-              decoration: BoxDecoration(
-                color: HowWeatherColor.primary[600],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Medium_14px(
-                text: thickness,
-                color: HowWeatherColor.white,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
