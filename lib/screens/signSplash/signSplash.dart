@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:client/api/auth/auth_repository.dart';
+import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
@@ -5,16 +10,87 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class SignSplash extends ConsumerWidget {
-  SignSplash({super.key});
-
-  final idProvider = StateProvider<String>((ref) => '');
-  final passwordProvider = StateProvider<String>((ref) => '');
-  final obscureProvider = StateProvider<bool>((ref) => true);
-  final isPasswordFocusedProvider = StateProvider<bool>((ref) => false);
+class SignSplash extends ConsumerStatefulWidget {
+  const SignSplash({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SignSplash> createState() => _SignSplashState();
+}
+
+final idProvider = StateProvider<String>((ref) => '');
+final passwordProvider = StateProvider<String>((ref) => '');
+final obscureProvider = StateProvider<bool>((ref) => true);
+final isPasswordFocusedProvider = StateProvider<bool>((ref) => false);
+
+class _SignSplashState extends ConsumerState<SignSplash> {
+  @override
+  void initState() {
+    super.initState();
+
+    _startApp();
+  }
+
+  Future<void> _startApp() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    final accessToken = await AuthStorage.getAccessToken();
+    final refreshToken = await AuthStorage.getRefreshToken();
+
+    print('accessToken: $accessToken');
+    print('refreshToken: $refreshToken');
+
+    if (accessToken != null && refreshToken != null) {
+      try {
+        if (!isTokenExpired(accessToken)) {
+          print('토큰이 만료되지 않았다면 바로 홈으로 이동');
+          context.pushReplacement('/home');
+        } else {
+          print('토큰 만료 시 재발급 시도');
+          await AuthRepository().reissueToken();
+          context.pushReplacement('/home');
+        }
+      } catch (e) {
+        print('토큰 재발급 실패 시 로그인 화면으로 이동');
+        await AuthStorage.clear();
+      }
+    } else {
+      print('토큰이 없으면 로그인 화면으로 이동');
+    }
+  }
+
+  bool isTokenExpired(String token) {
+    try {
+      // "Bearer " 접두사 제거
+      if (token.startsWith('Bearer ')) {
+        token = token.substring(7);
+      }
+
+      final parts = token.split('.');
+      if (parts.length != 3) {
+        return true; // 올바른 JWT 형식이 아님
+      }
+
+      // 패딩 처리
+      String normalizedPayload = parts[1];
+      while (normalizedPayload.length % 4 != 0) {
+        normalizedPayload += '=';
+      }
+
+      final decodedToken =
+          jsonDecode(utf8.decode(base64Url.decode(normalizedPayload)));
+      final exp = decodedToken['exp']; // 만료 시간 (Unix timestamp)
+      final currentTime = DateTime.now().millisecondsSinceEpoch / 1000;
+
+      print('Token exp: $exp, Current time: $currentTime');
+      return currentTime > exp; // 현재 시간이 만료 시간보다 크면 만료된 토큰
+    } catch (e) {
+      print('Token validation error: $e');
+      return true; // 토큰 파싱에 실패하면 만료된 것으로 간주
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isAllValidProvider = Provider<bool>((ref) {
       final id = ref.watch(idProvider);
       final password = ref.watch(passwordProvider);
@@ -65,9 +141,26 @@ class SignSplash extends ConsumerWidget {
                 height: 20,
               ),
               InkWell(
-                onTap: () {
-                  isAllValid ? context.go('/home') : null;
-                },
+                onTap: isAllValid
+                    ? () async {
+                        final username = ref.read(idProvider);
+                        final password = ref.read(passwordProvider);
+                        final authViewModel =
+                            ref.read(authViewModelProvider.notifier);
+
+                        await authViewModel.login(username, password);
+
+                        final loginState = ref.read(authViewModelProvider);
+                        if (loginState is AsyncData) {
+                          context.go('/home');
+                        } else if (loginState is AsyncError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('로그인 실패: ${loginState.error}')),
+                          );
+                        }
+                      }
+                    : null,
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   width: double.infinity,

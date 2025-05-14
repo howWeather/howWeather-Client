@@ -1,4 +1,7 @@
+import 'package:client/api/auth/auth_repository.dart';
+import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
+import 'package:client/designs/HowWeatherDialog.dart';
 import 'package:client/designs/HowWeatherNavi.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
@@ -149,7 +152,19 @@ class MyPage extends ConsumerWidget {
                 height: 1,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => HowWeatherDialog(
+                      titleText: "로그아웃",
+                      contentText: "로그아웃하시겠습니까?",
+                      done: () async {
+                        await AuthRepository().logout();
+                        context.go('/');
+                      },
+                    ),
+                  );
+                },
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),

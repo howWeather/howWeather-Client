@@ -51,4 +51,21 @@ class AuthViewModel extends StateNotifier<AsyncValue<void>> {
       state = AsyncError(e, st);
     }
   }
+
+  // 로그인
+  Future<void> login(String loginId, String password) async {
+    state = const AsyncLoading();
+
+    try {
+      final repo = ref.read(authRepositoryProvider);
+      final tokens = await repo.login(loginId, password);
+
+      print('AccessToken: ${tokens['accessToken']}');
+      print('RefreshToken: ${tokens['refreshToken']}');
+
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
 }
