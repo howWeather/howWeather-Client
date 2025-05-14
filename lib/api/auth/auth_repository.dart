@@ -99,4 +99,31 @@ class AuthRepository {
           '로그인 실패: ${jsonDecode(response.body)['error']['message']}');
     }
   }
+
+  /// 로그아웃
+  Future<void> logout() async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final refreshToken = await AuthStorage.getRefreshToken();
+    final url = Uri.parse('$_baseUrl/logout');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        "Authorization": 'Bearer $accessToken',
+        "Refresh-Token": 'Bearer $refreshToken',
+      },
+    );
+
+    print(
+        '{Content-Type: application/json,"Authorization": Bearer $accessToken, "Refresh-Token": Bearer $refreshToken,}');
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      return responseBody['success'];
+    } else {
+      print(jsonDecode(response.body)['error']['message']);
+      throw Exception('로그아웃 실패: ${response.statusCode}');
+    }
+  }
 }
