@@ -11,8 +11,8 @@ final isAllValidProvider = Provider<bool>((ref) {
   return true;
 });
 final selectedTemperatureProvider = StateProvider<String?>((ref) => null);
-final selectedClothProvider = StateProvider<String?>((ref) => null);
-final selectedClothInfoProvider = StateProvider<String?>((ref) => null);
+final selectedClothProvider = StateProvider<int?>((ref) => null);
+final selectedClothInfoProvider = StateProvider<int?>((ref) => null);
 
 class Register extends ConsumerWidget {
   Register({super.key});
@@ -93,8 +93,8 @@ class Register extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Cloth(context, "상의", ref),
-                    Cloth(context, "아우터", ref),
+                    Cloth(context, "상의", ref, "uppers"),
+                    Cloth(context, "아우터", ref, "outers"),
                   ],
                 ),
               ],
@@ -185,7 +185,8 @@ class Register extends ConsumerWidget {
     );
   }
 
-  Widget Cloth(BuildContext context, String text, WidgetRef ref) {
+  Widget Cloth(
+      BuildContext context, String text, WidgetRef ref, String category) {
     return Column(
       children: [
         Medium_16px(text: text),
@@ -197,8 +198,13 @@ class Register extends ConsumerWidget {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return ClothModal(context, ref, selectedClothProvider,
-                    selectedClothInfoProvider);
+                return ClothModal(
+                    context: context,
+                    ref: ref,
+                    text: text,
+                    category: category,
+                    provider: selectedClothProvider,
+                    infoProvider: selectedClothInfoProvider);
               },
             );
           },
