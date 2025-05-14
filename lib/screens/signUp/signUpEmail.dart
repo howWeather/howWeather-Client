@@ -1,6 +1,7 @@
 import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -169,7 +170,8 @@ class SignUpEmail extends ConsumerWidget {
               } catch (_) {
                 ref.read(isVerificationSuccessProvider.notifier).state = false;
               }
-              context.push('/signUp/id');
+              final signupData = SignupData(email: email);
+              context.push('/signUp/id', extra: signupData);
             }
           : null,
       child: Container(

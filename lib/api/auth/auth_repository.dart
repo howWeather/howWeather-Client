@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:client/model/sign_up.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRepository {
@@ -19,7 +20,7 @@ class AuthRepository {
       return responseBody['success'];
     } else {
       print(jsonDecode(response.body)['error']['message']);
-      throw Exception('로그인 실패: ${response.statusCode}');
+      throw Exception('이메일 중복 검증 실패: ${response.statusCode}');
     }
   }
 
@@ -37,7 +38,26 @@ class AuthRepository {
       return responseBody['success'];
     } else {
       print(jsonDecode(response.body)['error']['message']);
-      throw Exception('로그인 실패: ${response.statusCode}');
+      throw Exception('아이디 중복 검증 실패: ${response.statusCode}');
+    }
+  }
+
+  /// 회원가입
+  Future<bool> signUp(SignupData signUp) async {
+    final url = Uri.parse('$_baseUrl/signup');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(signUp.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      return responseBody['success'];
+    } else {
+      print(jsonDecode(response.body)['error']['message']);
+      throw Exception('회원가입 실패: ${response.statusCode}');
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -54,7 +55,8 @@ final isAllValidProvider = Provider<bool>((ref) {
 });
 
 class SignUpPassword extends ConsumerWidget {
-  SignUpPassword({super.key});
+  final SignupData signupData;
+  SignUpPassword({super.key, required this.signupData});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -329,7 +331,10 @@ class SignUpPassword extends ConsumerWidget {
     return GestureDetector(
       onTap: isAllValid
           ? () {
-              context.push('/signUp/nickname');
+              final updatedData = signupData.copyWith(
+                password: ref.read(passwordProvider),
+              );
+              context.push('/signUp/nickname', extra: updatedData);
             }
           : null,
       child: Container(

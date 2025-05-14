@@ -1,6 +1,7 @@
 import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -37,12 +38,8 @@ final isAllValidProvider = Provider<bool>((ref) {
 });
 
 class SignUpId extends ConsumerWidget {
-  SignUpId({super.key});
-
-  // Future<bool> checkIdDuplicate(String id) async {
-  //   await Future.delayed(Duration(milliseconds: 500));
-  //   return id == 'testtest';
-  // }
+  final SignupData signupData;
+  SignUpId({super.key, required this.signupData});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -194,15 +191,19 @@ class SignUpId extends ConsumerWidget {
           ],
         ),
       ),
-      bottomSheet: bottomSheetWidget(context, isAllValid),
+      bottomSheet: bottomSheetWidget(context, isAllValid, ref),
     );
   }
 
-  Widget bottomSheetWidget(BuildContext context, bool isAllValid) {
+  Widget bottomSheetWidget(
+      BuildContext context, bool isAllValid, WidgetRef ref) {
     return GestureDetector(
       onTap: isAllValid
           ? () {
-              context.push('/signUp/password');
+              final updatedData = signupData.copyWith(
+                loginId: ref.read(idProvider),
+              );
+              context.push('/signUp/password', extra: updatedData);
             }
           : null,
       child: Container(
