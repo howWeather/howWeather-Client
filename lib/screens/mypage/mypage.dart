@@ -1,3 +1,4 @@
+import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherDialog.dart';
@@ -158,9 +159,7 @@ class MyPage extends ConsumerWidget {
                       titleText: "로그아웃",
                       contentText: "로그아웃하시겠습니까?",
                       done: () async {
-                        final viewModel =
-                            ref.read(authViewModelProvider.notifier);
-                        await viewModel.logout();
+                        await AuthRepository().logout();
                         context.go('/');
                       },
                     ),

@@ -109,21 +109,51 @@ class AuthRepository {
     final response = await http.post(
       url,
       headers: {
-        'Content-Type': 'application/json',
         "Authorization": 'Bearer $accessToken',
         "Refresh-Token": 'Bearer $refreshToken',
       },
     );
 
     print(
-        '{Content-Type: application/json,"Authorization": Bearer $accessToken, "Refresh-Token": Bearer $refreshToken,}');
+        '{"Authorization": "Bearer $accessToken", "Refresh-Token": "Bearer $refreshToken",}');
 
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
+      await AuthStorage.clear();
       return responseBody['success'];
     } else {
       print(jsonDecode(response.body)['error']['message']);
       throw Exception('로그아웃 실패: ${response.statusCode}');
+    }
+  }
+
+  /// 토큰 재발급
+  Future<void> reissueToken() async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final refreshToken = await AuthStorage.getRefreshToken();
+
+    final url = Uri.parse('$_baseUrl/reissue');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    print('🔁 재발급 응답: ${response.statusCode} / ${response.body}');
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      final result = responseBody['result'];
+      final newAccessToken = result['accessToken'];
+
+      await AuthStorage.saveTokens(
+        accessToken: newAccessToken,
+        refreshToken: refreshToken!,
+      );
+    } else {
+      throw Exception('토큰 재발급 실패: ${response.reasonPhrase}');
     }
   }
 }

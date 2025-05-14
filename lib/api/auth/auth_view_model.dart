@@ -68,17 +68,4 @@ class AuthViewModel extends StateNotifier<AsyncValue<void>> {
       state = AsyncError(e, st);
     }
   }
-
-  // 로그아웃
-  Future<void> logout() async {
-    final repo = ref.read(authRepositoryProvider);
-
-    try {
-      await repo.logout();
-      print('✅ 로그아웃 완료');
-    } catch (e, st) {
-      print('❌ 로그아웃 실패: $e');
-      throw e;
-    }
-  }
 }
