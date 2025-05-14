@@ -1,3 +1,4 @@
+import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
@@ -65,9 +66,26 @@ class SignSplash extends ConsumerWidget {
                 height: 20,
               ),
               InkWell(
-                onTap: () {
-                  isAllValid ? context.go('/home') : null;
-                },
+                onTap: isAllValid
+                    ? () async {
+                        final username = ref.read(idProvider);
+                        final password = ref.read(passwordProvider);
+                        final authViewModel =
+                            ref.read(authViewModelProvider.notifier);
+
+                        await authViewModel.login(username, password);
+
+                        final loginState = ref.read(authViewModelProvider);
+                        if (loginState is AsyncData) {
+                          context.go('/home');
+                        } else if (loginState is AsyncError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('로그인 실패: ${loginState.error}')),
+                          );
+                        }
+                      }
+                    : null,
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   width: double.infinity,

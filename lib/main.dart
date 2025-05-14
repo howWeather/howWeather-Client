@@ -6,7 +6,7 @@ import 'package:client/screens/mypage/clothes_enroll.dart';
 import 'package:client/screens/mypage/mypage.dart';
 import 'package:client/screens/mypage/profile.dart';
 import 'package:client/screens/register/view.dart';
-import 'package:client/screens/signSplash.dart';
+import 'package:client/screens/signSplash/signSplash.dart';
 import 'package:client/screens/signUp/signUpCheck.dart';
 import 'package:client/screens/signUp/signUpEmail.dart';
 import 'package:client/screens/signUp/signUpId.dart';
