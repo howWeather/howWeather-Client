@@ -1,5 +1,6 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,18 +9,17 @@ import 'package:go_router/go_router.dart';
 final temperamentProvider = StateProvider<int?>((ref) => null);
 final genderProvider = StateProvider<int?>((ref) => null);
 final ageProvider = StateProvider<String?>((ref) => null);
-final formProvider = StateProvider<String?>((ref) => null);
 
 final isAllValidProvider = Provider<bool>((ref) {
   final temperament = ref.watch(temperamentProvider);
   final gender = ref.watch(genderProvider);
   final age = ref.watch(ageProvider);
-  final form = ref.watch(formProvider);
-  return temperament != null && gender != null && age != null && form != null;
+  return temperament != null && gender != null && age != null;
 });
 
 class SignUpPersonal extends ConsumerWidget {
-  SignUpPersonal({super.key});
+  final SignupData signupData;
+  SignUpPersonal({super.key, required this.signupData});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -105,12 +105,6 @@ class SignUpPersonal extends ConsumerWidget {
                 title: "당신의 연령대는 어떻게 되나요?",
                 options: ["10대", "20대", "30대 이상"], //TODO: 추후 수정
                 provider: ageProvider,
-              ),
-              buildDropdown(
-                ref: ref,
-                title: "당신은 어떤 체형인가요?",
-                options: ["마른 체형", "보통 체형", "통통한 체형"], //TODO: 추후 수정
-                provider: formProvider,
               ),
               SizedBox(
                 height: 70,
@@ -217,7 +211,13 @@ class SignUpPersonal extends ConsumerWidget {
     return GestureDetector(
       onTap: isAllValid
           ? () {
-              context.push('/signUp/check');
+              final updatedData = signupData.copyWith(
+                constitution: mapConstitution(ref.read(temperamentProvider)),
+                ageGroup: mapAgeGroup(ref.read(ageProvider)),
+                gender: mapGender(ref.read(genderProvider)),
+              );
+
+              context.push('/signUp/check', extra: updatedData);
             }
           : null,
       child: Container(
@@ -241,5 +241,46 @@ class SignUpPersonal extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  int? mapConstitution(int? value) {
+    // 화면 표시 순서: 더위(0), 보통(1), 추위(2)
+    // API 요구: 추위(1), 보통(2), 더위(3)
+    switch (value) {
+      case 0:
+        return 3;
+      case 1:
+        return 2;
+      case 2:
+        return 1;
+      default:
+        return null;
+    }
+  }
+
+  int? mapAgeGroup(String? value) {
+    switch (value) {
+      case "10대":
+        return 1;
+      case "20대":
+        return 2;
+      case "30대 이상":
+        return 3;
+      default:
+        return null;
+    }
+  }
+
+  int? mapGender(int? value) {
+    // 화면 표시 순서: 여자(0), 남자(1)
+    // API 요구: 남(1), 여(2)
+    switch (value) {
+      case 0:
+        return 2;
+      case 1:
+        return 1;
+      default:
+        return null;
+    }
   }
 }

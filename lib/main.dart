@@ -1,5 +1,6 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherNavi.dart';
+import 'package:client/model/sign_up.dart';
 import 'package:client/screens/calendar/view.dart';
 import 'package:client/screens/mypage/clothes_enroll.dart';
 import 'package:client/screens/mypage/mypage.dart';
@@ -22,7 +23,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/mypage',
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
@@ -34,23 +35,38 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/signUp/id',
-        builder: (context, state) => SignUpId(),
+        builder: (context, state) {
+          final signupData = state.extra as SignupData;
+          return SignUpId(signupData: signupData);
+        },
       ),
       GoRoute(
         path: '/signUp/password',
-        builder: (context, state) => SignUpPassword(),
+        builder: (context, state) {
+          final signupData = state.extra as SignupData;
+          return SignUpPassword(signupData: signupData);
+        },
       ),
       GoRoute(
         path: '/signUp/nickname',
-        builder: (context, state) => SignUpNickname(),
+        builder: (context, state) {
+          final signupData = state.extra as SignupData;
+          return SignUpNickname(signupData: signupData);
+        },
       ),
       GoRoute(
         path: '/signUp/personal',
-        builder: (context, state) => SignUpPersonal(),
+        builder: (context, state) {
+          final signupData = state.extra as SignupData;
+          return SignUpPersonal(signupData: signupData);
+        },
       ),
       GoRoute(
         path: '/signUp/check',
-        builder: (context, state) => SignUpCheck(),
+        builder: (context, state) {
+          final signupData = state.extra as SignupData;
+          return SignUpCheck(signupData: signupData);
+        },
       ),
       GoRoute(
         path: '/calendar/register',

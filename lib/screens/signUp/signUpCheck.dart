@@ -1,5 +1,7 @@
+import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,7 +10,8 @@ import 'package:go_router/go_router.dart';
 final isCheckProvider = StateProvider<bool>((ref) => false);
 
 class SignUpCheck extends ConsumerWidget {
-  SignUpCheck({super.key});
+  final SignupData signupData;
+  SignUpCheck({super.key, required this.signupData});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -104,7 +107,10 @@ class SignUpCheck extends ConsumerWidget {
     final isCheck = ref.watch(isCheckProvider);
     return GestureDetector(
       onTap: isCheck
-          ? () {
+          ? () async {
+              await ref
+                  .read(authViewModelProvider.notifier)
+                  .signUpWithFullData(signupData);
               context.push('/');
             }
           : null,
