@@ -1,0 +1,27 @@
+import 'package:client/api/auth/auth_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final authRepositoryProvider = Provider((ref) => AuthRepository());
+
+final authViewModelProvider =
+    StateNotifierProvider<AuthViewModel, AsyncValue<void>>(
+  (ref) => AuthViewModel(ref),
+);
+
+class AuthViewModel extends StateNotifier<AsyncValue<void>> {
+  final Ref ref;
+
+  AuthViewModel(this.ref) : super(const AsyncData(null));
+
+  /// 이메일 중복 검증
+  Future<void> verifyEmail(String email) async {
+    final repo = ref.read(authRepositoryProvider);
+    try {
+      await repo.verifyEmail(email);
+      print('✅ 이메일 중복 검증 확인 완료');
+    } catch (e) {
+      print('❌ 이메일 중복 검증 확인 실패: $e');
+      throw e;
+    }
+  }
+}

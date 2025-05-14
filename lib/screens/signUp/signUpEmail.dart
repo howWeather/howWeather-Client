@@ -1,3 +1,4 @@
+import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class SignUpEmail extends ConsumerWidget {
 
   final emailIdProvider = StateProvider<String>((ref) => '');
   final emailDomainProvider = StateProvider<String>((ref) => '');
+  final isVerificationSuccessProvider = StateProvider<bool>((ref) => false);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -148,14 +150,25 @@ class SignUpEmail extends ConsumerWidget {
           ],
         ),
       ),
-      bottomSheet: bottomSheetWidget(context, isAllValid),
+      bottomSheet: bottomSheetWidget(context, isAllValid, ref),
     );
   }
 
-  Widget bottomSheetWidget(BuildContext context, isAllValid) {
+  Widget bottomSheetWidget(BuildContext context, isAllValid, WidgetRef ref) {
     return GestureDetector(
       onTap: isAllValid
-          ? () {
+          ? () async {
+              final viewModel = ref.read(authViewModelProvider.notifier);
+              final email =
+                  '${ref.read(emailIdProvider)}@${ref.read(emailDomainProvider)}';
+              try {
+                await viewModel.verifyEmail(
+                  email,
+                );
+                ref.read(isVerificationSuccessProvider.notifier).state = true;
+              } catch (_) {
+                ref.read(isVerificationSuccessProvider.notifier).state = false;
+              }
               context.push('/signUp/id');
             }
           : null,
