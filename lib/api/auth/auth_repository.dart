@@ -22,4 +22,22 @@ class AuthRepository {
       throw Exception('로그인 실패: ${response.statusCode}');
     }
   }
+
+  /// 아이디 중복 검증
+  Future<bool> verifyLoginId(String loginId) async {
+    final url = Uri.parse('$_baseUrl/loginid-exist-check?loginId=$loginId');
+
+    final response = await http.get(
+      url,
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      return responseBody['success'];
+    } else {
+      print(jsonDecode(response.body)['error']['message']);
+      throw Exception('로그인 실패: ${response.statusCode}');
+    }
+  }
 }

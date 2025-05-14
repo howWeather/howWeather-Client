@@ -1,3 +1,4 @@
+import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:go_router/go_router.dart';
 final idProvider = StateProvider<String>((ref) => '');
 final duplicateCheckedProvider = StateProvider<bool>((ref) => false);
 final duplicateProvider = StateProvider<String>((ref) => '');
+final isVerificationSuccessProvider = StateProvider<bool>((ref) => false);
 
 // 아이디 형식 유효성 검사 (6~20자, 영문/숫자/특수문자 가능)
 final isIdFormatValidProvider = Provider<bool>((ref) {
@@ -30,16 +32,17 @@ final isAllValidProvider = Provider<bool>((ref) {
   final isFormatValid = ref.watch(isIdFormatValidProvider);
   final isDuplicate = ref.watch(duplicateProvider).isEmpty;
   final isChecked = ref.watch(duplicateCheckedProvider);
-  return isFormatValid && isDuplicate && isChecked;
+  final verification = ref.watch(isVerificationSuccessProvider);
+  return isFormatValid && isDuplicate && isChecked && (verification == true);
 });
 
 class SignUpId extends ConsumerWidget {
   SignUpId({super.key});
 
-  Future<bool> checkIdDuplicate(String id) async {
-    await Future.delayed(Duration(milliseconds: 500));
-    return id == 'testtest';
-  }
+  // Future<bool> checkIdDuplicate(String id) async {
+  //   await Future.delayed(Duration(milliseconds: 500));
+  //   return id == 'testtest';
+  // }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -121,13 +124,12 @@ class SignUpId extends ConsumerWidget {
                       ),
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                      suffixIcon: isAllValid
-                          ? SvgPicture.asset(
-                              "assets/icons/circle-check.svg",
-                              fit: BoxFit.scaleDown,
-                            )
+                      suffixIcon: isDuplicateCheckEnabled
+                          ? null
                           : SvgPicture.asset(
-                              "assets/icons/circle-cancel.svg",
+                              isAllValid
+                                  ? "assets/icons/circle-check.svg"
+                                  : "assets/icons/circle-cancel.svg",
                               fit: BoxFit.scaleDown,
                             ),
                     ),
@@ -137,12 +139,20 @@ class SignUpId extends ConsumerWidget {
                 InkWell(
                   onTap: isDuplicateCheckEnabled
                       ? () async {
-                          final id = ref.read(idProvider);
-                          final result = await checkIdDuplicate(id);
-                          ref.read(duplicateProvider.notifier).state =
-                              result ? 'duplicated' : '';
-                          ref.read(duplicateCheckedProvider.notifier).state =
-                              true;
+                          final viewModel =
+                              ref.read(authViewModelProvider.notifier);
+                          try {
+                            await viewModel.verifyloginId(ref.read(idProvider));
+                            ref
+                                .read(isVerificationSuccessProvider.notifier)
+                                .state = true;
+                            ref.read(duplicateCheckedProvider.notifier).state =
+                                true;
+                          } catch (_) {
+                            ref
+                                .read(isVerificationSuccessProvider.notifier)
+                                .state = false;
+                          }
                         }
                       : null,
                   child: Container(

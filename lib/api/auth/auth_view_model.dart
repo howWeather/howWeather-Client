@@ -24,4 +24,16 @@ class AuthViewModel extends StateNotifier<AsyncValue<void>> {
       throw e;
     }
   }
+
+  /// 아이디 중복 검증
+  Future<void> verifyloginId(String loginId) async {
+    final repo = ref.read(authRepositoryProvider);
+    try {
+      await repo.verifyLoginId(loginId);
+      print('✅ 아이디 중복 검증 확인 완료');
+    } catch (e) {
+      print('❌ 아이디 중복 검증 확인 실패: $e');
+      throw e;
+    }
+  }
 }
