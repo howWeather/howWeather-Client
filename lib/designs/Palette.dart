@@ -1,5 +1,6 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
 import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,12 +11,14 @@ class Palette extends ConsumerWidget {
   final BuildContext context;
   final WidgetRef ref;
   final int selectedColor;
+  final String text;
 
   Palette({
     Key? key,
     required this.context,
     required this.ref,
-    required this.selectedColor,
+    this.selectedColor = 0,
+    required this.text,
   }) : super(key: key);
 
   @override
@@ -25,7 +28,7 @@ class Palette extends ConsumerWidget {
 
     return AlertDialog(
       backgroundColor: HowWeatherColor.white,
-      title: Center(child: Semibold_22px(text: "의류 수정")),
+      title: Center(child: Semibold_22px(text: "의류 $text")),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -43,7 +46,10 @@ class Palette extends ConsumerWidget {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () => context.pop(),
+                  onTap: () {
+                    ref.read(selectedEnrollClothProvider.notifier).state = null;
+                    context.pop();
+                  },
                   child: Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(

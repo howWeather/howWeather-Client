@@ -32,6 +32,7 @@ Widget ClothInfoCard({
               context: context,
               ref: ref,
               selectedColor: color,
+              text: '수정',
             );
           },
         );

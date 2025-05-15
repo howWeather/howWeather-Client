@@ -39,13 +39,25 @@ final dummyClothesData = [
       ClothGroup(
         clothType: 7,
         items: [
-          ClothItem(clothType: 7, color: 6, thickness: 1, clothId: 8),
+          ClothItem(clothType: 7, color: 6, thickness: 1, clothId: 1),
         ],
       ),
       ClothGroup(
         clothType: 9,
         items: [
-          ClothItem(clothType: 9, color: 1, thickness: 3, clothId: 3),
+          ClothItem(clothType: 9, color: 1, thickness: 3, clothId: 2),
+        ],
+      ),
+      ClothGroup(
+        clothType: 4,
+        items: [
+          ClothItem(clothType: 4, color: 2, thickness: 2, clothId: 3),
+        ],
+      ),
+      ClothGroup(
+        clothType: 2,
+        items: [
+          ClothItem(clothType: 2, color: 9, thickness: 2, clothId: 4),
         ],
       ),
     ],
@@ -56,20 +68,21 @@ final dummyClothesData = [
       ClothGroup(
         clothType: 1,
         items: [
-          ClothItem(clothType: 1, color: 1, thickness: 1, clothId: 2),
+          ClothItem(clothType: 1, color: 1, thickness: 1, clothId: 5),
         ],
       ),
     ],
   ),
 ];
+final clothesProvider =
+    StateProvider<List<CategoryCloth>>((ref) => dummyClothesData);
 
 class ClothesView extends ConsumerWidget {
   ClothesView({super.key});
 
-  final List<CategoryCloth> clothesData = dummyClothesData;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final clothesData = ref.watch(clothesProvider);
     final uppers = clothesData.firstWhere((e) => e.category == "uppers");
     final outers = clothesData.firstWhere((e) => e.category == "outers");
 

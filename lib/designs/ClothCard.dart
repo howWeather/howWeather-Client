@@ -41,7 +41,7 @@ Widget ClothCard(
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Medium_14px(text: clothTypeToKorean(category, item.clothId)),
+              Medium_14px(text: clothTypeToKorean(category, item.clothType)),
               SvgPicture.asset(
                 isSelected
                     ? "assets/icons/chevron-up.svg"
