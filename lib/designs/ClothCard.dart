@@ -7,11 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 Widget ClothCard(
-    ClothItem item,
-    WidgetRef ref,
-    StateProvider<int?> selectedProvider,
-    StateProvider<int?> infoProvider,
-    String category) {
+  BuildContext context,
+  ClothItem item,
+  WidgetRef ref,
+  StateProvider<int?> selectedProvider,
+  StateProvider<int?> infoProvider,
+  String category,
+  bool havePalette,
+) {
   final selected = ref.watch(selectedProvider);
   final isSelected = selected == item.clothId;
 
@@ -49,49 +52,19 @@ Widget ClothCard(
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: ClothInfoCard(
+                context,
                 ref,
-                colorIndexToColor(item.color),
-                thicknessToText(item.thickness),
+                item.color,
+                item.thickness,
                 infoProvider,
                 selectedItemId: item.clothId,
+                havePalette,
               ),
             ),
         ],
       ),
     ),
   );
-}
-
-Color colorIndexToColor(int index) {
-  switch (index) {
-    case 1:
-      return Colors.red;
-    case 2:
-      return Colors.orange;
-    case 3:
-      return Colors.yellow;
-    case 4:
-      return Colors.green;
-    case 5:
-      return Colors.blue;
-    case 6:
-      return Colors.purple;
-    default:
-      return Colors.grey;
-  }
-}
-
-String thicknessToText(int value) {
-  switch (value) {
-    case 1:
-      return "얇음";
-    case 2:
-      return "보통";
-    case 3:
-      return "두꺼움";
-    default:
-      return "알 수 없음";
-  }
 }
 
 String clothTypeToKorean(String category, int type) {

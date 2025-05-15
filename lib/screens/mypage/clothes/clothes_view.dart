@@ -9,6 +9,28 @@ import 'package:go_router/go_router.dart';
 
 final selectedClothProvider = StateProvider<int?>((ref) => null);
 final selectedClothInfoProvider = StateProvider<int?>((ref) => null);
+final thicknessProvider = StateNotifierProvider<ThicknessNotifier, int>((ref) {
+  return ThicknessNotifier();
+});
+final colorProvider = StateNotifierProvider<ColorNotifier, int>((ref) {
+  return ColorNotifier();
+});
+
+class ThicknessNotifier extends StateNotifier<int> {
+  ThicknessNotifier() : super(1); // 기본값: 1 (얇음)
+
+  void updateThickness(int newThickness) {
+    state = newThickness;
+  }
+}
+
+class ColorNotifier extends StateNotifier<int> {
+  ColorNotifier() : super(1); // 기본값: 1 (빨강)
+
+  void updateColor(int newColor) {
+    state = newColor;
+  }
+}
 
 final dummyClothesData = [
   CategoryCloth(
@@ -73,7 +95,7 @@ class ClothesView extends ConsumerWidget {
           child: Column(
             children: [
               sectionTitle("상의", "assets/icons/clothes-upper.svg"),
-              itemList(ref, uppers.clothList, "uppers"),
+              itemList(context, ref, uppers.clothList, "uppers"),
               Container(
                 padding: EdgeInsets.symmetric(vertical: 24),
                 child: Divider(
@@ -82,7 +104,7 @@ class ClothesView extends ConsumerWidget {
                 ),
               ),
               sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
-              itemList(ref, outers.clothList, "outers"),
+              itemList(context, ref, outers.clothList, "outers"),
             ],
           ),
         ),
@@ -103,8 +125,8 @@ class ClothesView extends ConsumerWidget {
     );
   }
 
-  Widget itemList(
-      WidgetRef ref, List<ClothGroup> clothGroups, String category) {
+  Widget itemList(BuildContext context, WidgetRef ref,
+      List<ClothGroup> clothGroups, String category) {
     return Column(
       children: clothGroups.map((group) {
         return Column(
@@ -112,11 +134,13 @@ class ClothesView extends ConsumerWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: ClothCard(
+                context,
                 item, // ClothItem 전달
                 ref,
                 selectedClothProvider,
                 selectedClothInfoProvider,
                 category,
+                true,
               ),
             );
           }).toList(),

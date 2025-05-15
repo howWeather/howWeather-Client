@@ -10,6 +10,18 @@ class ClothItem {
     required this.thickness,
     required this.clothId,
   });
+
+  ClothItem copyWith({
+    int? color,
+    int? thickness,
+  }) {
+    return ClothItem(
+      clothType: this.clothType,
+      color: color ?? this.color,
+      thickness: thickness ?? this.thickness,
+      clothId: this.clothId,
+    );
+  }
 }
 
 class ClothGroup {

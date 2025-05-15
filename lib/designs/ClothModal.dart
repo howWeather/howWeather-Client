@@ -13,6 +13,7 @@ class ClothModal extends ConsumerWidget {
   final String category;
   final provider;
   final infoProvider;
+  final bool havePalette;
 
   ClothModal({
     Key? key,
@@ -22,6 +23,7 @@ class ClothModal extends ConsumerWidget {
     required this.category,
     required this.provider,
     required this.infoProvider,
+    this.havePalette = false,
   }) : super(key: key);
 
   final dummyClothesData = [
@@ -67,7 +69,7 @@ class ClothModal extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          itemList(ref, clothes.clothList, category),
+          itemList(ref, clothes.clothList, category, havePalette),
           Row(
             children: [
               Expanded(
@@ -111,8 +113,8 @@ class ClothModal extends ConsumerWidget {
     );
   }
 
-  Widget itemList(
-      WidgetRef ref, List<ClothGroup> clothGroups, String category) {
+  Widget itemList(WidgetRef ref, List<ClothGroup> clothGroups, String category,
+      bool havePalette) {
     return Column(
       children: clothGroups.map((group) {
         return Column(
@@ -120,11 +122,13 @@ class ClothModal extends ConsumerWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: ClothCard(
+                context,
                 item, // ClothItem 전달
                 ref,
                 provider,
                 infoProvider,
                 category,
+                havePalette,
               ),
             );
           }).toList(),
