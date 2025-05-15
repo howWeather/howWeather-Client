@@ -77,12 +77,14 @@ class MyPage extends ConsumerWidget {
                 height: 1,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  context.push('/mypage/clothes/delete');
+                },
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   child: Medium_18px(
-                    text: "의류 수정",
+                    text: "의류 삭제",
                     color: HowWeatherColor.neutral[600],
                   ),
                 ),

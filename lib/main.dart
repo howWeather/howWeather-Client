@@ -2,6 +2,7 @@ import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherNavi.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:client/screens/calendar/view.dart';
+import 'package:client/screens/mypage/clothes/clothes_delete.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
 import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:client/screens/mypage/mypage.dart';
@@ -84,6 +85,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/mypage/clothes/view',
         builder: (context, state) => ClothesView(),
+      ),
+      GoRoute(
+        path: '/mypage/clothes/delete',
+        builder: (context, state) => ClothesDelete(),
       ),
       ShellRoute(
         builder: (context, state, child) => HowWeatherNaviShell(child: child),
