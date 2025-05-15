@@ -1,4 +1,5 @@
 import 'package:client/designs/ClothCard.dart';
+import 'package:client/designs/ClothInfoCard.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:client/model/cloth_item.dart';
@@ -85,6 +86,7 @@ class ClothesDelete extends ConsumerWidget {
                 selectedClothProvider,
                 selectedClothInfoProvider,
                 category,
+                false,
                 true,
               ),
             );

@@ -14,6 +14,7 @@ Widget ClothCard(
   StateProvider<int?> infoProvider,
   String category,
   bool havePalette,
+  bool haveDelete,
 ) {
   final selected = ref.watch(selectedProvider);
   final isSelected = selected == item.clothId;
@@ -52,13 +53,16 @@ Widget ClothCard(
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: ClothInfoCard(
-                context,
-                ref,
-                item.color,
-                item.thickness,
-                infoProvider,
+                context: context,
+                ref: ref,
+                color: item.color,
+                thicknessLabel: item.thickness,
+                provider: infoProvider,
                 selectedItemId: item.clothId,
-                havePalette,
+                havePalette: havePalette,
+                haveDelete: haveDelete,
+                category: category,
+                type: item.clothId,
               ),
             ),
         ],

@@ -141,6 +141,7 @@ class ClothesView extends ConsumerWidget {
                 selectedClothInfoProvider,
                 category,
                 true,
+                false,
               ),
             );
           }).toList(),

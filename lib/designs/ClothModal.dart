@@ -129,6 +129,7 @@ class ClothModal extends ConsumerWidget {
                 infoProvider,
                 category,
                 havePalette,
+                false,
               ),
             );
           }).toList(),
