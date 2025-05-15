@@ -44,4 +44,24 @@ final class HowWeatherColor extends Color {
     800: Color(0xFF1C1C1C),
     900: Color(0xFF000000),
   };
+
+  static const Map<int, Color> colorMap = {
+    1: Color(0xFFEE3737),
+    2: Color(0xFFEE8337),
+    3: Color(0xFFEEC337),
+    4: Color(0xFFABC81A),
+    5: Color(0xFF37B4EE),
+    6: Color(0xFF3759EE),
+    7: Color(0xFF9637EE),
+    8: Color(0xFFFF89E3),
+    9: Color(0xFFFFFFFF),
+    10: Color(0xFF111111),
+    11: Color(0xFF743C11),
+  };
+
+  static const Map<int, String> thicknessMap = {
+    1: "얇음",
+    2: "보통",
+    3: "두꺼움",
+  };
 }

@@ -14,7 +14,7 @@ class ClothesEnroll extends ConsumerWidget {
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "의상 등록"),
+        title: Medium_18px(text: "의류 등록"),
         centerTitle: true,
         leading: InkWell(
           onTap: () {
