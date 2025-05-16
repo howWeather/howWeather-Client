@@ -11,9 +11,9 @@ class Weather {
     required this.temperature,
   });
 
-  factory Weather.fromJson(Map<String, dynamic> json) {
+  factory Weather.fromJson(Map<String, dynamic> json, String koreanName) {
     return Weather(
-      name: json['name'] ?? "",
+      name: koreanName,
       description: json['weather'][0]['description'],
       icon: json['weather'][0]['icon'],
       temperature: (json['main']['temp'] as num).toDouble(),
