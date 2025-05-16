@@ -10,7 +10,7 @@ class WeatherRepository {
 
   Future<Weather> fetchWeather(String city) async {
     final url = Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric');
+        'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric&lang=kr');
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
@@ -23,7 +23,7 @@ class WeatherRepository {
 
   Future<Weather> fetchWeatherByLocation(double lat, double lon) async {
     final url = Uri.parse(
-      'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric',
+      'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr',
     );
 
     final response = await http.get(url);
@@ -37,7 +37,7 @@ class WeatherRepository {
 
   Future<List<HourlyWeather>> fetchHourlyWeather(double lat, double lon) async {
     final url = Uri.parse(
-      'https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric',
+      'https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr',
     );
 
     final response = await http.get(url);
@@ -58,6 +58,8 @@ class WeatherRepository {
                 date.month == tomorrow.month &&
                 date.day == tomorrow.day);
       }).toList();
+
+      print(data);
 
       return todayOrTomorrowForecast;
     } else {
