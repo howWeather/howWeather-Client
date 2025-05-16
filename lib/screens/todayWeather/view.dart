@@ -222,8 +222,7 @@ class HourlyTemperatureChart extends StatelessWidget {
                               ),
                               const SizedBox(height: 100), // 그래프와 습도 사이 간격 조정
                               Medium_14px(
-                                text:
-                                    '${data.precipitation.toStringAsFixed(0)}%',
+                                text: '${data.humidity.toStringAsFixed(0)}%',
                                 color: HowWeatherColor.white.withOpacity(0.5),
                               ),
                             ],

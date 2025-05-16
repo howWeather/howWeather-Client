@@ -8,28 +8,37 @@ class WeatherRepository {
 
   WeatherRepository({required this.apiKey});
 
-  Future<Weather> fetchWeather(String city) async {
+  /// 한글 도시 이름 가져오기
+  Future<String> fetchKoreanCityName(String city) async {
     final url = Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric');
+      'http://api.openweathermap.org/geo/1.0/direct?q=$city&limit=1&appid=$apiKey&lang=kr',
+    );
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return Weather.fromJson(data);
+      final List data = json.decode(response.body);
+      if (data.isNotEmpty && data[0]['local_names'] != null) {
+        return data[0]['local_names']['ko'] ?? city;
+      } else {
+        return city;
+      }
     } else {
-      throw Exception('Failed to fetch weather data');
+      throw Exception('한글 도시 이름을 가져오지 못했습니다.');
     }
   }
 
   Future<Weather> fetchWeatherByLocation(double lat, double lon) async {
     final url = Uri.parse(
-      'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric',
+      'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr',
     );
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      return Weather.fromJson(data);
+      final name = data['name'] ?? '';
+      final koreanName =
+          await fetchKoreanCityName(name); // 위도 기반일 때도 한글 이름으로 변환
+      return Weather.fromJson(data, koreanName);
     } else {
       throw Exception('위치 기반 날씨 데이터를 가져오지 못했습니다.');
     }
@@ -37,7 +46,7 @@ class WeatherRepository {
 
   Future<List<HourlyWeather>> fetchHourlyWeather(double lat, double lon) async {
     final url = Uri.parse(
-      'https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric',
+      'https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr',
     );
 
     final response = await http.get(url);
@@ -58,6 +67,8 @@ class WeatherRepository {
                 date.month == tomorrow.month &&
                 date.day == tomorrow.day);
       }).toList();
+
+      print(data);
 
       return todayOrTomorrowForecast;
     } else {

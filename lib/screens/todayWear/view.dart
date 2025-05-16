@@ -187,50 +187,48 @@ class PerceivedTemperatureChart extends StatelessWidget {
             // 📌 그래프
             Positioned(
               top: 20,
-              left: 26,
-              child: SizedBox(
-                height: graphHeight,
-                width: hourlyData.length * columnWidth * 0.76,
-                child: LineChart(
-                  LineChartData(
-                    minY: minTemp,
-                    maxY: maxTemp,
-                    minX: 0,
-                    maxX: (hourlyData.length - 1) * columnWidth,
-                    titlesData: FlTitlesData(show: false),
-                    gridData: FlGridData(show: false),
-                    borderData: FlBorderData(show: false),
-                    lineBarsData: [
-                      LineChartBarData(
-                        isCurved: true,
-                        spots: hourlyData.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final data = entry.value;
-                          return FlSpot(index * columnWidth, data.temperature);
-                        }).toList(),
-                        color: Colors.white,
-                        barWidth: 1,
-                        dotData: FlDotData(
-                          show: true,
-                          getDotPainter: (spot, percent, barData, index) {
-                            final temp = hourlyData[index].temperature;
-                            final color = temp > 30
-                                ? HowWeatherColor.secondary[800]!
-                                : temp >= 15
-                                    ? HowWeatherColor.secondary[500]!
-                                    : HowWeatherColor.primary[800]!;
+              left: columnWidth / 2, // 첫 번째 열의 중앙에서 시작
+              right: columnWidth / 2, // 마지막 열의 중앙에서 끝
+              height: graphHeight,
+              child: LineChart(
+                LineChartData(
+                  minY: minTemp,
+                  maxY: maxTemp,
+                  minX: 0,
+                  maxX: (hourlyData.length - 1) * columnWidth,
+                  titlesData: FlTitlesData(show: false),
+                  gridData: FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      isCurved: true,
+                      spots: hourlyData.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final data = entry.value;
+                        return FlSpot(index * columnWidth, data.temperature);
+                      }).toList(),
+                      color: Colors.white,
+                      barWidth: 2,
+                      dotData: FlDotData(
+                        show: true,
+                        getDotPainter: (spot, percent, barData, index) {
+                          final temp = hourlyData[index].temperature;
+                          final color = temp > 30
+                              ? HowWeatherColor.secondary[800]!
+                              : temp >= 15
+                                  ? HowWeatherColor.secondary[500]!
+                                  : HowWeatherColor.primary[800]!;
 
-                            return FlDotCirclePainter(
-                              radius: 4,
-                              color: color,
-                              strokeColor: Colors.transparent,
-                            );
-                          },
-                        ),
-                        belowBarData: BarAreaData(show: false),
-                      )
-                    ],
-                  ),
+                          return FlDotCirclePainter(
+                            radius: 4,
+                            color: color,
+                            strokeColor: Colors.transparent,
+                          );
+                        },
+                      ),
+                      belowBarData: BarAreaData(show: false),
+                    )
+                  ],
                 ),
               ),
             ),

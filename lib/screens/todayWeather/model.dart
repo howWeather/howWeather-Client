@@ -11,9 +11,9 @@ class Weather {
     required this.temperature,
   });
 
-  factory Weather.fromJson(Map<String, dynamic> json) {
+  factory Weather.fromJson(Map<String, dynamic> json, String koreanName) {
     return Weather(
-      name: json['name'] ?? "",
+      name: koreanName,
       description: json['weather'][0]['description'],
       icon: json['weather'][0]['icon'],
       temperature: (json['main']['temp'] as num).toDouble(),
@@ -24,14 +24,14 @@ class Weather {
 class HourlyWeather {
   final DateTime dateTime;
   final double temperature;
-  final double precipitation; // mm
+  final double humidity;
   final String icon;
   final String description;
 
   HourlyWeather({
     required this.dateTime,
     required this.temperature,
-    required this.precipitation,
+    required this.humidity,
     required this.icon,
     required this.description,
   });
@@ -40,7 +40,7 @@ class HourlyWeather {
     return HourlyWeather(
       dateTime: DateTime.parse(json['dt_txt']),
       temperature: (json['main']['temp'] as num).toDouble(),
-      precipitation: (json['rain']?['3h'] ?? 0).toDouble(),
+      humidity: (json['main']['humidity'] as num).toDouble(),
       icon: (json['weather'][0]['icon']),
       description: json['weather'][0]['description'],
     );
