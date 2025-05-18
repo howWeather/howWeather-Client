@@ -53,4 +53,23 @@ class MypageRepository {
       throw Exception('닉네임 수정 요청 실패: ${response.statusCode}');
     }
   }
+
+  /// 체질 수정
+  Future<void> updateConstitution(String newConstitution) async {
+    final accessToken = await AuthStorage.getAccessToken();
+
+    final url = Uri.parse('$_baseUrl/update-constitution');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': '$accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({"data": newConstitution}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('체질 수정 실패: ${response.statusCode}');
+    }
+  }
 }
