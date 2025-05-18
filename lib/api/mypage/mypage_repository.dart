@@ -25,4 +25,32 @@ class MypageRepository {
       throw Exception('프로필을 불러오는데 실패했습니다: ${response.statusCode}');
     }
   }
+
+  /// 닉네임 수정
+  Future<void> updateNickname(String newNickname) async {
+    final accessToken = await AuthStorage.getAccessToken();
+
+    final url = Uri.parse('$_baseUrl/update-nickname');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': '$accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'data': newNickname,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        return; // 성공
+      } else {
+        throw Exception('닉네임 수정 실패: ${data['result']}');
+      }
+    } else {
+      throw Exception('닉네임 수정 요청 실패: ${response.statusCode}');
+    }
+  }
 }
