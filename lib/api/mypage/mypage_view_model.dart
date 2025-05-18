@@ -1,4 +1,5 @@
 import 'package:client/model/user_profile.dart';
+import 'package:client/screens/mypage/profile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/api/mypage/mypage_repository.dart';
 
@@ -38,7 +39,7 @@ class MypageViewModel extends StateNotifier<AsyncValue<UserProfile?>> {
   }
 
   /// 체질 수정
-  Future<void> updateConstitution(String newConstitution) async {
+  Future<void> updateConstitution(int newConstitution) async {
     try {
       state = const AsyncLoading(); // 로딩 상태로 변경
       final repo = ref.read(mypageRepositoryProvider);

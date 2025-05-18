@@ -32,7 +32,7 @@ class MypageRepository {
     final accessToken = await AuthStorage.getAccessToken();
 
     final url = Uri.parse('$_baseUrl/update-nickname');
-    final response = await http.post(
+    final response = await http.patch(
       url,
       headers: {
         'Authorization': 'Bearer $accessToken',
@@ -56,11 +56,11 @@ class MypageRepository {
   }
 
   /// 체질 수정
-  Future<void> updateConstitution(String newConstitution) async {
+  Future<void> updateConstitution(int newConstitution) async {
     final accessToken = await AuthStorage.getAccessToken();
 
     final url = Uri.parse('$_baseUrl/update-constitution');
-    final response = await http.post(
+    final response = await http.patch(
       url,
       headers: {
         'Authorization': 'Bearer $accessToken',
@@ -79,7 +79,7 @@ class MypageRepository {
     final accessToken = await AuthStorage.getAccessToken();
 
     final url = Uri.parse('$_baseUrl/update-gender');
-    final response = await http.post(
+    final response = await http.patch(
       url,
       headers: {
         'Authorization': 'Bearer $accessToken',
@@ -98,7 +98,7 @@ class MypageRepository {
     final accessToken = await AuthStorage.getAccessToken();
 
     final url = Uri.parse('$_baseUrl/update-age');
-    final response = await http.post(
+    final response = await http.patch(
       url,
       headers: {
         'Authorization': 'Bearer $accessToken',

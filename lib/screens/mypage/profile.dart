@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 final nicknameProvider = StateProvider<String>((ref) => '');
 final temperamentProvider = StateProvider<int?>((ref) => null);
 final genderProvider = StateProvider<int?>((ref) => null);
-final ageProvider = StateProvider<String?>((ref) => null);
+final ageProvider = StateProvider<int?>((ref) => null);
 
 class Profile extends ConsumerWidget {
   Profile({super.key});
@@ -52,6 +52,33 @@ class Profile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileState = ref.watch(mypageViewModelProvider);
 
+    // 다이얼로그가 처음 열릴 때 초기값 설정
+    profileState.when(
+      data: (profile) {
+        if (profile != null) {
+          // 다이얼로그를 열 때 초기값 설정을 위해 필요한 데이터 초기화
+          Future.microtask(() {
+            if (profile.nickname != null) {
+              ref.read(nicknameProvider.notifier).state =
+                  profile.nickname ?? '';
+            }
+            if (profile.constitution != null) {
+              ref.read(temperamentProvider.notifier).state =
+                  profile.constitution! - 1;
+            }
+            if (profile.gender != null) {
+              ref.read(genderProvider.notifier).state = profile.gender! - 1;
+            }
+            if (profile.ageGroup != null) {
+              ref.read(ageProvider.notifier).state = profile.ageGroup;
+            }
+          });
+        }
+      },
+      loading: () {},
+      error: (_, __) {},
+    );
+
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
@@ -60,7 +87,7 @@ class Profile extends ConsumerWidget {
         centerTitle: true,
         leading: InkWell(
           onTap: () {
-            context.pop();
+            context.go('/mypage');
           },
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
@@ -76,7 +103,20 @@ class Profile extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              titleCard(context, ref, "닉네임", "닉네임 변경", changeNickname(ref)),
+              titleCard(
+                context,
+                ref,
+                "닉네임",
+                "닉네임 변경",
+                (setState) => changeNickname(ref),
+                () async {
+                  final viewModel = ref.read(mypageViewModelProvider.notifier);
+                  final value = ref.read(nicknameProvider);
+                  await viewModel.updateNickname(value);
+                  // 프로필 상태 새로고침
+                  ref.invalidate(mypageViewModelProvider);
+                },
+              ),
               ContainerCard(profile?.nickname),
               SizedBox(
                 height: 8,
@@ -113,33 +153,81 @@ class Profile extends ConsumerWidget {
               SizedBox(
                 height: 8,
               ),
-              titleCard(context, ref, "체질", "체질 변경", changeTemperament(ref)),
+              titleCard(
+                context,
+                ref,
+                "체질",
+                "체질 변경",
+                (setState) => changeTemperament(),
+                () async {
+                  final viewModel = ref.read(mypageViewModelProvider.notifier);
+                  final value = ref.read(temperamentProvider.notifier).state;
+                  await viewModel
+                      .updateConstitution(value! + 1); // 1부터 시작하므로 +1 추가
+                  // 프로필 상태 새로고침
+                  ref.invalidate(mypageViewModelProvider);
+                },
+              ),
               ContainerCard(getTemperamentText(profile?.constitution)),
               SizedBox(
                 height: 8,
               ),
-              titleCard(context, ref, "성별", "성별 변경", changeGender(ref)),
+              titleCard(
+                context,
+                ref,
+                "성별",
+                "성별 변경",
+                (setState) => changeGender(),
+                () async {
+                  final viewModel = ref.read(mypageViewModelProvider.notifier);
+                  final value = ref.read(genderProvider.notifier).state;
+                  await viewModel.updateGender(value! + 1); // 1부터 시작하므로 +1 추가
+                  // 프로필 상태 새로고침
+                  ref.invalidate(mypageViewModelProvider);
+                },
+              ),
               ContainerCard(getGenderText(profile?.gender)),
               SizedBox(
                 height: 8,
               ),
-              titleCard(context, ref, "나이", "나이 변경", changeAge(ref)),
+              titleCard(
+                context,
+                ref,
+                "나이",
+                "나이 변경",
+                (setState) => changeAge(),
+                () async {
+                  final viewModel = ref.read(mypageViewModelProvider.notifier);
+                  final value = ref.read(ageProvider.notifier).state;
+                  await viewModel.updateAge(value!);
+                  // 프로필 상태 새로고침
+                  ref.invalidate(mypageViewModelProvider);
+                },
+              ),
               ContainerCard(getAgeText(profile?.ageGroup)),
             ],
           ),
         ),
-        loading: () => const SizedBox(
-          height: 28,
-          width: 28,
-          child: CircularProgressIndicator(strokeWidth: 2),
+        loading: () => Center(
+          child: SizedBox(
+            height: 28,
+            width: 28,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
         ),
-        error: (error, _) => Text("에러"),
+        error: (error, _) => Center(child: Text("에러가 발생했습니다: $error")),
       ),
     );
   }
 
   Widget titleCard(
-      BuildContext context, WidgetRef ref, text, title, Widget widget) {
+    BuildContext context,
+    WidgetRef ref,
+    text,
+    title,
+    Widget Function(StateSetter setState) builder,
+    Future<void> Function() onConfirm,
+  ) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Row(
@@ -151,7 +239,7 @@ class Profile extends ConsumerWidget {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return changeDialog(context, ref, title, widget);
+                  return changeDialog(context, ref, title, builder, onConfirm);
                 },
               );
             },
@@ -178,65 +266,75 @@ class Profile extends ConsumerWidget {
   }
 
   Widget changeDialog(
-      BuildContext context, WidgetRef ref, title, Widget widget) {
+    BuildContext context,
+    WidgetRef ref,
+    title,
+    Widget Function(StateSetter setState) builder,
+    Future<void> Function() onConfirm,
+  ) {
     return AlertDialog(
       backgroundColor: HowWeatherColor.white,
       title: Center(
         child: Semibold_20px(text: title),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          widget,
-          SizedBox(
-            height: 12,
-          ),
-          Row(
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: HowWeatherColor.neutral[200],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(child: Medium_14px(text: "취소")),
-                  ),
-                ),
+              builder(setState),
+              SizedBox(
+                height: 12,
               ),
-              SizedBox(width: 8),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    context.push('/mypage/profile');
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: HowWeatherColor.primary[900],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Medium_14px(
-                        text: "변경",
-                        color: HowWeatherColor.white,
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => context.pop(),
+                      child: Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: HowWeatherColor.neutral[200],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(child: Medium_14px(text: "취소")),
                       ),
                     ),
                   ),
-                ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () async {
+                        Navigator.pop(context); // 다이얼로그를 먼저 닫음
+                        await onConfirm(); // 업데이트 함수 실행
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: HowWeatherColor.primary[900],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Medium_14px(
+                            text: "변경",
+                            color: HowWeatherColor.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
   Widget changeNickname(WidgetRef ref) {
     return TextFormField(
-      onChanged: (value) {
+      onChanged: (value) async {
         ref.read(nicknameProvider.notifier).state = value;
       },
       style: TextStyle(
@@ -272,8 +370,11 @@ class Profile extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget changeTemperament(ref) {
+class changeTemperament extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     return buildChoiceGroup(
       ref: ref,
       options: ["더위를 많이 타요", "평범한 것 같아요", "추위를 많이 타요"],
@@ -285,8 +386,11 @@ class Profile extends ConsumerWidget {
       ],
     );
   }
+}
 
-  Widget changeGender(ref) {
+class changeGender extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     return buildChoiceGroup(
       ref: ref,
       options: ["여자", "남자"],
@@ -297,95 +401,106 @@ class Profile extends ConsumerWidget {
       ],
     );
   }
+}
 
-  Widget changeAge(ref) {
+final ageDisplayMap = {
+  1: "10대",
+  2: "20대",
+  3: "30대 이상",
+};
+
+class changeAge extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     return buildDropdown(
       ref: ref,
-      options: ["10대", "20대", "30대 이상"],
+      options: [1, 2, 3],
       provider: ageProvider,
+      displayMap: ageDisplayMap,
     );
   }
+}
 
-  Widget buildChoiceGroup({
-    required WidgetRef ref,
-    required List<String> options,
-    required StateProvider<int?> provider,
-    required List<Color> colors,
-  }) {
-    final selectedIndex = ref.watch(provider);
+Widget buildChoiceGroup({
+  required WidgetRef ref,
+  required List<String> options,
+  required StateProvider<int?> provider,
+  required List<Color> colors,
+}) {
+  final selectedIndex = ref.watch(provider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ...List.generate(options.length, (index) {
-          final isSelected = selectedIndex == index;
-          final color = colors[index];
-          return InkWell(
-            onTap: () {
-              ref.read(provider.notifier).state = index;
-            },
-            splashColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              margin: EdgeInsets.only(bottom: 16),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: isSelected ? color : Colors.transparent,
-                border: Border.all(width: 2, color: color),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Medium_16px(
-                  text: options[index],
-                  color: isSelected
-                      ? HowWeatherColor.white
-                      : HowWeatherColor.black,
-                ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      ...List.generate(options.length, (index) {
+        final isSelected = selectedIndex == index;
+        final color = colors[index];
+        return InkWell(
+          onTap: () {
+            ref.read(provider.notifier).state = index;
+          },
+          splashColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            margin: EdgeInsets.only(bottom: 16),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: isSelected ? color : Colors.transparent,
+              border: Border.all(width: 2, color: color),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: Medium_16px(
+                text: options[index],
+                color:
+                    isSelected ? HowWeatherColor.white : HowWeatherColor.black,
               ),
             ),
-          );
-        }),
-      ],
-    );
-  }
-
-  Widget buildDropdown({
-    required WidgetRef ref,
-    required List<String> options,
-    required StateProvider<String?> provider,
-  }) {
-    final selectedValue = ref.watch(provider);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            border: Border.all(color: HowWeatherColor.primary[200]!),
-            borderRadius: BorderRadius.circular(10),
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: selectedValue,
-              hint: Text("선택하세요", style: TextStyle(color: Colors.grey)),
-              items: options.map((value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                ref.read(provider.notifier).state = newValue;
-              },
-            ),
+        );
+      }),
+    ],
+  );
+}
+
+Widget buildDropdown({
+  required WidgetRef ref,
+  required List<int> options,
+  required StateProvider<int?> provider,
+  required Map<int, String> displayMap,
+}) {
+  final selectedValue = ref.watch(provider);
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(color: HowWeatherColor.primary[200]!),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<int>(
+            value: selectedValue,
+            hint: Text("선택하세요", style: TextStyle(color: Colors.grey)),
+            isExpanded: true,
+            items: options.map((value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(displayMap[value]!),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              ref.read(provider.notifier).state = newValue;
+            },
           ),
         ),
-        SizedBox(height: 20),
-      ],
-    );
-  }
+      ),
+      SizedBox(height: 20),
+    ],
+  );
 }
