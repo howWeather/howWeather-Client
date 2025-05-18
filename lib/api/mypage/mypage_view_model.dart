@@ -60,4 +60,16 @@ class MypageViewModel extends StateNotifier<AsyncValue<UserProfile?>> {
       state = AsyncValue.error(e, st);
     }
   }
+
+  /// 연령대 수정
+  Future<void> updateAge(int newAgeGroup) async {
+    try {
+      state = const AsyncLoading();
+      final repo = ref.read(mypageRepositoryProvider);
+      await repo.updateAge(newAgeGroup);
+      await loadProfile(); // 변경 후 프로필 갱신
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
