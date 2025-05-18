@@ -1,3 +1,4 @@
+import 'package:client/api/mypage/mypage_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ class Profile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profileState = ref.watch(mypageViewModelProvider);
+
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
@@ -33,58 +36,66 @@ class Profile extends ConsumerWidget {
           ),
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            titleCard(context, ref, "닉네임", "닉네임 변경", changeNickname(ref)),
-            ContainerCard("test"),
-            SizedBox(
-              height: 8,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child: Medium_18px(text: "이메일"),
-            ),
-            Row(
-              children: [
-                Expanded(flex: 2, child: ContainerCard("test")),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Medium_18px(
-                    text: "@",
-                    color: HowWeatherColor.neutral[200],
+      body: profileState.when(
+        data: (profile) => Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              titleCard(context, ref, "닉네임", "닉네임 변경", changeNickname(ref)),
+              ContainerCard(profile?.nickname),
+              SizedBox(
+                height: 8,
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: Medium_18px(text: "이메일"),
+              ),
+              Row(
+                children: [
+                  Expanded(flex: 2, child: ContainerCard(profile?.email)),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Medium_18px(
+                      text: "@",
+                      color: HowWeatherColor.neutral[200],
+                    ),
                   ),
-                ),
-                Expanded(flex: 1, child: ContainerCard("test.com")),
-              ],
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child: Medium_18px(text: "아이디"),
-            ),
-            ContainerCard("testid"),
-            SizedBox(
-              height: 8,
-            ),
-            titleCard(context, ref, "체질", "체질 변경", changeTemperament(ref)),
-            ContainerCard("평범한 것 같아요"),
-            SizedBox(
-              height: 8,
-            ),
-            titleCard(context, ref, "성별", "성별 변경", changeGender(ref)),
-            ContainerCard("여"),
-            SizedBox(
-              height: 8,
-            ),
-            titleCard(context, ref, "나이", "나이 변경", changeAge(ref)),
-            ContainerCard("10대"),
-          ],
+                  Expanded(flex: 1, child: ContainerCard(profile?.email)),
+                ],
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: Medium_18px(text: "아이디"),
+              ),
+              ContainerCard(profile?.loginId),
+              SizedBox(
+                height: 8,
+              ),
+              titleCard(context, ref, "체질", "체질 변경", changeTemperament(ref)),
+              ContainerCard(profile?.constitution),
+              SizedBox(
+                height: 8,
+              ),
+              titleCard(context, ref, "성별", "성별 변경", changeGender(ref)),
+              ContainerCard(profile?.gender),
+              SizedBox(
+                height: 8,
+              ),
+              titleCard(context, ref, "나이", "나이 변경", changeAge(ref)),
+              ContainerCard(profile?.ageGroup),
+            ],
+          ),
         ),
+        loading: () => const SizedBox(
+          height: 28,
+          width: 28,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        error: (error, _) => Text("에러"),
       ),
     );
   }

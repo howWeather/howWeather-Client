@@ -109,13 +109,13 @@ class AuthRepository {
     final response = await http.post(
       url,
       headers: {
-        "Authorization": 'Bearer $accessToken',
-        "Refresh-Token": 'Bearer $refreshToken',
+        "Authorization": '$accessToken',
+        "Refresh-Token": '$refreshToken',
       },
     );
 
     print(
-        '{"Authorization": "Bearer $accessToken", "Refresh-Token": "Bearer $refreshToken",}');
+        '{"Authorization": "$accessToken", "Refresh-Token": "$refreshToken",}');
 
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
@@ -137,7 +137,7 @@ class AuthRepository {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': 'Bearer $accessToken',
+        'Authorization': '$refreshToken',
       },
     );
 
