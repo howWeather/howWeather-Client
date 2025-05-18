@@ -1,8 +1,7 @@
 import 'package:client/api/auth/auth_repository.dart';
-import 'package:client/api/auth/auth_view_model.dart';
+import 'package:client/api/mypage/mypage_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherDialog.dart';
-import 'package:client/designs/HowWeatherNavi.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +13,8 @@ class MyPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profileState = ref.watch(mypageViewModelProvider);
+
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
@@ -31,11 +32,23 @@ class MyPage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
-                onTap: () => context.push('/mypage/profile'),
+                onTap: () async {
+                  await context.push('/mypage/profile');
+                  ref.read(mypageViewModelProvider.notifier).loadProfile();
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Semibold_28px(text: "username"),
+                    profileState.when(
+                      data: (profile) =>
+                          Semibold_28px(text: profile?.nickname ?? "닉네임 없음"),
+                      loading: () => const SizedBox(
+                        height: 28,
+                        width: 28,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      error: (error, _) => Text("에러"),
+                    ),
                     SvgPicture.asset("assets/icons/chevron-right.svg"),
                   ],
                 ),
