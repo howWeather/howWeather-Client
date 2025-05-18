@@ -72,4 +72,23 @@ class MypageRepository {
       throw Exception('체질 수정 실패: ${response.statusCode}');
     }
   }
+
+  /// 성별 수정
+  Future<void> updateGender(int newGender) async {
+    final accessToken = await AuthStorage.getAccessToken();
+
+    final url = Uri.parse('$_baseUrl/update-gender');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': '$accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({"data": newGender}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('성별 수정 실패: ${response.statusCode}');
+    }
+  }
 }
