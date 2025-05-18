@@ -13,13 +13,14 @@ class MypageRepository {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': '$accessToken',
+        'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
     );
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+      print(data);
       return UserProfile.fromJson(data);
     } else {
       throw Exception('프로필을 불러오는데 실패했습니다: ${response.statusCode}');
@@ -34,7 +35,7 @@ class MypageRepository {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': '$accessToken',
+        'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
@@ -62,7 +63,7 @@ class MypageRepository {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': '$accessToken',
+        'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
       body: json.encode({"data": newConstitution}),
@@ -81,7 +82,7 @@ class MypageRepository {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': '$accessToken',
+        'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
       body: json.encode({"data": newGender}),
@@ -100,7 +101,7 @@ class MypageRepository {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': '$accessToken',
+        'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
       body: json.encode({"data": newAgeGroup}),

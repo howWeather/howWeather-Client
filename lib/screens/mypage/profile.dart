@@ -14,6 +14,40 @@ final ageProvider = StateProvider<String?>((ref) => null);
 class Profile extends ConsumerWidget {
   Profile({super.key});
 
+  final List<String> temperamentOptions = [
+    "더위를 많이 타요",
+    "평범한 것 같아요",
+    "추위를 많이 타요"
+  ];
+  final List<String> genderOptions = ["남자", "여자"];
+  final List<String> ageOptions = ["10대", "20대", "30대 이상"];
+
+  String? getEmailFront(String? email) {
+    if (email == null || !email.contains("@")) return email;
+    return email.split("@")[0];
+  }
+
+  String? getEmailBack(String? email) {
+    if (email == null || !email.contains("@")) return "";
+    return email.split("@")[1];
+  }
+
+  String? getTemperamentText(int? index) {
+    if (index == null || index < 1 || index > temperamentOptions.length)
+      return null;
+    return temperamentOptions[index - 1];
+  }
+
+  String? getGenderText(int? index) {
+    if (index == null || index < 1 || index > genderOptions.length) return null;
+    return genderOptions[index - 1];
+  }
+
+  String? getAgeText(int? index) {
+    if (index == null || index < 1 || index > ageOptions.length) return null;
+    return ageOptions[index - 1];
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileState = ref.watch(mypageViewModelProvider);
@@ -53,7 +87,9 @@ class Profile extends ConsumerWidget {
               ),
               Row(
                 children: [
-                  Expanded(flex: 2, child: ContainerCard(profile?.email)),
+                  Expanded(
+                      flex: 2,
+                      child: ContainerCard(getEmailFront(profile?.email))),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Medium_18px(
@@ -61,7 +97,9 @@ class Profile extends ConsumerWidget {
                       color: HowWeatherColor.neutral[200],
                     ),
                   ),
-                  Expanded(flex: 1, child: ContainerCard(profile?.email)),
+                  Expanded(
+                      flex: 1,
+                      child: ContainerCard(getEmailBack(profile?.email))),
                 ],
               ),
               SizedBox(
@@ -76,17 +114,17 @@ class Profile extends ConsumerWidget {
                 height: 8,
               ),
               titleCard(context, ref, "체질", "체질 변경", changeTemperament(ref)),
-              ContainerCard(profile?.constitution),
+              ContainerCard(getTemperamentText(profile?.constitution)),
               SizedBox(
                 height: 8,
               ),
               titleCard(context, ref, "성별", "성별 변경", changeGender(ref)),
-              ContainerCard(profile?.gender),
+              ContainerCard(getGenderText(profile?.gender)),
               SizedBox(
                 height: 8,
               ),
               titleCard(context, ref, "나이", "나이 변경", changeAge(ref)),
-              ContainerCard(profile?.ageGroup),
+              ContainerCard(getAgeText(profile?.ageGroup)),
             ],
           ),
         ),

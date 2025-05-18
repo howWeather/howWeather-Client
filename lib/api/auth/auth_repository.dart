@@ -109,8 +109,8 @@ class AuthRepository {
     final response = await http.post(
       url,
       headers: {
-        "Authorization": '$accessToken',
-        "Refresh-Token": '$refreshToken',
+        "Authorization": 'Bearer $accessToken',
+        "Refresh-Token": 'Bearer $refreshToken',
       },
     );
 
@@ -137,7 +137,7 @@ class AuthRepository {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': '$refreshToken',
+        'Authorization': 'Bearer $refreshToken',
       },
     );
 
