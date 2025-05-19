@@ -8,8 +8,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-final selectedClothProvider = StateProvider<int?>((ref) => null);
-final selectedClothInfoProvider = StateProvider<int?>((ref) => null);
+final selectedUpperProvider = StateProvider<int?>((ref) => null);
+final selectedOuterProvider = StateProvider<int?>((ref) => null);
+final selectedUpperInfoProvider = StateProvider<int?>((ref) => null);
+final selectedOuterInfoProvider = StateProvider<int?>((ref) => null);
+
 final thicknessProvider = StateNotifierProvider<ThicknessNotifier, int>((ref) {
   return ThicknessNotifier();
 });
@@ -109,23 +112,35 @@ class ClothesView extends ConsumerWidget {
     List<ClothGroup> clothGroups,
     String category,
   ) {
+    final allItems = clothGroups.expand((g) => g.items).toList();
+    final seenTypes = <int>{};
+    final filteredItems = <ClothItem>[];
+
+    // clothType별로 하나씩만 남기기
+    for (final item in allItems) {
+      if (!seenTypes.contains(item.clothType)) {
+        seenTypes.add(item.clothType);
+        filteredItems.add(item);
+      }
+    }
+
     return Column(
-      children: clothGroups.expand((group) {
-        return group.items.map((item) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: ClothCard(
-              context,
-              item,
-              ref,
-              selectedClothProvider,
-              selectedClothInfoProvider,
-              category,
-              true,
-              false,
-            ),
-          );
-        }).toList();
+      children: filteredItems.map((item) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: ClothCard(
+            context: context,
+            item: item,
+            allItems: allItems,
+            ref: ref,
+            category: category,
+            havePalette: true, // havePalette
+            haveDelete: false, // haveDelete
+            text: "수정",
+            initColor: item.color,
+            initThickness: item.thickness,
+          ),
+        );
       }).toList(),
     );
   }

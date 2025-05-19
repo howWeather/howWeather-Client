@@ -11,17 +11,17 @@ import 'package:go_router/go_router.dart';
 class Palette extends ConsumerWidget {
   final BuildContext context;
   final WidgetRef ref;
-  final int selectedColor;
   final String text;
   final String category;
+  final int clothId;
 
   Palette({
     Key? key,
     required this.context,
     required this.ref,
-    this.selectedColor = 0,
     required this.text,
     required this.category,
+    this.clothId = 0,
   }) : super(key: key);
 
   @override
@@ -66,39 +66,72 @@ class Palette extends ConsumerWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () async {
-                    final selectedColor = ref.read(colorProvider);
-                    final selectedThickness = ref.read(thicknessProvider);
-                    final selectedClothType =
-                        ref.read(selectedEnrollClothProvider);
-                    final clothTypeForCategory = selectedClothType[category];
+                    if (text == "등록") {
+                      final selectedClothType =
+                          ref.read(selectedEnrollClothProvider);
+                      final clothTypeForCategory = selectedClothType[category];
+                      final clothData = {
+                        "clothType": clothTypeForCategory,
+                        "color": selectedColor,
+                        "thickness": selectedThickness,
+                      };
 
-                    final clothData = {
-                      "clothType": clothTypeForCategory,
-                      "color": selectedColor,
-                      "thickness": selectedThickness,
-                    };
+                      try {
+                        if (category == "uppers") {
+                          await ref
+                              .read(closetProvider.notifier)
+                              .registerClothes(
+                            uppers: [clothData],
+                            outers: [],
+                          );
+                        } else if (category == "outers") {
+                          await ref
+                              .read(closetProvider.notifier)
+                              .registerClothes(
+                            uppers: [],
+                            outers: [clothData],
+                          );
+                        }
 
-                    try {
-                      if (category == "uppers") {
-                        await ref.read(closetProvider.notifier).registerClothes(
-                          uppers: [clothData],
-                          outers: [],
+                        context.pop();
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(content: Text('의상이 등록되었습니다.')),
                         );
-                      } else if (category == "outers") {
-                        await ref.read(closetProvider.notifier).registerClothes(
-                          uppers: [],
-                          outers: [clothData],
+                      } catch (e) {
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(content: Text('등록 실패: $e')),
                         );
                       }
+                    }
+                    if (text == "수정") {
+                      try {
+                        if (category == "uppers") {
+                          await ref
+                              .read(closetProvider.notifier)
+                              .updateUpperCloth(
+                                clothId: clothId,
+                                color: selectedColor,
+                                thickness: selectedThickness,
+                              );
+                        } else if (category == "outers") {
+                          await ref
+                              .read(closetProvider.notifier)
+                              .updateOuterCloth(
+                                clothId: clothId,
+                                color: selectedColor,
+                                thickness: selectedThickness,
+                              );
+                        }
 
-                      context.pop();
-                      ScaffoldMessenger.of(this.context).showSnackBar(
-                        SnackBar(content: Text('의상이 등록되었습니다.')),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(this.context).showSnackBar(
-                        SnackBar(content: Text('등록 실패: $e')),
-                      );
+                        context.pop();
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(content: Text('의상이 수정되었습니다.')),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(content: Text('등록 실패: $e')),
+                        );
+                      }
                     }
                   },
                   child: Container(
@@ -109,7 +142,7 @@ class Palette extends ConsumerWidget {
                     ),
                     child: Center(
                       child: Medium_14px(
-                        text: "등록",
+                        text: text,
                         color: HowWeatherColor.white,
                       ),
                     ),

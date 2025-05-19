@@ -1,6 +1,7 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:client/designs/Palette.dart';
+import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -135,6 +136,8 @@ class ClothesEnroll extends ConsumerWidget {
                     ref.read(selectedEnrollClothProvider));
                 resetMap[category] = null;
                 ref.read(selectedEnrollClothProvider.notifier).state = resetMap;
+                ref.read(colorProvider.notifier).state = 1;
+                ref.read(thicknessProvider.notifier).state = 1;
                 return true;
               },
               child: Palette(
@@ -151,6 +154,8 @@ class ClothesEnroll extends ConsumerWidget {
               Map<String, int?>.from(ref.read(selectedEnrollClothProvider));
           resetMap[category] = null;
           ref.read(selectedEnrollClothProvider.notifier).state = resetMap;
+          ref.read(colorProvider.notifier).state = 1;
+          ref.read(thicknessProvider.notifier).state = 1;
         });
       },
       child: Container(

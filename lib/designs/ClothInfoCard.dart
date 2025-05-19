@@ -2,6 +2,7 @@ import 'package:client/designs/ClothCard.dart';
 import 'package:client/designs/Palette.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,9 +15,9 @@ Widget ClothInfoCard({
   required StateProvider<int?> provider,
   required bool havePalette,
   required bool haveDelete,
-  String category = "uppers",
-  int type = 1,
+  required String category,
   required int selectedItemId,
+  String text = "등록",
 }) {
   final selected = ref.watch(provider);
   final isSelected = selected == selectedItemId;
@@ -24,20 +25,34 @@ Widget ClothInfoCard({
   return InkWell(
     onTap: () {
       ref.read(provider.notifier).state = isSelected ? null : selectedItemId;
-      if (havePalette)
+      if (havePalette) {
+        ref.read(colorProvider.notifier).state = color;
+        ref.read(thicknessProvider.notifier).state = thicknessLabel;
         showDialog(
           context: context,
-          builder: (BuildContext context) {
-            return Palette(
-              context: context,
-              ref: ref,
-              selectedColor: color,
-              text: '수정',
-              category: category,
+          builder: (BuildContext dialogContext) {
+            return WillPopScope(
+              onWillPop: () async {
+                // 다이얼로그 닫을 때 선택 초기화
+                ref.read(provider.notifier).state = null;
+                return true;
+              },
+              child: Palette(
+                clothId: selectedItemId,
+                context: dialogContext,
+                ref: ref,
+                text: text,
+                category: category,
+              ),
             );
           },
-        );
-      if (haveDelete)
+        ).then((_) {
+          // 다이얼로그 닫힌 후에도 선택 초기화
+          ref.read(provider.notifier).state = null;
+        });
+      }
+
+      if (haveDelete) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -48,11 +63,14 @@ Widget ClothInfoCard({
               color,
               thicknessLabel,
               selectedItemId,
-              category!,
-              type!,
+              category,
             );
           },
-        );
+        ).then((_) {
+          // 다이얼로그 닫힌 후 선택 초기화
+          ref.read(provider.notifier).state = null;
+        });
+      }
     },
     child: Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -104,14 +122,14 @@ Widget ClothInfoCard({
 }
 
 Widget deleteDialog(
-    BuildContext context,
-    WidgetRef ref,
-    StateProvider<int?> provider,
-    int color,
-    int thickness,
-    selectedItemId,
-    String category,
-    int type) {
+  BuildContext context,
+  WidgetRef ref,
+  StateProvider<int?> provider,
+  int color,
+  int thickness,
+  selectedItemId,
+  String category,
+) {
   return AlertDialog(
     backgroundColor: HowWeatherColor.white,
     title: Center(child: Semibold_20px(text: "의류 삭제")),
@@ -124,7 +142,7 @@ Widget deleteDialog(
         ),
         Align(
           alignment: Alignment.centerLeft,
-          child: Medium_14px(text: clothTypeToKorean(category, type)),
+          child: Medium_14px(text: clothTypeToKorean(category, selectedItemId)),
         ),
         SizedBox(
           height: 8,
@@ -138,6 +156,7 @@ Widget deleteDialog(
           havePalette: false,
           haveDelete: false,
           selectedItemId: selectedItemId,
+          category: category,
         ),
         SizedBox(
           height: 12,

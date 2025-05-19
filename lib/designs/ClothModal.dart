@@ -96,17 +96,19 @@ class ClothModal extends ConsumerWidget {
       children: clothGroups.map((group) {
         return Column(
           children: group.items.map((item) {
+            final allItems = clothGroups.expand((g) => g.items).toList();
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: ClothCard(
-                context,
-                item, // ClothItem 전달
-                ref,
-                provider,
-                infoProvider,
-                category,
-                havePalette,
-                false,
+                context: context,
+                item: item,
+                allItems: allItems,
+                ref: ref,
+                category: category,
+                havePalette: havePalette,
+                haveDelete: false,
+                initColor: item.color,
+                initThickness: item.thickness,
               ),
             );
           }).toList(),
