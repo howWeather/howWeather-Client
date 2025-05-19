@@ -218,6 +218,9 @@ class SignUpPersonal extends ConsumerWidget {
               );
 
               context.push('/signUp/check', extra: updatedData);
+              ref.read(temperamentProvider.notifier).state = null;
+              ref.read(ageProvider.notifier).state = null;
+              ref.read(genderProvider.notifier).state = null;
             }
           : null,
       child: Container(

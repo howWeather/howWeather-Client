@@ -111,7 +111,10 @@ class SignUpCheck extends ConsumerWidget {
               await ref
                   .read(authViewModelProvider.notifier)
                   .signUpWithFullData(signupData);
-              context.push('/');
+              await ref
+                  .read(authViewModelProvider.notifier)
+                  .login(signupData.loginId, signupData.password);
+              context.push('/signUp/enrollClothes');
             }
           : null,
       child: Container(

@@ -114,15 +114,11 @@ class AuthRepository {
       },
     );
 
-    print(
-        '{"Authorization": "$accessToken", "Refresh-Token": "$refreshToken",}');
-
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       await AuthStorage.clear();
       return responseBody['success'];
     } else {
-      print(jsonDecode(response.body)['error']['message']);
       throw Exception('로그아웃 실패: ${response.statusCode}');
     }
   }

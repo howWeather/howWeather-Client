@@ -26,6 +26,7 @@ class ClosetRepository {
     }
   }
 
+  /// 의류 등록
   Future<String> registerClothes({
     required List<Map<String, dynamic>> uppers,
     required List<Map<String, dynamic>> outers,
@@ -45,6 +46,9 @@ class ClosetRepository {
       },
       body: body,
     );
+
+    print(accessToken);
+    print(body);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

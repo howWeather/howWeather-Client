@@ -204,6 +204,9 @@ class SignUpId extends ConsumerWidget {
                 loginId: ref.read(idProvider),
               );
               context.push('/signUp/password', extra: updatedData);
+              ref.read(idProvider.notifier).state = '';
+              ref.read(duplicateProvider.notifier).state = '';
+              ref.read(duplicateCheckedProvider.notifier).state = false;
             }
           : null,
       child: Container(

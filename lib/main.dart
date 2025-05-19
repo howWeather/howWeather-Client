@@ -15,6 +15,7 @@ import 'package:client/screens/signUp/signUpId.dart';
 import 'package:client/screens/signUp/signUpNickname.dart';
 import 'package:client/screens/signUp/signUpPassword.dart';
 import 'package:client/screens/signUp/signUpPersonal.dart';
+import 'package:client/screens/signUp/signup_clothes_enroll.dart';
 import 'package:client/screens/todayWear/view.dart';
 import 'package:client/screens/todayWeather/view.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final signupData = state.extra as SignupData;
           return SignUpCheck(signupData: signupData);
         },
+      ),
+      GoRoute(
+        path: '/signUp/enrollClothes',
+        builder: (context, state) => SignUpEnrollClothes(),
       ),
       GoRoute(
         path: '/calendar/register',
