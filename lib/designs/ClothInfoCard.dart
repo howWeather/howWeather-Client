@@ -1,3 +1,4 @@
+import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/designs/ClothCard.dart';
 import 'package:client/designs/Palette.dart';
 import 'package:client/designs/HowWeatherColor.dart';
@@ -180,6 +181,11 @@ Widget deleteDialog(
             Expanded(
               child: GestureDetector(
                 onTap: () {
+                  if (category == 'uppers') {
+                    ref
+                        .read(closetProvider.notifier)
+                        .deleteUpperCloth(clothId: selectedItemId);
+                  }
                   context.pop();
                 },
                 child: Container(
