@@ -19,7 +19,7 @@ class Profile extends ConsumerWidget {
     "평범한 것 같아요",
     "추위를 많이 타요"
   ];
-  final List<String> genderOptions = ["남자", "여자"];
+  final List<String> genderOptions = ["여자", "남자"];
   final List<String> ageOptions = ["10대", "20대", "30대 이상"];
 
   String? getEmailFront(String? email) {
