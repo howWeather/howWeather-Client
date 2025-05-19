@@ -100,4 +100,19 @@ class ClosetNotifier extends StateNotifier<AsyncValue<List<CategoryCloth>>> {
       rethrow;
     }
   }
+
+  /// 아우터 삭제
+  Future<void> deleteOuterCloth({
+    required int clothId,
+  }) async {
+    try {
+      final repo = ClosetRepository();
+      await repo.deleteOuterCloth(clothId: clothId);
+
+      await loadClothes(); // 삭제 후 의류 목록 갱신
+    } catch (e) {
+      print('상의 삭제 실패: $e');
+      rethrow;
+    }
+  }
 }

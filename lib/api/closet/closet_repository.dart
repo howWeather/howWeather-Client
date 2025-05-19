@@ -150,4 +150,24 @@ class ClosetRepository {
       throw Exception('상의 삭제 실패: ${response.statusCode}');
     }
   }
+
+  /// 아우터 삭제
+  Future<void> deleteOuterCloth({
+    required int clothId,
+  }) async {
+    final accessToken = await AuthStorage.getAccessToken();
+
+    final url = Uri.parse('$_baseUrl/delete-outer/$clothId');
+
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('상의 삭제 실패: ${response.statusCode}');
+    }
+  }
 }

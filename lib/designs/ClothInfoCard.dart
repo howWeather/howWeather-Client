@@ -186,6 +186,11 @@ Widget deleteDialog(
                         .read(closetProvider.notifier)
                         .deleteUpperCloth(clothId: selectedItemId);
                   }
+                  if (category == 'outers') {
+                    ref
+                        .read(closetProvider.notifier)
+                        .deleteOuterCloth(clothId: selectedItemId);
+                  }
                   context.pop();
                 },
                 child: Container(
