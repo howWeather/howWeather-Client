@@ -7,86 +7,125 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-Widget ClothCard(
-  BuildContext context,
-  ClothItem item,
-  List<ClothItem> allItems,
-  WidgetRef ref,
-  String category,
-  bool havePalette,
-  bool haveDelete, {
-  String text = "등록",
-}) {
+class ClothCard extends ConsumerStatefulWidget {
+  final BuildContext context;
+  final ClothItem item;
+  final List<ClothItem> allItems;
+  final WidgetRef ref;
+  final String category;
+  final int initColor;
+  final int initThickness;
+  final bool havePalette;
+  final bool haveDelete;
+  final String text;
+
+  const ClothCard({
+    super.key,
+    required this.context,
+    required this.item,
+    required this.allItems,
+    required this.ref,
+    required this.category,
+    required this.initColor,
+    required this.initThickness,
+    this.havePalette = true,
+    this.haveDelete = false,
+    this.text = "등록",
+  });
+
+  @override
+  ConsumerState<ClothCard> createState() => _ClothCardState();
+}
+
+class _ClothCardState extends ConsumerState<ClothCard> {
   late StateProvider<int?> selectedProvider;
   late StateProvider<int?> infoProvider;
 
-  if (category == "uppers") {
-    selectedProvider = selectedUpperProvider;
-    infoProvider = selectedUpperInfoProvider;
+  @override
+  void initState() {
+    super.initState();
+
+    // 카테고리에 따른 Provider 설정
+    if (widget.category == "uppers") {
+      selectedProvider = selectedUpperProvider;
+      infoProvider = selectedUpperInfoProvider;
+    } else if (widget.category == "outers") {
+      selectedProvider = selectedOuterProvider;
+      infoProvider = selectedOuterInfoProvider;
+    }
+
+    // 초기값 설정
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(colorProvider.notifier).state = widget.initColor;
+      ref.read(thicknessProvider.notifier).state = widget.initThickness;
+    });
   }
-  if (category == "outers") {
-    selectedProvider = selectedOuterProvider;
-    infoProvider = selectedOuterInfoProvider;
-  }
 
-  final selected = ref.watch(selectedProvider);
-  final isSelected = selected == item.clothId;
+  @override
+  Widget build(BuildContext context) {
+    final selected = ref.watch(selectedProvider);
+    final isSelected = selected == widget.item.clothId;
+    final sameTypeItems = widget.allItems
+        .where((i) => i.clothType == widget.item.clothType)
+        .toList();
 
-  final sameTypeItems =
-      allItems.where((i) => i.clothType == item.clothType).toList();
-
-  return InkWell(
-    onTap: () {
-      final isNowSelected =
-          ref.read(selectedProvider.notifier).state == item.clothId;
-      ref.read(selectedProvider.notifier).state =
-          isNowSelected ? null : item.clothId;
-    },
-    child: Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      decoration: BoxDecoration(
-        color: isSelected ? HowWeatherColor.primary[50] : HowWeatherColor.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isSelected
-              ? HowWeatherColor.neutral[400]!
-              : HowWeatherColor.neutral[200]!,
-          width: 1,
+    return InkWell(
+      onTap: () {
+        final isNowSelected =
+            ref.read(selectedProvider.notifier).state == widget.item.clothId;
+        ref.read(selectedProvider.notifier).state =
+            isNowSelected ? null : widget.item.clothId;
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? HowWeatherColor.primary[50] : HowWeatherColor.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected
+                ? HowWeatherColor.neutral[400]!
+                : HowWeatherColor.neutral[200]!,
+            width: 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Medium_14px(
+                  text:
+                      clothTypeToKorean(widget.category, widget.item.clothType),
+                ),
+                SvgPicture.asset(
+                  isSelected
+                      ? "assets/icons/chevron-up.svg"
+                      : "assets/icons/chevron-down.svg",
+                ),
+              ],
+            ),
+            if (isSelected)
+              ...sameTypeItems.map((i) => Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: ClothInfoCard(
+                      text: widget.text,
+                      context: widget.context,
+                      ref: widget.ref,
+                      color: i.color,
+                      thicknessLabel: i.thickness,
+                      provider: infoProvider,
+                      selectedItemId: i.clothId,
+                      havePalette: widget.havePalette,
+                      haveDelete: widget.haveDelete,
+                      category: widget.category,
+                    ),
+                  )),
+          ],
         ),
       ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Medium_14px(text: clothTypeToKorean(category, item.clothType)),
-              SvgPicture.asset(
-                isSelected
-                    ? "assets/icons/chevron-up.svg"
-                    : "assets/icons/chevron-down.svg",
-              ),
-            ],
-          ),
-          if (isSelected)
-            ...sameTypeItems.map((i) => Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: ClothInfoCard(
-                    text: text,
-                    context: context,
-                    ref: ref,
-                    color: i.color,
-                    thicknessLabel: i.thickness,
-                    provider: infoProvider,
-                    selectedItemId: i.clothId,
-                    havePalette: havePalette,
-                    haveDelete: haveDelete,
-                    category: category,
-                  ),
-                )),
-        ],
-      ),
-    ),
-  );
+    );
+  }
 }
 
 String clothTypeToKorean(String category, int type) {

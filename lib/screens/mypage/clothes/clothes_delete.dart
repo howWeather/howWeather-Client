@@ -100,13 +100,15 @@ class ClothesDelete extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: ClothCard(
-            context,
-            item,
-            allItems,
-            ref,
-            category,
-            false, // havePalette
-            true, // haveDelete
+            context: context,
+            item: item,
+            allItems: allItems,
+            ref: ref,
+            category: category,
+            havePalette: false, // havePalette
+            haveDelete: true, // haveDelete
+            initColor: item.color,
+            initThickness: item.thickness,
           ),
         );
       }).toList(),

@@ -11,7 +11,6 @@ import 'package:go_router/go_router.dart';
 class Palette extends ConsumerWidget {
   final BuildContext context;
   final WidgetRef ref;
-  final int selectedColor;
   final String text;
   final String category;
   final int clothId;
@@ -20,7 +19,6 @@ class Palette extends ConsumerWidget {
     Key? key,
     required this.context,
     required this.ref,
-    this.selectedColor = 0,
     required this.text,
     required this.category,
     this.clothId = 0,
@@ -68,8 +66,6 @@ class Palette extends ConsumerWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () async {
-                    final selectedColor = ref.read(colorProvider);
-                    final selectedThickness = ref.read(thicknessProvider);
                     if (text == "등록") {
                       final selectedClothType =
                           ref.read(selectedEnrollClothProvider);

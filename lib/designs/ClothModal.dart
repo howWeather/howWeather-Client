@@ -100,13 +100,15 @@ class ClothModal extends ConsumerWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: ClothCard(
-                context,
-                item,
-                allItems,
-                ref,
-                category,
-                havePalette,
-                false,
+                context: context,
+                item: item,
+                allItems: allItems,
+                ref: ref,
+                category: category,
+                havePalette: havePalette,
+                haveDelete: false,
+                initColor: item.color,
+                initThickness: item.thickness,
               ),
             );
           }).toList(),

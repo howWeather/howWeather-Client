@@ -129,14 +129,16 @@ class ClothesView extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: ClothCard(
-            context,
-            item,
-            allItems,
-            ref,
-            category,
-            true, // havePalette
-            false, // haveDelete
+            context: context,
+            item: item,
+            allItems: allItems,
+            ref: ref,
+            category: category,
+            havePalette: true, // havePalette
+            haveDelete: false, // haveDelete
             text: "수정",
+            initColor: item.color,
+            initThickness: item.thickness,
           ),
         );
       }).toList(),
