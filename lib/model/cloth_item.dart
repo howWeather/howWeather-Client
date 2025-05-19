@@ -22,6 +22,22 @@ class ClothItem {
       clothId: this.clothId,
     );
   }
+
+  factory ClothItem.fromJson(Map<String, dynamic> json) {
+    return ClothItem(
+      clothType: json['clothType'],
+      color: json['color'],
+      thickness: json['thickness'],
+      clothId: json['clothId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'clothType': clothType,
+        'color': color,
+        'thickness': thickness,
+        'clothId': clothId,
+      };
 }
 
 class ClothGroup {
@@ -32,6 +48,15 @@ class ClothGroup {
     required this.clothType,
     required this.items,
   });
+
+  factory ClothGroup.fromJson(Map<String, dynamic> json) {
+    return ClothGroup(
+      clothType: json['clothType'],
+      items: (json['items'] as List)
+          .map((item) => ClothItem.fromJson(item))
+          .toList(),
+    );
+  }
 }
 
 class CategoryCloth {
@@ -42,4 +67,13 @@ class CategoryCloth {
     required this.category,
     required this.clothList,
   });
+
+  factory CategoryCloth.fromJson(Map<String, dynamic> json) {
+    return CategoryCloth(
+      category: json['category'],
+      clothList: (json['clothList'] as List)
+          .map((item) => ClothGroup.fromJson(item))
+          .toList(),
+    );
+  }
 }
