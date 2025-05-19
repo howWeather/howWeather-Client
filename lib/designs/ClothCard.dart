@@ -2,6 +2,7 @@ import 'package:client/designs/ClothInfoCard.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:client/model/cloth_item.dart';
+import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,20 +10,37 @@ import 'package:flutter_svg/flutter_svg.dart';
 Widget ClothCard(
   BuildContext context,
   ClothItem item,
+  List<ClothItem> allItems,
   WidgetRef ref,
-  StateProvider<int?> selectedProvider,
-  StateProvider<int?> infoProvider,
   String category,
   bool havePalette,
-  bool haveDelete,
-) {
+  bool haveDelete, {
+  String text = "등록",
+}) {
+  late StateProvider<int?> selectedProvider;
+  late StateProvider<int?> infoProvider;
+
+  if (category == "uppers") {
+    selectedProvider = selectedUpperProvider;
+    infoProvider = selectedUpperInfoProvider;
+  }
+  if (category == "outers") {
+    selectedProvider = selectedOuterProvider;
+    infoProvider = selectedOuterInfoProvider;
+  }
+
   final selected = ref.watch(selectedProvider);
   final isSelected = selected == item.clothId;
 
+  final sameTypeItems =
+      allItems.where((i) => i.clothType == item.clothType).toList();
+
   return InkWell(
     onTap: () {
+      final isNowSelected =
+          ref.read(selectedProvider.notifier).state == item.clothId;
       ref.read(selectedProvider.notifier).state =
-          isSelected ? null : item.clothId;
+          isNowSelected ? null : item.clothId;
     },
     child: Container(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -50,21 +68,21 @@ Widget ClothCard(
             ],
           ),
           if (isSelected)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: ClothInfoCard(
-                context: context,
-                ref: ref,
-                color: item.color,
-                thicknessLabel: item.thickness,
-                provider: infoProvider,
-                selectedItemId: item.clothId,
-                havePalette: havePalette,
-                haveDelete: haveDelete,
-                category: category,
-                type: item.clothId,
-              ),
-            ),
+            ...sameTypeItems.map((i) => Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: ClothInfoCard(
+                    text: text,
+                    context: context,
+                    ref: ref,
+                    color: i.color,
+                    thicknessLabel: i.thickness,
+                    provider: infoProvider,
+                    selectedItemId: i.clothId,
+                    havePalette: havePalette,
+                    haveDelete: haveDelete,
+                    category: category,
+                  ),
+                )),
         ],
       ),
     ),

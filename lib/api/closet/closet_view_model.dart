@@ -11,6 +11,7 @@ class ClosetNotifier extends StateNotifier<AsyncValue<List<CategoryCloth>>> {
     loadClothes();
   }
 
+  /// 의류 조회
   Future<void> loadClothes() async {
     try {
       final repo = ClosetRepository();
@@ -21,6 +22,7 @@ class ClosetNotifier extends StateNotifier<AsyncValue<List<CategoryCloth>>> {
     }
   }
 
+  /// 의류 등록
   Future<void> registerClothes({
     required List<Map<String, dynamic>> uppers,
     required List<Map<String, dynamic>> outers,
@@ -34,6 +36,29 @@ class ClosetNotifier extends StateNotifier<AsyncValue<List<CategoryCloth>>> {
       print(result);
     } catch (e) {
       print('의상 등록 실패: $e');
+      rethrow;
+    }
+  }
+
+  /// 상의 수정
+  Future<void> updateUpperCloth({
+    required int clothId,
+    int? color,
+    int? thickness,
+  }) async {
+    try {
+      final repo = ClosetRepository();
+      final result = await repo.updateUpperCloth(
+        clothId: clothId,
+        color: color,
+        thickness: thickness,
+      );
+
+      await loadClothes();
+
+      print(result);
+    } catch (e) {
+      print('상의 수정 실패: $e');
       rethrow;
     }
   }
