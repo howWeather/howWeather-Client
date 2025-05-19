@@ -1,3 +1,4 @@
+import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/designs/ClothCard.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
@@ -5,18 +6,15 @@ import 'package:client/model/cloth_item.dart';
 import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class ClothesDelete extends ConsumerWidget {
   ClothesDelete({super.key});
 
-  final List<CategoryCloth> clothesData = dummyClothesData;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final uppers = clothesData.firstWhere((e) => e.category == "uppers");
-    final outers = clothesData.firstWhere((e) => e.category == "outers");
+    final clothesAsync = ref.watch(closetProvider);
 
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
@@ -34,25 +32,34 @@ class ClothesDelete extends ConsumerWidget {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              sectionTitle("상의", "assets/icons/clothes-upper.svg"),
-              itemList(context, ref, uppers.clothList, "uppers"),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Divider(
-                  color: HowWeatherColor.primary[900],
-                  height: 1,
-                ),
+      body: clothesAsync.when(
+        data: (clothesData) {
+          final uppers = clothesData.firstWhere((e) => e.category == "uppers");
+          final outers = clothesData.firstWhere((e) => e.category == "outers");
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  sectionTitle("상의", "assets/icons/clothes-upper.svg"),
+                  itemList(context, ref, uppers.clothList, "uppers"),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Divider(
+                      color: HowWeatherColor.primary[900],
+                      height: 1,
+                    ),
+                  ),
+                  sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
+                  itemList(context, ref, outers.clothList, "outers"),
+                ],
               ),
-              sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
-              itemList(context, ref, outers.clothList, "outers"),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('에러 발생: $err')),
       ),
     );
   }
@@ -70,8 +77,12 @@ class ClothesDelete extends ConsumerWidget {
     );
   }
 
-  Widget itemList(BuildContext context, WidgetRef ref,
-      List<ClothGroup> clothGroups, String category) {
+  Widget itemList(
+    BuildContext context,
+    WidgetRef ref,
+    List<ClothGroup> clothGroups,
+    String category,
+  ) {
     return Column(
       children: clothGroups.map((group) {
         return Column(
@@ -80,7 +91,7 @@ class ClothesDelete extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 12),
               child: ClothCard(
                 context,
-                item, // ClothItem 전달
+                item,
                 ref,
                 selectedClothProvider,
                 selectedClothInfoProvider,

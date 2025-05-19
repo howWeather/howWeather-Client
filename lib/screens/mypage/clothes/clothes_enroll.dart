@@ -1,23 +1,52 @@
-import 'package:client/designs/ClothCard.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:client/designs/Palette.dart';
-import 'package:client/model/cloth_item.dart';
-import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 final selectedEnrollClothProvider = StateProvider<int?>((ref) => null);
+
+// 모든 옷 타입을 다 보여주기 위한 상의/아우터 Map
+const upperMap = {
+  1: "민소매",
+  2: "반소매",
+  3: "긴소매",
+  4: "니트",
+  5: "조끼",
+  6: "셔츠",
+  7: "원피스",
+  8: "후드티",
+  9: "맨투맨",
+};
+
+const outerMap = {
+  1: "가디건",
+  2: "트렌치코트",
+  3: "블레이저",
+  4: "트위드 자켓",
+  5: "코듀로이 자켓",
+  6: "청자켓",
+  7: "가죽자켓",
+  8: "항공점퍼",
+  9: "야구잠바",
+  10: "후리스",
+  11: "후드집업",
+  12: "져지",
+  13: "바람막이",
+  14: "무스탕",
+  15: "코트",
+  16: "경량패딩",
+  17: "숏패딩",
+  18: "롱패딩",
+};
 
 class ClothesEnroll extends ConsumerWidget {
   ClothesEnroll({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clothes = ref.watch(clothesProvider);
-
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
@@ -25,9 +54,7 @@ class ClothesEnroll extends ConsumerWidget {
         title: Medium_18px(text: "의류 등록"),
         centerTitle: true,
         leading: InkWell(
-          onTap: () {
-            context.pop();
-          },
+          onTap: () => context.pop(),
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
             fit: BoxFit.scaleDown,
@@ -43,7 +70,7 @@ class ClothesEnroll extends ConsumerWidget {
             children: [
               sectionTitle("상의", "assets/icons/clothes-upper.svg"),
               const SizedBox(height: 12),
-              buildGrid(clothes, "uppers", ref, context),
+              buildGrid(context, ref, "uppers", upperMap),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Divider(
@@ -53,7 +80,7 @@ class ClothesEnroll extends ConsumerWidget {
               ),
               sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
               const SizedBox(height: 12),
-              buildGrid(clothes, "outers", ref, context),
+              buildGrid(context, ref, "outers", outerMap),
             ],
           ),
         ),
@@ -61,18 +88,8 @@ class ClothesEnroll extends ConsumerWidget {
     );
   }
 
-  Widget buildGrid(
-    List<CategoryCloth> clothes,
-    String category,
-    WidgetRef ref,
-    BuildContext context,
-  ) {
-    final selectedCategory =
-        clothes.firstWhere((element) => element.category == category);
-
-    final allItems =
-        selectedCategory.clothList.expand((group) => group.items).toList();
-
+  Widget buildGrid(BuildContext context, WidgetRef ref, String category,
+      Map<int, String> itemMap) {
     return GridView.count(
       crossAxisCount: 3,
       shrinkWrap: true,
@@ -80,18 +97,14 @@ class ClothesEnroll extends ConsumerWidget {
       mainAxisSpacing: 4,
       childAspectRatio: 3 / 1,
       physics: const NeverScrollableScrollPhysics(),
-      children: allItems.map((item) {
-        return ClothEnrollCard(
-          context,
-          ref,
-          category,
-          item.clothType,
-        );
+      children: itemMap.keys.map((type) {
+        return ClothEnrollCard(context, ref, category, type, itemMap[type]!);
       }).toList(),
     );
   }
 
-  Widget ClothEnrollCard(BuildContext context, WidgetRef ref, category, type) {
+  Widget ClothEnrollCard(BuildContext context, WidgetRef ref, String category,
+      int type, String label) {
     final selected = ref.watch(selectedEnrollClothProvider);
     final isSelected = selected == type;
 
@@ -118,10 +131,11 @@ class ClothesEnroll extends ConsumerWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
-            child: Medium_16px(
-          text: clothTypeToKorean(category, type),
-          color: isSelected ? HowWeatherColor.white : HowWeatherColor.black,
-        )),
+          child: Medium_16px(
+            text: label,
+            color: isSelected ? HowWeatherColor.white : HowWeatherColor.black,
+          ),
+        ),
       ),
     );
   }

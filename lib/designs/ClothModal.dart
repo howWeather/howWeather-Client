@@ -1,3 +1,4 @@
+import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/designs/ClothCard.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
@@ -26,41 +27,17 @@ class ClothModal extends ConsumerWidget {
     this.havePalette = false,
   }) : super(key: key);
 
-  final dummyClothesData = [
-    CategoryCloth(
-      category: "uppers",
-      clothList: [
-        ClothGroup(
-          clothType: 7,
-          items: [
-            ClothItem(clothType: 7, color: 6, thickness: 1, clothId: 8),
-          ],
-        ),
-        ClothGroup(
-          clothType: 9,
-          items: [
-            ClothItem(clothType: 9, color: 1, thickness: 3, clothId: 3),
-          ],
-        ),
-      ],
-    ),
-    CategoryCloth(
-      category: "outers",
-      clothList: [
-        ClothGroup(
-          clothType: 1,
-          items: [
-            ClothItem(clothType: 1, color: 1, thickness: 1, clothId: 2),
-          ],
-        ),
-      ],
-    ),
-  ];
-
-  List<CategoryCloth> get clothesData => dummyClothesData;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final clothesAsync = ref.watch(closetProvider);
+
+    if (clothesAsync is AsyncLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (clothesAsync is AsyncError) {
+      return Center(child: Text('불러오기 실패'));
+    }
+
+    final clothesData = clothesAsync.value!;
     final clothes = clothesData.firstWhere((e) => e.category == category);
 
     return AlertDialog(
