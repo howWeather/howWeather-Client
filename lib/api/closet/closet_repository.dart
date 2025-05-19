@@ -59,6 +59,7 @@ class ClosetRepository {
     }
   }
 
+  /// 상의 수정
   Future<String> updateUpperCloth({
     required int clothId,
     int? color,
@@ -67,6 +68,42 @@ class ClosetRepository {
     final accessToken = await AuthStorage.getAccessToken();
 
     final url = Uri.parse('$_baseUrl/update-upper/$clothId');
+
+    final Map<String, dynamic> body = {};
+    if (color != null) body["color"] = color;
+    if (thickness != null) body["thickness"] = thickness;
+
+    final response = await http.patch(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data["success"] == true) {
+        print(data);
+        return data["result"];
+      } else {
+        throw Exception("수정 실패: ${data["error"] ?? '알 수 없는 오류'}");
+      }
+    } else {
+      throw Exception('서버 오류: ${response.statusCode}');
+    }
+  }
+
+  /// 아우터 수정
+  Future<String> updateOuterCloth({
+    required int clothId,
+    int? color,
+    int? thickness,
+  }) async {
+    final accessToken = await AuthStorage.getAccessToken();
+
+    final url = Uri.parse('$_baseUrl/update-outer/$clothId');
 
     final Map<String, dynamic> body = {};
     if (color != null) body["color"] = color;

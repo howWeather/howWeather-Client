@@ -62,4 +62,27 @@ class ClosetNotifier extends StateNotifier<AsyncValue<List<CategoryCloth>>> {
       rethrow;
     }
   }
+
+  /// 아우터 수정
+  Future<void> updateOuterCloth({
+    required int clothId,
+    int? color,
+    int? thickness,
+  }) async {
+    try {
+      final repo = ClosetRepository();
+      final result = await repo.updateOuterCloth(
+        clothId: clothId,
+        color: color,
+        thickness: thickness,
+      );
+
+      await loadClothes();
+
+      print(result);
+    } catch (e) {
+      print('상의 수정 실패: $e');
+      rethrow;
+    }
+  }
 }

@@ -108,13 +108,34 @@ class Palette extends ConsumerWidget {
                       }
                     }
                     if (text == "수정") {
-                      await ref.read(closetProvider.notifier).updateUpperCloth(
-                            clothId: clothId,
-                            color: selectedColor,
-                            thickness: selectedThickness,
-                          );
+                      try {
+                        if (category == "uppers") {
+                          await ref
+                              .read(closetProvider.notifier)
+                              .updateUpperCloth(
+                                clothId: clothId,
+                                color: selectedColor,
+                                thickness: selectedThickness,
+                              );
+                        } else if (category == "outers") {
+                          await ref
+                              .read(closetProvider.notifier)
+                              .updateOuterCloth(
+                                clothId: clothId,
+                                color: selectedColor,
+                                thickness: selectedThickness,
+                              );
+                        }
 
-                      context.pop();
+                        context.pop();
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(content: Text('의상이 수정되었습니다.')),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(content: Text('등록 실패: $e')),
+                        );
+                      }
                     }
                   },
                   child: Container(
