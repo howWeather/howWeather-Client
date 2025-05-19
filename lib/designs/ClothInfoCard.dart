@@ -33,6 +33,7 @@ Widget ClothInfoCard({
               ref: ref,
               selectedColor: color,
               text: '수정',
+              category: category,
             );
           },
         );

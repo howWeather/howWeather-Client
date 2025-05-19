@@ -20,4 +20,21 @@ class ClosetNotifier extends StateNotifier<AsyncValue<List<CategoryCloth>>> {
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<void> registerClothes({
+    required List<Map<String, dynamic>> uppers,
+    required List<Map<String, dynamic>> outers,
+  }) async {
+    try {
+      final repo = ClosetRepository();
+      final result = await repo.registerClothes(uppers: uppers, outers: outers);
+
+      await loadClothes();
+
+      print(result);
+    } catch (e) {
+      print('의상 등록 실패: $e');
+      rethrow;
+    }
+  }
 }
