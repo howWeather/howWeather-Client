@@ -8,7 +8,7 @@ import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:client/screens/mypage/mypage.dart';
 import 'package:client/screens/mypage/profile.dart';
 import 'package:client/screens/register/view.dart';
-import 'package:client/screens/signSplash/signSplash.dart';
+import 'package:client/screens/signIn/signIn.dart';
 import 'package:client/screens/signUp/signUpCheck.dart';
 import 'package:client/screens/signUp/signUpEmail.dart';
 import 'package:client/screens/signUp/signUpId.dart';
@@ -16,6 +16,7 @@ import 'package:client/screens/signUp/signUpNickname.dart';
 import 'package:client/screens/signUp/signUpPassword.dart';
 import 'package:client/screens/signUp/signUpPersonal.dart';
 import 'package:client/screens/signUp/signup_clothes_enroll.dart';
+import 'package:client/screens/splash/splash.dart';
 import 'package:client/screens/todayWear/view.dart';
 import 'package:client/screens/todayWeather/view.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => SignSplash(),
+        builder: (context, state) => Splash(),
+      ),
+      GoRoute(
+        path: '/signIn',
+        builder: (context, state) => SignIn(),
       ),
       GoRoute(
         path: '/signUp/email',
