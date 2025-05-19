@@ -6,9 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-final selectedEnrollClothProvider = StateProvider<int?>((ref) => null);
+final selectedEnrollClothProvider = StateProvider<Map<String, int?>>((ref) => {
+      "uppers": null,
+      "outers": null,
+    });
 
-// 모든 옷 타입을 다 보여주기 위한 상의/아우터 Map
 const upperMap = {
   1: "민소매",
   2: "반소매",
@@ -105,23 +107,51 @@ class ClothesEnroll extends ConsumerWidget {
 
   Widget ClothEnrollCard(BuildContext context, WidgetRef ref, String category,
       int type, String label) {
-    final selected = ref.watch(selectedEnrollClothProvider);
-    final isSelected = selected == type;
+    final selectedMap = ref.watch(selectedEnrollClothProvider);
+    final selectedType = selectedMap[category];
+    final isSelected = selectedType == type;
 
     return InkWell(
       onTap: () {
-        ref.read(selectedEnrollClothProvider.notifier).state =
-            isSelected ? null : type;
+        final selectedMap = ref.read(selectedEnrollClothProvider);
+        final currentSelectedType = selectedMap[category];
+
+        // 선택된 타입이 같으면 null로, 아니면 새 값으로 설정
+        final newType = (currentSelectedType == type) ? null : type;
+
+        // 새 Map 생성 (immutability 유지)
+        final newSelectedMap = Map<String, int?>.from(selectedMap);
+        newSelectedMap[category] = newType;
+
+        ref.read(selectedEnrollClothProvider.notifier).state = newSelectedMap;
+
         showDialog(
           context: context,
-          builder: (BuildContext context) {
-            return Palette(
-              context: context,
-              ref: ref,
-              text: '등록',
+          builder: (BuildContext dialogContext) {
+            return WillPopScope(
+              onWillPop: () async {
+                // 다이얼로그 닫을 때 선택 초기화
+                final resetMap = Map<String, int?>.from(
+                    ref.read(selectedEnrollClothProvider));
+                resetMap[category] = null;
+                ref.read(selectedEnrollClothProvider.notifier).state = resetMap;
+                return true;
+              },
+              child: Palette(
+                context: dialogContext,
+                ref: ref,
+                text: '등록',
+                category: category,
+              ),
             );
           },
-        );
+        ).then((_) {
+          // 다이얼로그 닫힌 후에도 초기화
+          final resetMap =
+              Map<String, int?>.from(ref.read(selectedEnrollClothProvider));
+          resetMap[category] = null;
+          ref.read(selectedEnrollClothProvider.notifier).state = resetMap;
+        });
       },
       child: Container(
         decoration: BoxDecoration(

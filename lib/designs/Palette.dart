@@ -1,3 +1,4 @@
+import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
@@ -12,6 +13,7 @@ class Palette extends ConsumerWidget {
   final WidgetRef ref;
   final int selectedColor;
   final String text;
+  final String category;
 
   Palette({
     Key? key,
@@ -19,6 +21,7 @@ class Palette extends ConsumerWidget {
     required this.ref,
     this.selectedColor = 0,
     required this.text,
+    required this.category,
   }) : super(key: key);
 
   @override
@@ -47,7 +50,6 @@ class Palette extends ConsumerWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    ref.read(selectedEnrollClothProvider.notifier).state = null;
                     context.pop();
                   },
                   child: Container(
@@ -63,8 +65,41 @@ class Palette extends ConsumerWidget {
               SizedBox(width: 8),
               Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    context.pop();
+                  onTap: () async {
+                    final selectedColor = ref.read(colorProvider);
+                    final selectedThickness = ref.read(thicknessProvider);
+                    final selectedClothType =
+                        ref.read(selectedEnrollClothProvider);
+                    final clothTypeForCategory = selectedClothType[category];
+
+                    final clothData = {
+                      "clothType": clothTypeForCategory,
+                      "color": selectedColor,
+                      "thickness": selectedThickness,
+                    };
+
+                    try {
+                      if (category == "uppers") {
+                        await ref.read(closetProvider.notifier).registerClothes(
+                          uppers: [clothData],
+                          outers: [],
+                        );
+                      } else if (category == "outers") {
+                        await ref.read(closetProvider.notifier).registerClothes(
+                          uppers: [],
+                          outers: [clothData],
+                        );
+                      }
+
+                      context.pop();
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        SnackBar(content: Text('의상이 등록되었습니다.')),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        SnackBar(content: Text('등록 실패: $e')),
+                      );
+                    }
                   },
                   child: Container(
                     padding: EdgeInsets.all(16),
