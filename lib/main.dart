@@ -26,7 +26,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/signUp/enrollClothes',
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
