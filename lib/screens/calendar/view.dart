@@ -39,10 +39,10 @@ class Calendar extends ConsumerWidget {
                     child: MonthCalendar(),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
                     child: Divider(
                       height: 1,
-                      color: HowWeatherColor.black,
+                      color: HowWeatherColor.primary[900],
                     ),
                   ),
                   DailyHistory(),
@@ -68,7 +68,7 @@ class Calendar extends ConsumerWidget {
     final Map<DateTime, List<String>> events = {
       DateTime.utc(2025, 5, 15): ['Event 1'],
       DateTime.utc(2025, 5, 19): ['Event 1'],
-      DateTime.utc(2025, 5, 23): ['Event 2'],
+      DateTime.utc(2025, 5, 20): ['Event 2'],
     };
 
     return Consumer(
@@ -121,14 +121,14 @@ class Calendar extends ConsumerWidget {
             // 달력 body
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: HowWeatherColor.white,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: TableCalendar(
                 headerVisible: false,
-                daysOfWeekHeight: 70,
+                daysOfWeekHeight: 55,
                 // 요일
                 daysOfWeekStyle: DaysOfWeekStyle(
                   dowTextFormatter: (date, locale) {
@@ -165,10 +165,10 @@ class Calendar extends ConsumerWidget {
                           clipBehavior: Clip.none,
                           children: [
                             Positioned(
-                              top: -7,
+                              top: -5,
                               child: Container(
-                                width: 40,
-                                height: 40,
+                                width: 35,
+                                height: 35,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
@@ -195,17 +195,6 @@ class Calendar extends ConsumerWidget {
                       alignment: Alignment.center,
                       clipBehavior: Clip.none,
                       children: [
-                        // Positioned(
-                        //   top: -7,
-                        //   child: Container(
-                        //     width: 40,
-                        //     height: 40,
-                        //     decoration: BoxDecoration(
-                        //       shape: BoxShape.circle,
-                        //       color: HowWeatherColor.secondary[700],
-                        //     ),
-                        //   ),
-                        // ),
                         Align(
                           alignment: Alignment.topCenter,
                           child: Medium_18px(
@@ -214,7 +203,7 @@ class Calendar extends ConsumerWidget {
                           ),
                         ),
                         Positioned(
-                          top: 32,
+                          top: 28,
                           child: Medium_14px(
                             text: '오늘',
                             color: HowWeatherColor.secondary[900],
@@ -230,10 +219,10 @@ class Calendar extends ConsumerWidget {
                       clipBehavior: Clip.none,
                       children: [
                         Positioned(
-                          top: -7,
+                          top: -5,
                           child: Container(
-                            width: 40,
-                            height: 40,
+                            width: 35,
+                            height: 35,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: HowWeatherColor.secondary[700],
@@ -265,7 +254,7 @@ class Calendar extends ConsumerWidget {
                   },
                 ),
                 // 주간 높이
-                rowHeight: 70,
+                rowHeight: 55,
                 focusedDay: focusedDay,
                 // 달력 시작 날짜
                 firstDay: DateTime.utc(DateTime.now().year, 01, 01),
@@ -321,33 +310,34 @@ class Calendar extends ConsumerWidget {
         return Column(
           children: [
             Semibold_16px(text: formattedDate),
+            SizedBox(
+              height: 20,
+            ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Medium_16px(text: "오전"),
-                    Bold_40px(text: "16°"),
-                    Medium_14px(
+                    Medium_20px(text: "오전"),
+                    SizedBox(width: 4),
+                    Bold_20px(text: "12°"),
+                    SizedBox(width: 8),
+                    Bold_20px(
                       text: "추움",
                       color: HowWeatherColor.primary[900],
                     ),
                   ],
                 ),
                 SizedBox(
-                  width: 30,
-                ),
-                Expanded(
-                  child: SizedBox(
-                    height: 80,
-                    width: MediaQuery.of(context).size.width * 7,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 3,
-                      itemBuilder: (context, index) =>
-                          Image.asset("assets/images/windbreak.png"),
-                      separatorBuilder: (context, index) => SizedBox(width: 24),
-                    ),
+                  height: 60,
+                  child: Row(
+                    children: [
+                      Image.asset("assets/images/T-shirts.png"),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Image.asset("assets/images/windbreak.png"),
+                    ],
                   ),
                 ),
               ],
@@ -356,32 +346,35 @@ class Calendar extends ConsumerWidget {
               height: 16,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Medium_16px(text: "오후"),
-                    Bold_40px(text: "16°"),
-                    Medium_14px(
-                      text: "추움",
-                      color: HowWeatherColor.primary[900],
+                    Medium_20px(text: "오후"),
+                    SizedBox(width: 4),
+                    Bold_20px(text: "26°"),
+                    SizedBox(width: 8),
+                    Bold_20px(
+                      text: "더움",
+                      color: HowWeatherColor.secondary[900],
                     ),
                   ],
                 ),
                 SizedBox(
-                  width: 30,
-                ),
-                Expanded(
-                  child: SizedBox(
-                    height: 80,
-                    width: MediaQuery.of(context).size.width * 7,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 3,
-                      itemBuilder: (context, index) =>
-                          Image.asset("assets/images/windbreak.png"),
-                      separatorBuilder: (context, index) => SizedBox(width: 24),
-                    ),
+                  height: 60,
+                  child: Row(
+                    children: [
+                      ColorFiltered(
+                        colorFilter: ColorFilter.mode(
+                            HowWeatherColor.colorMap[3]!.withOpacity(0.7),
+                            BlendMode.srcATop),
+                        child: Image.asset("assets/images/T-shirts.png"),
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Image.asset("assets/images/windbreak.png"),
+                    ],
                   ),
                 ),
               ],
@@ -390,32 +383,30 @@ class Calendar extends ConsumerWidget {
               height: 16,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Medium_16px(text: "저녁"),
-                    Bold_40px(text: "16°"),
-                    Medium_14px(
-                      text: "추움",
-                      color: HowWeatherColor.primary[900],
+                    Medium_20px(text: "저녁"),
+                    SizedBox(width: 4),
+                    Bold_20px(text: "22°"),
+                    SizedBox(width: 8),
+                    Bold_20px(
+                      text: "적당",
+                      color: HowWeatherColor.secondary[500],
                     ),
                   ],
                 ),
                 SizedBox(
-                  width: 30,
-                ),
-                Expanded(
-                  child: SizedBox(
-                    height: 80,
-                    width: MediaQuery.of(context).size.width * 7,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 3,
-                      itemBuilder: (context, index) =>
-                          Image.asset("assets/images/windbreak.png"),
-                      separatorBuilder: (context, index) => SizedBox(width: 24),
-                    ),
+                  height: 60,
+                  child: Row(
+                    children: [
+                      Image.asset("assets/images/T-shirts.png"),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Image.asset("assets/images/windbreak.png"),
+                    ],
                   ),
                 ),
               ],
