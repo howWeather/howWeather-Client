@@ -41,7 +41,7 @@ class MyPage extends ConsumerWidget {
                   children: [
                     profileState.when(
                       data: (profile) =>
-                          Semibold_28px(text: profile?.nickname ?? "닉네임 없음"),
+                          Semibold_24px(text: profile?.nickname ?? "닉네임 없음"),
                       loading: () => const SizedBox(
                         height: 28,
                         width: 28,
