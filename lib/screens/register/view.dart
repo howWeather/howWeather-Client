@@ -30,6 +30,7 @@ class Register extends ConsumerWidget {
         leading: InkWell(
           onTap: () {
             context.pop();
+            ref.read(selectedTemperatureProvider.notifier).state = null;
           },
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",

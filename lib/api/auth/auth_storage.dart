@@ -25,5 +25,6 @@ class AuthStorage {
   static Future<void> clear() async {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
+    await _storage.deleteAll();
   }
 }
