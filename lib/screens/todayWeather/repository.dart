@@ -68,8 +68,6 @@ class WeatherRepository {
                 date.day == tomorrow.day);
       }).toList();
 
-      print(data);
-
       return todayOrTomorrowForecast;
     } else {
       throw Exception('시간별 날씨 데이터를 가져오지 못했습니다.');
