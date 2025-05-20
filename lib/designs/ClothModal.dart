@@ -46,7 +46,7 @@ class ClothModal extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          itemList(ref, clothes.clothList, category, havePalette),
+          itemList(context, ref, clothes.clothList, category),
           Row(
             children: [
               Expanded(
@@ -90,28 +90,40 @@ class ClothModal extends ConsumerWidget {
     );
   }
 
-  Widget itemList(WidgetRef ref, List<ClothGroup> clothGroups, String category,
-      bool havePalette) {
+  Widget itemList(
+    BuildContext context,
+    WidgetRef ref,
+    List<ClothGroup> clothGroups,
+    String category,
+  ) {
+    final allItems = clothGroups.expand((g) => g.items).toList();
+    final seenTypes = <int>{};
+    final filteredItems = <ClothItem>[];
+
+    // clothType별로 하나씩만 남기기
+    for (final item in allItems) {
+      if (!seenTypes.contains(item.clothType)) {
+        seenTypes.add(item.clothType);
+        filteredItems.add(item);
+      }
+    }
+
     return Column(
-      children: clothGroups.map((group) {
-        return Column(
-          children: group.items.map((item) {
-            final allItems = clothGroups.expand((g) => g.items).toList();
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: ClothCard(
-                context: context,
-                item: item,
-                allItems: allItems,
-                ref: ref,
-                category: category,
-                havePalette: havePalette,
-                haveDelete: false,
-                initColor: item.color,
-                initThickness: item.thickness,
-              ),
-            );
-          }).toList(),
+      children: filteredItems.map((item) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: ClothCard(
+            context: context,
+            item: item,
+            allItems: allItems,
+            ref: ref,
+            category: category,
+            havePalette: false, // havePalette
+            haveDelete: false, // haveDelete
+            text: "수정",
+            initColor: item.color,
+            initThickness: item.thickness,
+          ),
         );
       }).toList(),
     );
