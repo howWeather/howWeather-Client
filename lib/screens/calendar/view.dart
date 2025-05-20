@@ -496,6 +496,7 @@ class Calendar extends ConsumerWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
+                    context.pop();
                     context.push('/calendar/register');
                   },
                   child: Container(

@@ -66,7 +66,7 @@ class ClothModal extends ConsumerWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    context.push('/calendar/register');
+                    context.pop();
                   },
                   child: Container(
                     padding: EdgeInsets.all(16),
