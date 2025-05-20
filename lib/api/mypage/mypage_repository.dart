@@ -19,9 +19,9 @@ class MypageRepository {
     );
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      print(data);
-      return UserProfile.fromJson(data);
+      final decodedResponse = utf8.decode(response.bodyBytes);
+      final jsonBody = jsonDecode(decodedResponse);
+      return UserProfile.fromJson(jsonBody);
     } else {
       throw Exception('프로필을 불러오는데 실패했습니다: ${response.statusCode}');
     }
