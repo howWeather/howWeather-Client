@@ -275,13 +275,11 @@ class SignUpPersonal extends ConsumerWidget {
   }
 
   int? mapGender(int? value) {
-    // 화면 표시 순서: 여자(0), 남자(1)
-    // API 요구: 남(1), 여(2)
     switch (value) {
       case 0:
-        return 2;
-      case 1:
         return 1;
+      case 1:
+        return 2;
       default:
         return null;
     }
