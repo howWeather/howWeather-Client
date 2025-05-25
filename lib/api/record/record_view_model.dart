@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final recordRepositoryProvider = Provider((ref) => RecordRepository());
 
-final recordViewModelProvider =
-    StateNotifierProvider<RecordViewModel, AsyncValue<void>>(
-        (ref) => RecordViewModel(ref));
+final recordViewModelProvider = StateNotifierProvider<RecordViewModel,
+    AsyncValue<List<Map<String, dynamic>>>>((ref) => RecordViewModel(ref));
 
-class RecordViewModel extends StateNotifier<AsyncValue<void>> {
+class RecordViewModel
+    extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
   final Ref ref;
 
-  RecordViewModel(this.ref) : super(const AsyncData(null));
+  RecordViewModel(this.ref) : super(const AsyncValue.data([]));
 
   /// 일일 기록 작성
   Future<void> writeRecord({
@@ -35,6 +35,24 @@ class RecordViewModel extends StateNotifier<AsyncValue<void>> {
       print('기록 성공: $result');
     } catch (e) {
       rethrow;
+    }
+  }
+
+  /// 일일 기록 조회
+  Future<void> fetchRecordByDate(String date) async {
+    state = const AsyncValue.loading();
+    try {
+      final repo = ref.read(recordRepositoryProvider);
+      final result = await repo.fetchRecordByDate(date);
+
+      // null 체크 추가
+      if (result == null) {
+        state = const AsyncValue.data([]);
+      } else {
+        state = AsyncValue.data(result);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
   }
 }
