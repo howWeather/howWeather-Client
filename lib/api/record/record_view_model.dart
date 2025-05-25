@@ -12,6 +12,17 @@ final recordedDaysProvider =
   return await viewModel.fetchRecordedDaysByMonth(month);
 });
 
+final similarDaysProvider = FutureProvider.family
+    .autoDispose<List<int>, ({String month, double temperature})>(
+  (ref, args) async {
+    final viewModel = ref.read(recordViewModelProvider.notifier);
+    return await viewModel.fetchSimilarDaysByMonth(
+      month: args.month,
+      temperature: args.temperature,
+    );
+  },
+);
+
 class RecordViewModel
     extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
   final Ref ref;
@@ -67,6 +78,27 @@ class RecordViewModel
     try {
       final repo = ref.read(recordRepositoryProvider);
       final result = await repo.fetchRecordedDaysByMonth(month);
+      return result;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// 유사날씨 날짜 달별 조회
+  Future<List<int>> fetchSimilarDaysByMonth({
+    required String month,
+    required double temperature,
+    double? upperGap,
+    double? lowerGap,
+  }) async {
+    try {
+      final repo = ref.read(recordRepositoryProvider);
+      final result = await repo.fetchSimilarDaysByMonth(
+        month: month,
+        temperature: temperature,
+        upperGap: upperGap,
+        lowerGap: lowerGap,
+      );
       return result;
     } catch (e) {
       rethrow;
