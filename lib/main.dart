@@ -7,6 +7,7 @@ import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
 import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:client/screens/mypage/mypage.dart';
 import 'package:client/screens/mypage/profile.dart';
+import 'package:client/screens/register/search.dart';
 import 'package:client/screens/register/view.dart';
 import 'package:client/screens/signIn/signIn.dart';
 import 'package:client/screens/signUp/signUpCheck.dart';
@@ -83,6 +84,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/calendar/register',
         builder: (context, state) => Register(),
+      ),
+      GoRoute(
+        path: '/calendar/register/search',
+        builder: (context, state) => AddressSearchPage(),
       ),
       GoRoute(
         path: '/mypage/profile',

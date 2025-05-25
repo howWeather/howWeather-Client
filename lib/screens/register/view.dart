@@ -20,7 +20,7 @@ final selectedClothProvider = StateProvider<int?>((ref) => null);
 final selectedClothInfoProvider = StateProvider<int?>((ref) => null);
 final registerUpperInfoProvider = StateProvider<ClothItem?>((ref) => null);
 final registerOuterInfoProvider = StateProvider<ClothItem?>((ref) => null);
-final currentLocationProvider = StateProvider<String>((ref) => "");
+final addressProvider = StateProvider<String>((ref) => "");
 
 class Register extends ConsumerWidget {
   Register({super.key});
@@ -77,20 +77,21 @@ class Register extends ConsumerWidget {
                     Spacer(),
                     weatherAsync.when(
                       data: (weather) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          ref.read(currentLocationProvider.notifier).state =
-                              weather.name;
-                        });
                         return Column(
                           children: [
-                            Row(
-                              children: [
-                                SvgPicture.asset("assets/icons/locator.svg"),
-                                Semibold_24px(
-                                  text: weather.name,
-                                  color: HowWeatherColor.black,
-                                ),
-                              ],
+                            InkWell(
+                              onTap: () {
+                                context.push('/calendar/register/search');
+                              },
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset("assets/icons/locator.svg"),
+                                  Semibold_24px(
+                                    text: ref.watch(addressProvider),
+                                    color: HowWeatherColor.black,
+                                  ),
+                                ],
+                              ),
                             ),
                             SizedBox(
                               height: 8,
@@ -152,8 +153,7 @@ class Register extends ConsumerWidget {
                           [ref.read(registerUpperInfoProvider)!.clothId]),
                       outers: List<int>.from(
                           [ref.read(registerOuterInfoProvider)!.clothId]),
-                      // city: ref.read(currentLocationProvider),
-                      city: "서울특별시 용산구", // TODO : 선택한 주소 반환
+                      city: ref.read(addressProvider),
                     );
 
                 ScaffoldMessenger.of(context).showSnackBar(
