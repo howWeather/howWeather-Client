@@ -98,4 +98,36 @@ class RecordRepository {
       throw Exception('기록된 날짜 조회 실패');
     }
   }
+
+  /// 유사날씨 날짜 달별 조회
+  Future<List<int>> fetchSimilarDaysByMonth({
+    required String month,
+    required double temperature,
+    double? upperGap,
+    double? lowerGap,
+  }) async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final uri = Uri.parse('$_baseUrl/similar/$month').replace(queryParameters: {
+      'temperature': temperature.toString(),
+      if (upperGap != null) 'upperGap': upperGap.toString(),
+      if (lowerGap != null) 'lowerGap': lowerGap.toString(),
+    });
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    final decoded = utf8.decode(response.bodyBytes);
+    final jsonBody = jsonDecode(decoded);
+
+    if (response.statusCode == 200) {
+      return List<int>.from(jsonBody);
+    } else {
+      throw Exception('유사 기록 날짜 조회 실패');
+    }
+  }
 }
