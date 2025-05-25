@@ -3,7 +3,9 @@ import 'package:client/designs/ClothCard.dart';
 import 'package:client/designs/Palette.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/model/cloth_item.dart';
 import 'package:client/screens/mypage/clothes/clothes_view.dart';
+import 'package:client/screens/register/view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +19,7 @@ Widget ClothInfoCard({
   required bool havePalette,
   required bool haveDelete,
   required String category,
+  required ClothItem selectedItem,
   required int selectedItemId,
   String text = "등록",
 }) {
@@ -26,6 +29,12 @@ Widget ClothInfoCard({
   return InkWell(
     onTap: () {
       ref.read(provider.notifier).state = isSelected ? null : selectedItemId;
+      if (category == "uppers") {
+        ref.read(registerUpperInfoProvider.notifier).state = selectedItem;
+      }
+      if (category == "outers") {
+        ref.read(registerOuterInfoProvider.notifier).state = selectedItem;
+      }
       if (havePalette) {
         ref.read(colorProvider.notifier).state = color;
         ref.read(thicknessProvider.notifier).state = thicknessLabel;
@@ -64,6 +73,7 @@ Widget ClothInfoCard({
               color,
               thicknessLabel,
               selectedItemId,
+              selectedItem,
               category,
             );
           },
@@ -129,6 +139,7 @@ Widget deleteDialog(
   int color,
   int thickness,
   selectedItemId,
+  selectedItem,
   String category,
 ) {
   return AlertDialog(
@@ -157,6 +168,7 @@ Widget deleteDialog(
           havePalette: false,
           haveDelete: false,
           selectedItemId: selectedItemId,
+          selectedItem: selectedItem,
           category: category,
         ),
         SizedBox(

@@ -116,6 +116,7 @@ class _ClothCardState extends ConsumerState<ClothCard> {
                       thicknessLabel: i.thickness,
                       provider: infoProvider,
                       selectedItemId: i.clothId,
+                      selectedItem: i,
                       havePalette: widget.havePalette,
                       haveDelete: widget.haveDelete,
                       category: widget.category,

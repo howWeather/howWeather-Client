@@ -7,7 +7,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-final selectedTimeProvider = StateProvider<String?>((ref) => null);
+final selectedTimeProvider = StateProvider<int?>((ref) => null);
+final calendarFormatProvider =
+    StateProvider<CalendarFormat>((ref) => CalendarFormat.month);
+final focusedDayProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final selectedDayProvider = StateProvider<DateTime?>((ref) => null);
 
 class Calendar extends ConsumerWidget {
   Calendar({super.key});
@@ -57,11 +61,6 @@ class Calendar extends ConsumerWidget {
       ),
     );
   }
-
-  final calendarFormatProvider =
-      StateProvider<CalendarFormat>((ref) => CalendarFormat.month);
-  final focusedDayProvider = StateProvider<DateTime>((ref) => DateTime.now());
-  final selectedDayProvider = StateProvider<DateTime?>((ref) => null);
 
   Widget MonthCalendar() {
     // 예시 이벤트 목록 ...TODO: api 연결
@@ -418,14 +417,15 @@ class Calendar extends ConsumerWidget {
   }
 
   Widget historyDialog(BuildContext context, WidgetRef ref) {
-    String? selectedTime = ref.watch(selectedTimeProvider);
+    final selected = ref.watch(selectedTimeProvider);
 
-    Widget timeButton(String label, String key) {
-      final isSelected = selectedTime == key;
+    Widget timeButton(String label, int value, WidgetRef ref) {
+      final isSelected = selected == value;
+
       return Expanded(
         child: GestureDetector(
           onTap: () {
-            ref.read(selectedTimeProvider.notifier).state = key;
+            ref.read(selectedTimeProvider.notifier).state = value;
           },
           child: Container(
             padding: EdgeInsets.all(8),
@@ -460,11 +460,11 @@ class Calendar extends ConsumerWidget {
         children: [
           Row(
             children: [
-              timeButton("오전", "morning"),
+              timeButton("오전", 1, ref),
               SizedBox(width: 8),
-              timeButton("오후", "afternoon"),
+              timeButton("오후", 2, ref),
               SizedBox(width: 8),
-              timeButton("저녁", "evening"),
+              timeButton("저녁", 3, ref),
             ],
           ),
           SizedBox(height: 12),
