@@ -64,18 +64,22 @@ class Calendar extends ConsumerWidget {
   }
 
   Widget MonthCalendar() {
-    // 예시 이벤트 목록 ...TODO: api 연결
-    final Map<DateTime, List<String>> events = {
-      DateTime.utc(2025, 5, 15): ['Event 1'],
-      DateTime.utc(2025, 5, 19): ['Event 1'],
-      DateTime.utc(2025, 5, 20): ['Event 2'],
-    };
+    Map<DateTime, List<String>> generateEvents(
+        DateTime month, List<int> recordedDays) {
+      return {
+        for (var day in recordedDays)
+          DateTime.utc(month.year, month.month, day): ['기록됨']
+      };
+    }
 
     return Consumer(
       builder: (context, ref, _) {
         final calendarFormat = ref.watch(calendarFormatProvider);
         final focusedDay = ref.watch(focusedDayProvider);
         final selectedDay = ref.watch(selectedDayProvider);
+        final monthString = DateFormat('yyyy-MM').format(focusedDay);
+
+        final recordedDaysAsync = ref.watch(recordedDaysProvider(monthString));
 
         return Column(
           children: [
@@ -126,41 +130,98 @@ class Calendar extends ConsumerWidget {
                 color: HowWeatherColor.white,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: TableCalendar(
-                headerVisible: false,
-                daysOfWeekHeight: 55,
-                // 요일
-                daysOfWeekStyle: DaysOfWeekStyle(
-                  dowTextFormatter: (date, locale) {
-                    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-                    return weekdays[date.weekday % 7];
-                  },
-                  weekdayStyle: TextStyle(
-                    color: HowWeatherColor.neutral[500],
-                    fontFamily: 'Pretendard',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  weekendStyle: TextStyle(
-                    color: HowWeatherColor.neutral[500],
-                    fontFamily: 'Pretendard',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                // 날짜
-                calendarStyle: CalendarStyle(
-                  markersAlignment: Alignment.topRight,
-                  canMarkersOverflow: true,
-                  markersMaxCount: 1,
-                  markersAnchor: 0.7,
-                  outsideDaysVisible: false,
-                ),
-                calendarBuilders: CalendarBuilders(
-                  // 일정 있을 경우 마크 표시
-                  markerBuilder: (context, day, events) {
-                    if (events.isNotEmpty) {
-                      return Stack(
+              child: recordedDaysAsync.when(
+                data: (recordedDays) {
+                  final events = generateEvents(focusedDay, recordedDays);
+                  return TableCalendar(
+                    headerVisible: false,
+                    daysOfWeekHeight: 55,
+                    // 요일
+                    daysOfWeekStyle: DaysOfWeekStyle(
+                      dowTextFormatter: (date, locale) {
+                        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+                        return weekdays[date.weekday % 7];
+                      },
+                      weekdayStyle: TextStyle(
+                        color: HowWeatherColor.neutral[500],
+                        fontFamily: 'Pretendard',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      weekendStyle: TextStyle(
+                        color: HowWeatherColor.neutral[500],
+                        fontFamily: 'Pretendard',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    // 날짜
+                    calendarStyle: CalendarStyle(
+                      markersAlignment: Alignment.topRight,
+                      canMarkersOverflow: true,
+                      markersMaxCount: 1,
+                      markersAnchor: 0.7,
+                      outsideDaysVisible: false,
+                    ),
+                    calendarBuilders: CalendarBuilders(
+                      // 일정 있을 경우 마크 표시
+                      markerBuilder: (context, day, events) {
+                        if (events.isNotEmpty) {
+                          return Stack(
+                              alignment: Alignment.center,
+                              clipBehavior: Clip.none,
+                              children: [
+                                Positioned(
+                                  top: -5,
+                                  child: Container(
+                                    width: 35,
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: HowWeatherColor.secondary[400]!,
+                                        width: 3,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Medium_18px(
+                                    text: '${day.day}',
+                                    color: HowWeatherColor.black,
+                                  ),
+                                ),
+                              ]);
+                        }
+                        return null;
+                      },
+                      // 오늘 날짜
+                      todayBuilder: (context, day, focusedDay) {
+                        return Stack(
+                          alignment: Alignment.center,
+                          clipBehavior: Clip.none,
+                          children: [
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Medium_18px(
+                                text: '${day.day}',
+                                color: HowWeatherColor.black,
+                              ),
+                            ),
+                            Positioned(
+                              top: 28,
+                              child: Medium_14px(
+                                text: '오늘',
+                                color: HowWeatherColor.secondary[900],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                      // 선택된 날짜
+                      selectedBuilder: (context, day, focusedDay) {
+                        return Stack(
                           alignment: Alignment.center,
                           clipBehavior: Clip.none,
                           children: [
@@ -171,10 +232,7 @@ class Calendar extends ConsumerWidget {
                                 height: 35,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: HowWeatherColor.secondary[400]!,
-                                    width: 3,
-                                  ),
+                                  color: HowWeatherColor.secondary[700],
                                 ),
                               ),
                             ),
@@ -185,111 +243,65 @@ class Calendar extends ConsumerWidget {
                                 color: HowWeatherColor.black,
                               ),
                             ),
-                          ]);
-                    }
-                    return null;
-                  },
-                  // 오늘 날짜
-                  todayBuilder: (context, day, focusedDay) {
-                    return Stack(
-                      alignment: Alignment.center,
-                      clipBehavior: Clip.none,
-                      children: [
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: Medium_18px(
-                            text: '${day.day}',
-                            color: HowWeatherColor.black,
-                          ),
-                        ),
-                        Positioned(
-                          top: 28,
-                          child: Medium_14px(
-                            text: '오늘',
-                            color: HowWeatherColor.secondary[900],
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                  // 선택된 날짜
-                  selectedBuilder: (context, day, focusedDay) {
-                    return Stack(
-                      alignment: Alignment.center,
-                      clipBehavior: Clip.none,
-                      children: [
-                        Positioned(
-                          top: -5,
-                          child: Container(
-                            width: 35,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: HowWeatherColor.secondary[700],
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: Medium_18px(
-                            text: '${day.day}',
-                            color: HowWeatherColor.black,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                  // 기본 날짜
-                  defaultBuilder: (context, day, focusedDay) {
-                    return Center(
-                      child: Column(
-                        children: [
-                          Medium_18px(
-                            text: '${day.day}',
-                            color: HowWeatherColor.black,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                // 주간 높이
-                rowHeight: 55,
-                focusedDay: focusedDay,
-                // 달력 시작 날짜
-                firstDay: DateTime.utc(DateTime.now().year, 01, 01),
-                // 달력 종료 날짜
-                lastDay: DateTime.utc(DateTime.now().year + 1, 12, 31),
-                selectedDayPredicate: (day) {
-                  return isSameDay(selectedDay, day);
-                },
-                onDaySelected: (selected, focused) {
-                  ref.read(selectedDayProvider.notifier).state = selected;
-                  ref.read(focusedDayProvider.notifier).state = focused;
-
-                  if (isSameDay(selected, DateTime.now())) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Consumer(
-                          builder: (context, ref, _) =>
-                              historyDialog(context, ref),
+                          ],
                         );
                       },
-                    );
-                  }
+                      // 기본 날짜
+                      defaultBuilder: (context, day, focusedDay) {
+                        return Center(
+                          child: Column(
+                            children: [
+                              Medium_18px(
+                                text: '${day.day}',
+                                color: HowWeatherColor.black,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    // 주간 높이
+                    rowHeight: 55,
+                    focusedDay: focusedDay,
+                    // 달력 시작 날짜
+                    firstDay: DateTime.utc(DateTime.now().year, 01, 01),
+                    // 달력 종료 날짜
+                    lastDay: DateTime.utc(DateTime.now().year + 1, 12, 31),
+                    selectedDayPredicate: (day) {
+                      return isSameDay(selectedDay, day);
+                    },
+                    onDaySelected: (selected, focused) {
+                      ref.read(selectedDayProvider.notifier).state = selected;
+                      ref.read(focusedDayProvider.notifier).state = focused;
+
+                      if (isSameDay(selected, DateTime.now())) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Consumer(
+                              builder: (context, ref, _) =>
+                                  historyDialog(context, ref),
+                            );
+                          },
+                        );
+                      }
+                    },
+                    onFormatChanged: (format) {
+                      ref.read(calendarFormatProvider.notifier).state = format;
+                    },
+                    onPageChanged: (focused) {
+                      ref.read(focusedDayProvider.notifier).state = focused;
+                    },
+                    calendarFormat: calendarFormat,
+                    eventLoader: (day) {
+                      return events[
+                              DateTime.utc(day.year, day.month, day.day)] ??
+                          [];
+                    },
+                  );
                 },
-                onFormatChanged: (format) {
-                  ref.read(calendarFormatProvider.notifier).state = format;
-                },
-                onPageChanged: (focused) {
-                  ref.read(focusedDayProvider.notifier).state = focused;
-                },
-                calendarFormat: calendarFormat,
-                eventLoader: (day) {
-                  return events[DateTime.utc(day.year, day.month, day.day)] ??
-                      [];
-                },
+                loading: () => CircularProgressIndicator(),
+                error: (e, _) => Text("에러: $e"),
               ),
             ),
           ],
@@ -297,96 +309,6 @@ class Calendar extends ConsumerWidget {
       },
     );
   }
-
-  // Widget DailyHistory() {
-  //   return Consumer(
-  //     builder: (context, ref, _) {
-  //       final selectedDay = ref.watch(selectedDayProvider);
-  //       final displayDate = selectedDay ?? DateTime.now();
-
-  //       String formattedDate =
-  //           DateFormat('y년 M월 d일', 'ko_KR').format(displayDate);
-  //       String formattedDate2 = DateFormat('yyyy-MM-dd').format(displayDate);
-
-  //       final recordState = ref.watch(recordViewModelProvider);
-  //       final recordViewModel = ref.read(recordViewModelProvider.notifier);
-
-  //       // API 호출은 최초 한 번만
-  //       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //         recordViewModel.fetchRecordByDate(formattedDate2);
-  //       });
-
-  //       return Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Semibold_16px(text: formattedDate),
-  //           SizedBox(height: 20),
-  //           recordState.when(
-  //             data: (records) {
-  //               if (records == null || records.isEmpty) {
-  //                 return Center(child: Text("기록이 없습니다."));
-  //               }
-
-  //               return ListView.builder(
-  //                 shrinkWrap: true,
-  //                 physics: NeverScrollableScrollPhysics(),
-  //                 itemCount: records.length,
-  //                 itemBuilder: (context, index) {
-  //                   final record = records[index];
-  //                   return Padding(
-  //                     padding: const EdgeInsets.only(bottom: 16),
-  //                     child: Row(
-  //                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //                       children: [
-  //                         Row(
-  //                           children: [
-  //                             Medium_20px(
-  //                                 text: timeSlotToText(record['timeSlot'])),
-  //                             SizedBox(width: 4),
-  //                             Bold_20px(
-  //                                 text: "${record['temperature'].round()}°"),
-  //                             SizedBox(width: 8),
-  //                             Bold_20px(
-  //                               text: feelingToText(record['feeling']),
-  //                               color: feelingToColor(record['feeling']),
-  //                             ),
-  //                           ],
-  //                         ),
-  //                         SizedBox(
-  //                           height: 60,
-  //                           child: Row(
-  //                             children: [
-  //                               ...record['uppers'].map<Widget>((id) {
-  //                                 return Padding(
-  //                                   padding: const EdgeInsets.only(right: 12),
-  //                                   child: Image.asset(
-  //                                       'assets/images/windbreak.png'),
-  //                                 );
-  //                               }).toList(),
-  //                               ...record['outers'].map<Widget>((id) {
-  //                                 return Padding(
-  //                                   padding: const EdgeInsets.only(right: 12),
-  //                                   child: Image.asset(
-  //                                       'assets/images/windbreak.png'),
-  //                                 );
-  //                               }).toList(),
-  //                             ],
-  //                           ),
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   );
-  //                 },
-  //               );
-  //             },
-  //             loading: () => Center(child: CircularProgressIndicator()),
-  //             error: (err, stack) => Center(child: Text("에러: $err")),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   Widget historyDialog(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedTimeProvider);

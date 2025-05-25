@@ -75,4 +75,27 @@ class RecordRepository {
       throw Exception('$error');
     }
   }
+
+  /// 기록한 날 달별 조회
+  Future<List<int>> fetchRecordedDaysByMonth(String month) async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final url = Uri.parse('$_baseUrl/month/$month');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    final decoded = utf8.decode(response.bodyBytes);
+    final jsonBody = jsonDecode(decoded);
+
+    if (response.statusCode == 200) {
+      return List<int>.from(jsonBody);
+    } else {
+      throw Exception('기록된 날짜 조회 실패');
+    }
+  }
 }

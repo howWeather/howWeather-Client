@@ -6,6 +6,12 @@ final recordRepositoryProvider = Provider((ref) => RecordRepository());
 final recordViewModelProvider = StateNotifierProvider<RecordViewModel,
     AsyncValue<List<Map<String, dynamic>>>>((ref) => RecordViewModel(ref));
 
+final recordedDaysProvider =
+    FutureProvider.family<List<int>, String>((ref, month) async {
+  final viewModel = ref.read(recordViewModelProvider.notifier);
+  return await viewModel.fetchRecordedDaysByMonth(month);
+});
+
 class RecordViewModel
     extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
   final Ref ref;
@@ -53,6 +59,17 @@ class RecordViewModel
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// 기록한 날 달별 조회
+  Future<List<int>> fetchRecordedDaysByMonth(String month) async {
+    try {
+      final repo = ref.read(recordRepositoryProvider);
+      final result = await repo.fetchRecordedDaysByMonth(month);
+      return result;
+    } catch (e) {
+      rethrow;
     }
   }
 }
