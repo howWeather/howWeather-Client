@@ -1,3 +1,4 @@
+import 'package:client/api/record/record_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
@@ -297,124 +298,95 @@ class Calendar extends ConsumerWidget {
     );
   }
 
-  Widget DailyHistory() {
-    return Consumer(
-      builder: (context, ref, _) {
-        final selectedDay = ref.watch(selectedDayProvider);
-        final displayDate = selectedDay ?? DateTime.now(); // 선택된 날짜가 없으면 오늘 날짜
+  // Widget DailyHistory() {
+  //   return Consumer(
+  //     builder: (context, ref, _) {
+  //       final selectedDay = ref.watch(selectedDayProvider);
+  //       final displayDate = selectedDay ?? DateTime.now();
 
-        String formattedDate =
-            DateFormat('y년 M월 d일', 'ko_KR').format(displayDate);
+  //       String formattedDate =
+  //           DateFormat('y년 M월 d일', 'ko_KR').format(displayDate);
+  //       String formattedDate2 = DateFormat('yyyy-MM-dd').format(displayDate);
 
-        return Column(
-          children: [
-            Semibold_16px(text: formattedDate),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Row(
-                  children: [
-                    Medium_20px(text: "오전"),
-                    SizedBox(width: 4),
-                    Bold_20px(text: "12°"),
-                    SizedBox(width: 8),
-                    Bold_20px(
-                      text: "추움",
-                      color: HowWeatherColor.primary[900],
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 60,
-                  child: Row(
-                    children: [
-                      Image.asset("assets/images/T-shirts.png"),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Image.asset("assets/images/windbreak.png"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Row(
-                  children: [
-                    Medium_20px(text: "오후"),
-                    SizedBox(width: 4),
-                    Bold_20px(text: "26°"),
-                    SizedBox(width: 8),
-                    Bold_20px(
-                      text: "더움",
-                      color: HowWeatherColor.secondary[900],
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 60,
-                  child: Row(
-                    children: [
-                      ColorFiltered(
-                        colorFilter: ColorFilter.mode(
-                            HowWeatherColor.colorMap[3]!.withOpacity(0.7),
-                            BlendMode.srcATop),
-                        child: Image.asset("assets/images/T-shirts.png"),
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Image.asset("assets/images/windbreak.png"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Row(
-                  children: [
-                    Medium_20px(text: "저녁"),
-                    SizedBox(width: 4),
-                    Bold_20px(text: "22°"),
-                    SizedBox(width: 8),
-                    Bold_20px(
-                      text: "적당",
-                      color: HowWeatherColor.secondary[500],
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 60,
-                  child: Row(
-                    children: [
-                      Image.asset("assets/images/T-shirts.png"),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Image.asset("assets/images/windbreak.png"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
+  //       final recordState = ref.watch(recordViewModelProvider);
+  //       final recordViewModel = ref.read(recordViewModelProvider.notifier);
+
+  //       // API 호출은 최초 한 번만
+  //       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //         recordViewModel.fetchRecordByDate(formattedDate2);
+  //       });
+
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Semibold_16px(text: formattedDate),
+  //           SizedBox(height: 20),
+  //           recordState.when(
+  //             data: (records) {
+  //               if (records == null || records.isEmpty) {
+  //                 return Center(child: Text("기록이 없습니다."));
+  //               }
+
+  //               return ListView.builder(
+  //                 shrinkWrap: true,
+  //                 physics: NeverScrollableScrollPhysics(),
+  //                 itemCount: records.length,
+  //                 itemBuilder: (context, index) {
+  //                   final record = records[index];
+  //                   return Padding(
+  //                     padding: const EdgeInsets.only(bottom: 16),
+  //                     child: Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //                       children: [
+  //                         Row(
+  //                           children: [
+  //                             Medium_20px(
+  //                                 text: timeSlotToText(record['timeSlot'])),
+  //                             SizedBox(width: 4),
+  //                             Bold_20px(
+  //                                 text: "${record['temperature'].round()}°"),
+  //                             SizedBox(width: 8),
+  //                             Bold_20px(
+  //                               text: feelingToText(record['feeling']),
+  //                               color: feelingToColor(record['feeling']),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                         SizedBox(
+  //                           height: 60,
+  //                           child: Row(
+  //                             children: [
+  //                               ...record['uppers'].map<Widget>((id) {
+  //                                 return Padding(
+  //                                   padding: const EdgeInsets.only(right: 12),
+  //                                   child: Image.asset(
+  //                                       'assets/images/windbreak.png'),
+  //                                 );
+  //                               }).toList(),
+  //                               ...record['outers'].map<Widget>((id) {
+  //                                 return Padding(
+  //                                   padding: const EdgeInsets.only(right: 12),
+  //                                   child: Image.asset(
+  //                                       'assets/images/windbreak.png'),
+  //                                 );
+  //                               }).toList(),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   );
+  //                 },
+  //               );
+  //             },
+  //             loading: () => Center(child: CircularProgressIndicator()),
+  //             error: (err, stack) => Center(child: Text("에러: $err")),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget historyDialog(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedTimeProvider);
@@ -509,6 +481,150 @@ class Calendar extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+String timeSlotToText(int slot) {
+  switch (slot) {
+    case 1:
+      return "오전";
+    case 2:
+      return "오후";
+    case 3:
+      return "저녁";
+    default:
+      return "시간대 정보 없음";
+  }
+}
+
+String feelingToText(int feeling) {
+  switch (feeling) {
+    case 1:
+      return "추움";
+    case 2:
+      return "적당";
+    case 3:
+      return "더움";
+    default:
+      return "알 수 없음";
+  }
+}
+
+Color feelingToColor(int feeling) {
+  switch (feeling) {
+    case 1:
+      return HowWeatherColor.primary[900]!;
+    case 2:
+      return HowWeatherColor.secondary[500]!;
+    case 3:
+      return HowWeatherColor.secondary[900]!;
+    default:
+      return Colors.black;
+  }
+}
+
+class DailyHistory extends StatefulWidget {
+  @override
+  State<DailyHistory> createState() => _DailyHistoryState();
+}
+
+class _DailyHistoryState extends State<DailyHistory> {
+  String? _lastFetchedDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final selectedDay = ref.watch(selectedDayProvider);
+        final displayDate = selectedDay ?? DateTime.now();
+
+        final formattedDate =
+            DateFormat('y년 M월 d일', 'ko_KR').format(displayDate);
+        final formattedDate2 = DateFormat('yyyy-MM-dd').format(displayDate);
+
+        final recordState = ref.watch(recordViewModelProvider);
+        final recordViewModel = ref.read(recordViewModelProvider.notifier);
+
+        // 날짜가 바뀔 때만 fetch
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_lastFetchedDate != formattedDate2) {
+            _lastFetchedDate = formattedDate2;
+            recordViewModel.fetchRecordByDate(formattedDate2);
+          }
+        });
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Semibold_16px(text: formattedDate),
+            SizedBox(height: 20),
+            recordState.when(
+              data: (records) {
+                if (records == null || records.isEmpty) {
+                  return Center(
+                    child: const Bold_20px(text: "기록이 없습니다."),
+                  );
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: records.length,
+                  itemBuilder: (context, index) {
+                    final record = records[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Row(
+                            children: [
+                              Medium_20px(
+                                  text: timeSlotToText(record['timeSlot'])),
+                              SizedBox(width: 4),
+                              Bold_20px(
+                                  text: "${record['temperature'].round()}°"),
+                              SizedBox(width: 8),
+                              Bold_20px(
+                                text: feelingToText(record['feeling']),
+                                color: feelingToColor(record['feeling']),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 60,
+                            child: Row(
+                              children: [
+                                ...record['uppers'].map<Widget>((id) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 12),
+                                    child: Image.asset(
+                                        'assets/images/windbreak.png'),
+                                  );
+                                }).toList(),
+                                ...record['outers'].map<Widget>((id) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 12),
+                                    child: Image.asset(
+                                        'assets/images/windbreak.png'),
+                                  );
+                                }).toList(),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text("에러: $err")),
+            ),
+          ],
+        );
+      },
     );
   }
 }

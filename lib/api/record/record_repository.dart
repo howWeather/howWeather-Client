@@ -47,4 +47,32 @@ class RecordRepository {
       throw Exception('$error');
     }
   }
+
+  /// 일일 기록 조회
+  Future<List<Map<String, dynamic>>> fetchRecordByDate(String date) async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final url = Uri.parse('$_baseUrl/date/$date');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    final decoded = utf8.decode(response.bodyBytes);
+    final jsonBody = jsonDecode(decoded);
+
+    if (response.statusCode == 200) {
+      if (jsonBody is List) {
+        return List<Map<String, dynamic>>.from(jsonBody);
+      } else {
+        throw Exception('예상치 못한 응답 형식입니다.');
+      }
+    } else {
+      final error = jsonBody['error']?['message'] ?? '알 수 없는 오류';
+      throw Exception('$error');
+    }
+  }
 }
