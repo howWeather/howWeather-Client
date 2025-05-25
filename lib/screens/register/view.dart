@@ -39,6 +39,7 @@ class Register extends ConsumerWidget {
           onTap: () {
             context.pop();
             ref.read(selectedTemperatureProvider.notifier).state = null;
+            ref.read(addressProvider.notifier).state = "";
           },
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
@@ -78,6 +79,7 @@ class Register extends ConsumerWidget {
                     weatherAsync.when(
                       data: (weather) {
                         return Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             InkWell(
                               onTap: () {
@@ -165,6 +167,7 @@ class Register extends ConsumerWidget {
                 );
 
                 await Future.delayed(const Duration(milliseconds: 1500));
+                ref.read(addressProvider.notifier).state = "";
                 context.go('/calendar');
               } catch (e) {
                 // ❌ 실패 스낵바

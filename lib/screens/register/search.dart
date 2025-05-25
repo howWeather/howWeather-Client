@@ -1,6 +1,10 @@
+import 'package:client/designs/HowWeatherColor.dart';
+import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/screens/register/view.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class AddressSearchPage extends ConsumerStatefulWidget {
   const AddressSearchPage({super.key});
@@ -282,17 +286,59 @@ class _AddressSearchPageState extends ConsumerState<AddressSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('주소 검색')),
+      backgroundColor: HowWeatherColor.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Medium_18px(text: "주소 검색"),
+        centerTitle: true,
+        leading: InkWell(
+          onTap: () {
+            context.pop();
+          },
+          child: SvgPicture.asset(
+            "assets/icons/chevron-left.svg",
+            fit: BoxFit.scaleDown,
+            height: 20,
+            width: 20,
+          ),
+        ),
+      ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               onChanged: _filterSearch,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: '주소 검색',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: HowWeatherColor.neutral[100]!,
+                    width: 3,
+                  ),
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+                filled: true,
+                fillColor: HowWeatherColor.neutral[50],
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: HowWeatherColor.neutral[200]!,
+                    width: 3,
+                  ),
+                ),
+                labelStyle: TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: HowWeatherColor.neutral[300],
+                ),
+                prefixIcon: SvgPicture.asset(
+                  "assets/icons/locator.svg",
+                  fit: BoxFit.scaleDown,
+                  color: HowWeatherColor.neutral[300],
+                ),
               ),
             ),
           ),
