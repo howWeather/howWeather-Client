@@ -1,18 +1,26 @@
+import 'package:client/api/record/record_view_model.dart';
+import 'package:client/designs/ClothCard.dart';
 import 'package:client/designs/ClothModal.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/model/cloth_item.dart';
+import 'package:client/screens/calendar/view.dart';
 import 'package:client/screens/todayWeather/viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 final isAllValidProvider = Provider<bool>((ref) {
   return true;
 });
-final selectedTemperatureProvider = StateProvider<String?>((ref) => null);
+final selectedTemperatureProvider = StateProvider<int?>((ref) => null);
 final selectedClothProvider = StateProvider<int?>((ref) => null);
 final selectedClothInfoProvider = StateProvider<int?>((ref) => null);
+final registerUpperInfoProvider = StateProvider<ClothItem?>((ref) => null);
+final registerOuterInfoProvider = StateProvider<ClothItem?>((ref) => null);
+final currentLocationProvider = StateProvider<String>((ref) => "");
 
 class Register extends ConsumerWidget {
   Register({super.key});
@@ -52,37 +60,53 @@ class Register extends ConsumerWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Semibold_24px(text: "오전"),
-                        Bold_40px(text: "16°"),
+                        Semibold_20px(
+                            text: DateFormat('yyyy-MM-dd')
+                                .format(ref.read(selectedDayProvider)!)),
+                        Row(
+                          children: [
+                            Semibold_28px(text: "오전"),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Bold_32px(text: "16°"),
+                          ],
+                        ),
                       ],
                     ),
                     Spacer(),
                     weatherAsync.when(
-                      data: (weather) => Column(
-                        children: [
-                          Row(
-                            children: [
-                              SvgPicture.asset("assets/icons/locator.svg"),
-                              Semibold_24px(
-                                text: weather.name,
-                                color: HowWeatherColor.black,
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            children: [
-                              TemperatureButton("추움", ref),
-                              SizedBox(width: 8),
-                              TemperatureButton("적당", ref),
-                              SizedBox(width: 8),
-                              TemperatureButton("더움", ref),
-                            ],
-                          ),
-                        ],
-                      ),
+                      data: (weather) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          ref.read(currentLocationProvider.notifier).state =
+                              weather.name;
+                        });
+                        return Column(
+                          children: [
+                            Row(
+                              children: [
+                                SvgPicture.asset("assets/icons/locator.svg"),
+                                Semibold_24px(
+                                  text: weather.name,
+                                  color: HowWeatherColor.black,
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            Row(
+                              children: [
+                                TemperatureButton(1, ref),
+                                SizedBox(width: 8),
+                                TemperatureButton(2, ref),
+                                SizedBox(width: 8),
+                                TemperatureButton(3, ref),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
                       loading: () => CircularProgressIndicator(),
                       error: (e, _) => Text('에러: $e'),
                     ),
@@ -94,8 +118,10 @@ class Register extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Cloth(context, "상의", ref, "uppers"),
-                    Cloth(context, "아우터", ref, "outers"),
+                    Cloth(context, "상의", ref, "uppers",
+                        ref.watch(registerUpperInfoProvider)?.clothType ?? 0),
+                    Cloth(context, "아우터", ref, "outers",
+                        ref.watch(registerOuterInfoProvider)?.clothType ?? 0),
                   ],
                 ),
               ],
@@ -112,10 +138,45 @@ class Register extends ConsumerWidget {
 
   Widget bottomSheetWidget(BuildContext context, ref) {
     final isAllValid = ref.watch(isAllValidProvider);
+
     return GestureDetector(
       onTap: isAllValid
-          ? () {
-              context.go('/calendar');
+          ? () async {
+              try {
+                await ref.read(recordViewModelProvider.notifier).writeRecord(
+                      timeSlot: ref.read(selectedTimeProvider),
+                      feeling: ref.read(selectedTemperatureProvider),
+                      date: DateFormat('yyyy-MM-dd')
+                          .format(ref.read(selectedDayProvider)),
+                      uppers: List<int>.from(
+                          [ref.read(registerUpperInfoProvider)!.clothId]),
+                      outers: List<int>.from(
+                          [ref.read(registerOuterInfoProvider)!.clothId]),
+                      // city: ref.read(currentLocationProvider),
+                      city: "서울특별시 용산구", // TODO : 선택한 주소 반환
+                    );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('기록이 성공적으로 저장되었어요!'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+
+                await Future.delayed(const Duration(milliseconds: 1500));
+                context.go('/calendar');
+              } catch (e) {
+                // ❌ 실패 스낵바
+                print(e);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('$e'),
+                    backgroundColor: Colors.red,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
             }
           : null,
       child: Container(
@@ -141,30 +202,40 @@ class Register extends ConsumerWidget {
     );
   }
 
-  Widget TemperatureButton(String label, WidgetRef ref) {
+  Widget TemperatureButton(int value, WidgetRef ref) {
     final selected = ref.watch(selectedTemperatureProvider);
-
-    // 선택된 상태인지 확인
-    final isSelected = selected == label;
-
-    // 라벨에 따라 색상 지정
+    String label;
     Color backgroundColor;
-    if (label == "적당") {
-      backgroundColor =
-          isSelected ? const Color(0xFF15A000) : HowWeatherColor.white;
-    } else if (label == "추움") {
-      backgroundColor =
-          isSelected ? HowWeatherColor.primary[900]! : HowWeatherColor.white;
-    } else if (label == "더움") {
-      backgroundColor =
-          isSelected ? HowWeatherColor.secondary[700]! : HowWeatherColor.white;
-    } else {
-      backgroundColor = HowWeatherColor.white;
+
+    switch (value) {
+      case 1:
+        label = "추움";
+        backgroundColor = selected == 1
+            ? HowWeatherColor.primary[900]!
+            : HowWeatherColor.white;
+        break;
+      case 2:
+        label = "적당";
+        backgroundColor = selected == 2
+            ? HowWeatherColor.secondary[400]!
+            : HowWeatherColor.white;
+        break;
+      case 3:
+        label = "더움";
+        backgroundColor = selected == 3
+            ? HowWeatherColor.secondary[700]!
+            : HowWeatherColor.white;
+        break;
+      default:
+        label = "";
+        backgroundColor = HowWeatherColor.white;
     }
+
+    final isSelected = selected == value;
 
     return GestureDetector(
       onTap: () {
-        ref.read(selectedTemperatureProvider.notifier).state = label;
+        ref.read(selectedTemperatureProvider.notifier).state = value;
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -186,8 +257,8 @@ class Register extends ConsumerWidget {
     );
   }
 
-  Widget Cloth(
-      BuildContext context, String text, WidgetRef ref, String category) {
+  Widget Cloth(BuildContext context, String text, WidgetRef ref,
+      String category, int type) {
     return Column(
       children: [
         Medium_16px(text: text),
@@ -210,16 +281,19 @@ class Register extends ConsumerWidget {
             );
           },
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 8),
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             width: MediaQuery.of(context).size.width * 0.4,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: HowWeatherColor.black, width: 1),
             ),
-            child: Container(
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.only(right: 8),
-                child: SvgPicture.asset("assets/icons/search.svg")),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Medium_16px(text: clothTypeToKorean(category, type)),
+                SvgPicture.asset("assets/icons/search.svg"),
+              ],
+            ),
           ),
         ),
         SizedBox(

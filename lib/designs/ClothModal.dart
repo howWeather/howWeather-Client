@@ -3,6 +3,7 @@ import 'package:client/designs/ClothCard.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:client/model/cloth_item.dart';
+import 'package:client/screens/register/view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -66,6 +67,7 @@ class ClothModal extends ConsumerWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
+                    print('선택 확인 ${ref.watch(infoProvider)}');
                     context.pop();
                   },
                   child: Container(
