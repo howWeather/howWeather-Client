@@ -153,7 +153,7 @@ class Register extends ConsumerWidget {
                       outers: List<int>.from(
                           [ref.read(registerOuterInfoProvider)!.clothId]),
                       // city: ref.read(currentLocationProvider),
-                      city: "서울특별시 용산구",
+                      city: "서울특별시 용산구", // TODO : 선택한 주소 반환
                     );
 
                 ScaffoldMessenger.of(context).showSnackBar(
