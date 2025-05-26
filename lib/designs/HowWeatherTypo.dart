@@ -434,6 +434,7 @@ class Medium_16px extends StatelessWidget {
   final TextStyle style;
   final Color? color;
   final TextOverflow? overflow;
+  final TextAlign? textAlign;
 
   const Medium_16px({
     Key? key,
@@ -441,6 +442,7 @@ class Medium_16px extends StatelessWidget {
     this.color,
     this.overflow,
     this.style = const TextStyle(),
+    this.textAlign,
   }) : super(key: key);
 
   @override
@@ -453,7 +455,7 @@ class Medium_16px extends StatelessWidget {
           fontSize: 16,
           fontWeight: FontWeight.w500),
       overflow: overflow ?? TextOverflow.clip,
-      textAlign: TextAlign.center,
+      textAlign: textAlign ?? TextAlign.start,
     );
   }
 }
