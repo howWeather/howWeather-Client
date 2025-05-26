@@ -1,5 +1,6 @@
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/screens/signIn/findPassword/find_password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -45,7 +46,7 @@ class SendEmail extends ConsumerWidget {
               height: 12,
             ),
             Medium_16px(
-              text: "0y******@n***.com 메일함을 확인해주세요!",
+              text: "${ref.read(identifierProvider)} 메일함을 확인해주세요!",
               color: HowWeatherColor.primary[900],
             ),
           ],
