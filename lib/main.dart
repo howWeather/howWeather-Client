@@ -7,6 +7,7 @@ import 'package:client/screens/mypage/clothes/clothes_delete.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
 import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:client/screens/mypage/mypage.dart';
+import 'package:client/screens/mypage/notification_set.dart';
 import 'package:client/screens/mypage/profile.dart';
 import 'package:client/screens/calendar/register/search.dart';
 import 'package:client/screens/calendar/register/view.dart';
@@ -119,6 +120,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/mypage/changePassword',
         builder: (context, state) => ChangePassword(),
+      ),
+      GoRoute(
+        path: '/mypage/notification',
+        builder: (context, state) => NotificationSet(),
       ),
       ShellRoute(
         builder: (context, state, child) => HowWeatherNaviShell(child: child),
