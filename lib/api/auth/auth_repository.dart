@@ -176,4 +176,31 @@ class AuthRepository {
       await AuthStorage.clear();
     }
   }
+
+  /// 비밀번호 초기화
+  Future<String?> resetPassword(String identifier) async {
+    final url = Uri.parse('$_baseUrl/reset-password');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(
+        {
+          "identifier": identifier,
+        },
+      ),
+    );
+
+    final decodedResponse = utf8.decode(response.bodyBytes);
+    final jsonBody = jsonDecode(decodedResponse);
+    print(identifier);
+    print(jsonBody);
+    if (response.statusCode == 200) {
+      return jsonBody['result'];
+    } else {
+      return jsonBody['result'];
+    }
+  }
 }

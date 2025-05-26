@@ -1,3 +1,4 @@
+import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/material.dart';
@@ -5,20 +6,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-final findProvider = StateProvider<String>((ref) => '');
-
-// 최종 유효성
-final isAllValidProvider = Provider<bool>((ref) {
-  final isFormatValid = ref.watch(findProvider).isNotEmpty;
-  return isFormatValid;
-});
+final identifierProvider = StateProvider<String?>((ref) => '');
 
 class FindPassword extends ConsumerWidget {
   FindPassword({super.key});
 
+  final findProvider = StateProvider<String>((ref) => '');
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 최종 유효성
+    final isAllValidProvider = Provider<bool>((ref) {
+      final isFormatValid = ref.watch(findProvider).isNotEmpty;
+      return isFormatValid;
+    });
+
     final isAllValid = ref.watch(isAllValidProvider);
+    final findInput = ref.watch(findProvider);
+    final result = ref.watch(identifierProvider);
+
+    final shouldShowError = result == null && result != findInput;
 
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
@@ -99,11 +106,11 @@ class FindPassword extends ConsumerWidget {
             SizedBox(
               height: 12,
             ),
-            // TODO: if(api error && ref.watch(findProvider) != findIdOrEmail)
-            Medium_16px(
-              text: "존재하지 않는 계정 정보입니다.",
-              color: HowWeatherColor.error,
-            ),
+            if (shouldShowError)
+              Medium_16px(
+                text: "존재하지 않는 계정 정보입니다.",
+                color: HowWeatherColor.error,
+              ),
           ],
         ),
       ),
@@ -115,9 +122,15 @@ class FindPassword extends ConsumerWidget {
       BuildContext context, bool isAllValid, WidgetRef ref) {
     return GestureDetector(
       onTap: isAllValid
-          ? () {
-              context.push('/signIn/findPassword/sendEmail');
-              ref.read(findProvider.notifier).state = '';
+          ? () async {
+              final result =
+                  await AuthRepository().resetPassword(ref.read(findProvider));
+              ref.read(identifierProvider.notifier).state = result;
+              print('result: $result');
+              if (result != null) {
+                context.push('/signIn/findPassword/sendEmail');
+                ref.read(findProvider.notifier).state = '';
+              }
             }
           : null,
       child: Container(
