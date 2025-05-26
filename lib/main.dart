@@ -9,6 +9,7 @@ import 'package:client/screens/mypage/mypage.dart';
 import 'package:client/screens/mypage/profile.dart';
 import 'package:client/screens/calendar/register/search.dart';
 import 'package:client/screens/calendar/register/view.dart';
+import 'package:client/screens/signIn/findPassword/find_password.dart';
 import 'package:client/screens/signIn/signIn.dart';
 import 'package:client/screens/signUp/signUpCheck.dart';
 import 'package:client/screens/signUp/signUpEmail.dart';
@@ -37,6 +38,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signIn',
         builder: (context, state) => SignIn(),
+      ),
+      GoRoute(
+        path: '/signIn/findPassword',
+        builder: (context, state) => FindPassword(),
       ),
       GoRoute(
         path: '/signUp/email',

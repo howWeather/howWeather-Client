@@ -127,8 +127,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
                   ),
                   InkWell(
                     onTap: () {
-                      // TODO: 비밀번호 찾기 페이지
-                      // context.go('/signUp');
+                      context.push('/signIn/findPassword');
                     },
                     child: Medium_18px(
                       text: "비밀번호 찾기",
