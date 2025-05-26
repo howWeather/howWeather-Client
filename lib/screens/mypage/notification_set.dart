@@ -1,3 +1,4 @@
+import 'package:client/api/alarm/alarm_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,12 +10,15 @@ import 'package:go_router/go_router.dart';
 class NotificationSet extends ConsumerWidget {
   NotificationSet({super.key});
 
-  final morningNotificationProvider = StateProvider<bool>((ref) => true);
-  final afternoonNotificationProvider = StateProvider<bool>((ref) => true);
-  final eveningNotificationProvider = StateProvider<bool>((ref) => true);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final alarmState = ref.watch(alarmViewModelProvider);
+    final alarmNotifier = ref.read(alarmViewModelProvider.notifier);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      alarmNotifier.fetchAlarmSettings();
+    });
+
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
@@ -23,7 +27,7 @@ class NotificationSet extends ConsumerWidget {
         centerTitle: true,
         leading: InkWell(
           onTap: () {
-            context.pop(); // ← () 빠졌던 거 고침
+            context.pop();
           },
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
@@ -46,22 +50,20 @@ class NotificationSet extends ConsumerWidget {
                 height: 1,
               ),
             ),
-            TimeNotification(
-                "오전 알림", "오전 9시에 알림이 와요", morningNotificationProvider, ref),
-            TimeNotification(
-                "오후 알림", "오후 2시에 알림이 와요", afternoonNotificationProvider, ref),
-            TimeNotification(
-                "저녁 알림", "오후 8시에 알림이 와요", eveningNotificationProvider, ref),
+            TimeNotification("오전 알림", "오전 9시에 알림이 와요", alarmState.morning,
+                alarmNotifier.toggleMorning),
+            TimeNotification("오후 알림", "오후 2시에 알림이 와요", alarmState.afternoon,
+                alarmNotifier.toggleAfternoon),
+            TimeNotification("저녁 알림", "오후 8시에 알림이 와요", alarmState.evening,
+                alarmNotifier.toggleEvening),
           ],
         ),
       ),
     );
   }
 
-  Widget TimeNotification(String title, String content,
-      StateProvider<bool> provider, WidgetRef ref) {
-    final isOn = ref.watch(provider);
-
+  Widget TimeNotification(
+      String title, String content, bool isOn, VoidCallback onToggle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
@@ -77,9 +79,7 @@ class NotificationSet extends ConsumerWidget {
           Spacer(),
           CupertinoSwitch(
             value: isOn,
-            onChanged: (value) {
-              ref.read(provider.notifier).state = value;
-            },
+            onChanged: (_) => onToggle(),
             activeColor: HowWeatherColor.primary[900],
           ),
         ],
