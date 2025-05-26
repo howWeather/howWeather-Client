@@ -196,7 +196,19 @@ class MyPage extends ConsumerWidget {
                 height: 1,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => HowWeatherDialog(
+                      titleText: "탈퇴",
+                      contentText: "탈퇴하시겠습니까?\n모든 기록이 사라집니다.",
+                      done: () async {
+                        // await AuthRepository().logout();
+                        context.go('/');
+                      },
+                    ),
+                  );
+                },
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),

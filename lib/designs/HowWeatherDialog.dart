@@ -25,6 +25,7 @@ class HowWeatherDialog extends ConsumerWidget {
         margin: EdgeInsets.symmetric(vertical: 34, horizontal: 34),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Bold_20px(
               text: titleText,
@@ -83,14 +84,13 @@ class HowWeatherDialog extends ConsumerWidget {
                     child: Container(
                       height: 40,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: HowWeatherColor.white,
-                          border: Border.all(
-                              color: HowWeatherColor.neutral[400]!, width: 1)),
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.redAccent,
+                      ),
                       child: Center(
                         child: Semibold_16px(
                           text: "네",
-                          color: HowWeatherColor.neutral[600],
+                          color: HowWeatherColor.white,
                         ),
                       ),
                     ),
