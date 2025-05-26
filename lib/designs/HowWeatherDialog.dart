@@ -37,6 +37,7 @@ class HowWeatherDialog extends ConsumerWidget {
             Medium_16px(
               text: contentText,
               color: HowWeatherColor.neutral[500],
+              textAlign: TextAlign.center,
             ),
             SizedBox(
               height: 33,
