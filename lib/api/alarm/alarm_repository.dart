@@ -30,4 +30,26 @@ class AlarmRepository {
       throw Exception('알림 정보를 불러오지 못했습니다. 상태 코드: ${response.statusCode}');
     }
   }
+
+  /// 알림 설정 수정
+  Future<void> updateAlarmSettings(Map<String, bool> updatedFields) async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final url = Uri.parse('$_baseUrl/update');
+
+    final response = await http.patch(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(updatedFields),
+    );
+
+    if (response.statusCode != 200) {
+      final decoded = utf8.decode(response.bodyBytes);
+      final json = jsonDecode(decoded);
+      final message = json['error']?['message'] ?? '알림 설정 변경 실패';
+      throw Exception(message);
+    }
+  }
 }

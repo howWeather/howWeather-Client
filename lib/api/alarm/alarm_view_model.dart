@@ -40,16 +40,35 @@ class AlarmViewModel extends StateNotifier<AlarmState> {
     );
   }
 
-  void toggleMorning() {
-    state = state.copyWith(morning: !state.morning);
+  void toggleMorning() async {
+    final newValue = !state.morning;
+    state = state.copyWith(morning: newValue);
+    try {
+      await repository.updateAlarmSettings({'morning': newValue});
+    } catch (e) {
+      // 실패 시 원래 값으로 롤백
+      state = state.copyWith(morning: !newValue);
+    }
   }
 
-  void toggleAfternoon() {
-    state = state.copyWith(afternoon: !state.afternoon);
+  void toggleAfternoon() async {
+    final newValue = !state.afternoon;
+    state = state.copyWith(afternoon: newValue);
+    try {
+      await repository.updateAlarmSettings({'afternoon': newValue});
+    } catch (e) {
+      state = state.copyWith(afternoon: !newValue);
+    }
   }
 
-  void toggleEvening() {
-    state = state.copyWith(evening: !state.evening);
+  void toggleEvening() async {
+    final newValue = !state.evening;
+    state = state.copyWith(evening: newValue);
+    try {
+      await repository.updateAlarmSettings({'evening': newValue});
+    } catch (e) {
+      state = state.copyWith(evening: !newValue);
+    }
   }
 }
 
