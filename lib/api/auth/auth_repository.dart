@@ -77,9 +77,10 @@ class AuthRepository {
       ),
     );
 
+    final decodedResponse = utf8.decode(response.bodyBytes);
+    final jsonBody = jsonDecode(decodedResponse);
     if (response.statusCode == 200) {
-      final responseBody = jsonDecode(response.body);
-      final result = responseBody['result'];
+      final result = jsonBody['result'];
 
       final accessToken = result['accessToken'];
       final refreshToken = result['refreshToken'];
@@ -95,8 +96,7 @@ class AuthRepository {
         'refreshToken': refreshToken,
       };
     } else {
-      throw Exception(
-          '로그인 실패: ${jsonDecode(response.body)['error']['message']}');
+      throw ('${jsonBody['error']['message']}');
     }
   }
 
@@ -201,6 +201,40 @@ class AuthRepository {
       return jsonBody['result'];
     } else {
       return jsonBody['result'];
+    }
+  }
+
+  /// 비밀번호 변경
+  Future<void> updatePassword(
+      String oldPassword, String newPassword, String confirmPassword) async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final refreshToken = await AuthStorage.getRefreshToken();
+    final url = Uri.parse('$_baseUrl/update-password');
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Authorization": 'Bearer $accessToken',
+        "Refresh-Token": 'Bearer $refreshToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(
+        {
+          "oldPassword": oldPassword,
+          "newPassword": newPassword,
+          "confirmPassword": confirmPassword,
+        },
+      ),
+    );
+
+    final decodedResponse = utf8.decode(response.bodyBytes);
+    final jsonBody = jsonDecode(decodedResponse);
+    if (response.statusCode == 200) {
+      await AuthStorage.clear();
+      print('비밀번호 변경 성공');
+      return jsonBody['success'];
+    } else {
+      throw ('비밀번호 변경 실패: ${jsonBody['error']['message']}');
     }
   }
 }

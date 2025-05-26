@@ -152,8 +152,8 @@ class ChangePassword extends ConsumerWidget {
   }
 
   Widget currentPasswordTextField(ref) {
-    final isCurrentObscure = ref.watch(obscureCurrentProvider);
-
+    final isObscure = ref.watch(obscureCurrentProvider);
+    final password = ref.watch(curruentPasswordProvider);
     return TextFormField(
       onChanged: (value) =>
           ref.read(curruentPasswordProvider.notifier).state = value,
@@ -162,7 +162,7 @@ class ChangePassword extends ConsumerWidget {
         fontWeight: FontWeight.w600,
         color: HowWeatherColor.black,
       ),
-      obscureText: isCurrentObscure,
+      obscureText: isObscure,
       obscuringCharacter: '*',
       decoration: InputDecoration(
         enabledBorder: OutlineInputBorder(
@@ -189,6 +189,20 @@ class ChangePassword extends ConsumerWidget {
           fontWeight: FontWeight.w500,
           color: HowWeatherColor.neutral[200],
         ),
+        suffixIcon: (password.isNotEmpty)
+            ? IconButton(
+                onPressed: () {
+                  ref.read(obscureCurrentProvider.notifier).state =
+                      !ref.read(obscureCurrentProvider.notifier).state;
+                },
+                icon: SvgPicture.asset(
+                  isObscure
+                      ? "assets/icons/eye-slash.svg"
+                      : "assets/icons/eye-open.svg",
+                  color: HowWeatherColor.black,
+                ),
+              )
+            : null,
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       ),
     );
@@ -410,8 +424,18 @@ class ChangePassword extends ConsumerWidget {
     return GestureDetector(
       onTap: isAllValid
           ? () async {
-              await AuthRepository().logout();
-              context.go('/');
+              try {
+                await AuthRepository().updatePassword(
+                  ref.watch(curruentPasswordProvider),
+                  ref.watch(passwordProvider),
+                  ref.watch(checkPasswordProvider),
+                );
+                context.go('/');
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('$e')),
+                );
+              }
             }
           : null,
       child: Container(
