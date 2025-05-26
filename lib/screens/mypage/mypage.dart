@@ -185,6 +185,23 @@ class _MyPageState extends ConsumerState<MyPage> {
               ),
               InkWell(
                 onTap: () {
+                  context.push('/mypage/changePassword');
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  child: Medium_18px(
+                    text: "비밀번호 변경",
+                    color: HowWeatherColor.neutral[600],
+                  ),
+                ),
+              ),
+              Divider(
+                color: HowWeatherColor.neutral[200],
+                height: 1,
+              ),
+              InkWell(
+                onTap: () {
                   showDialog(
                     context: context,
                     builder: (context) => HowWeatherDialog(
