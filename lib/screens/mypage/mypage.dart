@@ -8,11 +8,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class MyPage extends ConsumerWidget {
-  MyPage({super.key});
+class MyPage extends ConsumerStatefulWidget {
+  const MyPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyPage> createState() => _MyPageState();
+}
+
+class _MyPageState extends ConsumerState<MyPage> {
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    await ref.read(mypageViewModelProvider.notifier).loadProfile();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profileState = ref.watch(mypageViewModelProvider);
 
     return Scaffold(
@@ -196,7 +211,19 @@ class MyPage extends ConsumerWidget {
                 height: 1,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => HowWeatherDialog(
+                      titleText: "탈퇴",
+                      contentText: "탈퇴하시겠습니까?\n모든 기록이 사라집니다.",
+                      done: () async {
+                        await AuthRepository().withdraw();
+                        context.go('/');
+                      },
+                    ),
+                  );
+                },
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),

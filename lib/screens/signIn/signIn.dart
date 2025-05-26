@@ -13,12 +13,11 @@ class SignIn extends ConsumerStatefulWidget {
   ConsumerState<SignIn> createState() => _SignSplashState();
 }
 
-final idProvider = StateProvider<String>((ref) => '');
-final passwordProvider = StateProvider<String>((ref) => '');
-final obscureProvider = StateProvider<bool>((ref) => true);
-final isPasswordFocusedProvider = StateProvider<bool>((ref) => false);
-
 class _SignSplashState extends ConsumerState<SignIn> {
+  final idProvider = StateProvider<String>((ref) => '');
+  final passwordProvider = StateProvider<String>((ref) => '');
+  final obscureProvider = StateProvider<bool>((ref) => true);
+  final isPasswordFocusedProvider = StateProvider<bool>((ref) => false);
   @override
   void initState() {
     super.initState();

@@ -152,4 +152,28 @@ class AuthRepository {
       throw Exception('토큰 재발급 실패: ${response.reasonPhrase}');
     }
   }
+
+  /// 회원탈퇴
+  Future<void> withdraw() async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final refreshToken = await AuthStorage.getRefreshToken();
+
+    final url = Uri.parse('$_baseUrl/delete');
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          "Authorization": 'Bearer $accessToken',
+          "Refresh-Token": 'Bearer $refreshToken',
+        },
+      );
+    } catch (e) {
+      print('❌ 회원탈퇴 실패: $e');
+      rethrow;
+    } finally {
+      print('✅ 회원탈퇴 성공');
+      await AuthStorage.clear();
+    }
+  }
 }
