@@ -154,7 +154,9 @@ class _MyPageState extends ConsumerState<MyPage> {
                 height: 8,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  context.push('/mypage/notification');
+                },
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
