@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1023935599527",
+    "project_id": "howweather-dbf0a",
+    "storage_bucket": "howweather-dbf0a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023935599527:android:c696e602f45fc97fcd1c82",
+        "android_client_info": {
+          "package_name": "com.example.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnCtFqXDp6xwSBc8trEzcZighUE6n4LJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
