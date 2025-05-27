@@ -1,3 +1,4 @@
+import 'package:client/api/alarm/alarm_repository.dart';
 import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/api/mypage/mypage_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
@@ -210,6 +211,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                       titleText: "로그아웃",
                       contentText: "로그아웃하시겠습니까?",
                       done: () async {
+                        await AlarmRepository().deleteFCMToken();
                         await AuthRepository().logout();
                         context.go('/');
                       },
