@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 
 class AlarmRepository {
@@ -50,6 +51,39 @@ class AlarmRepository {
       final json = jsonDecode(decoded);
       final message = json['error']?['message'] ?? '알림 설정 변경 실패';
       throw Exception(message);
+    }
+  }
+
+  /// FCM token 등록
+  Future<void> saveFCMToken() async {
+    final accessToken = await AuthStorage.getAccessToken();
+    final url = Uri.parse('$_baseUrl/save-token');
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+
+    if (fcmToken == null) {
+      print('FCM 토큰을 가져올 수 없음');
+      return;
+    }
+    print(fcmToken);
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({"token": fcmToken}),
+    );
+
+    final decoded = utf8.decode(response.bodyBytes);
+    final json = jsonDecode(decoded);
+    print('응답 상태 코드: ${response.statusCode}');
+    print('응답 바디: ${json}');
+
+    if (response.statusCode == 201) {
+      print('FCM 토큰 등록 완료');
+    } else {
+      print('FCM 토큰 등록 실패: ${json}');
     }
   }
 }

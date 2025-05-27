@@ -1,3 +1,4 @@
+import 'package:client/api/alarm/alarm_repository.dart';
 import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/HowWeatherColor.dart';
 import 'package:client/designs/HowWeatherTypo.dart';
@@ -86,6 +87,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
 
                         final loginState = ref.read(authViewModelProvider);
                         if (loginState is AsyncData) {
+                          await AlarmRepository().saveFCMToken();
                           context.go('/home');
                         } else if (loginState is AsyncError) {
                           ScaffoldMessenger.of(context).showSnackBar(
