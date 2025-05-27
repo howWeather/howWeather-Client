@@ -24,6 +24,8 @@ import 'package:client/screens/signUp/signup_clothes_enroll.dart';
 import 'package:client/screens/splash/splash.dart';
 import 'package:client/screens/todayWear/view.dart';
 import 'package:client/screens/todayWeather/view.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -154,6 +156,17 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko_KR', null);
   await dotenv.load(fileName: ".env");
+  // ✅ 중복 초기화 방지
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp();
+  }
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  // 알림 권한 요청 (iOS 필수)
+  await messaging.requestPermission(alert: true, badge: true, sound: true);
+  // 포그라운드 메시지 수신
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Foreground 알림 수신: ${message.notification?.title}');
+  });
   runApp(const ProviderScope(child: HowWeather()));
 }
 
