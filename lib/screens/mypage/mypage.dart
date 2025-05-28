@@ -172,7 +172,9 @@ class _MyPageState extends ConsumerState<MyPage> {
                 height: 1,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  context.push('/mypage/version');
+                },
                 child: Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),

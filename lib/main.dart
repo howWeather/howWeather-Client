@@ -11,6 +11,7 @@ import 'package:client/screens/mypage/notification_set.dart';
 import 'package:client/screens/mypage/profile.dart';
 import 'package:client/screens/calendar/register/search.dart';
 import 'package:client/screens/calendar/register/view.dart';
+import 'package:client/screens/mypage/version.dart';
 import 'package:client/screens/signIn/findPassword/find_password.dart';
 import 'package:client/screens/signIn/findPassword/send_email.dart';
 import 'package:client/screens/signIn/signIn.dart';
@@ -126,6 +127,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/mypage/notification',
         builder: (context, state) => NotificationSet(),
+      ),
+      GoRoute(
+        path: '/mypage/version',
+        builder: (context, state) => Version(),
       ),
       ShellRoute(
         builder: (context, state, child) => HowWeatherNaviShell(child: child),
