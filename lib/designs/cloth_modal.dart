@@ -1,7 +1,7 @@
 import 'package:client/api/closet/closet_view_model.dart';
-import 'package:client/designs/ClothCard.dart';
-import 'package:client/designs/HowWeatherColor.dart';
-import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/designs/cloth_card.dart';
+import 'package:client/designs/how_weather_color.dart';
+import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
 import 'package:client/screens/calendar/register/view.dart';
 import 'package:flutter/material.dart';

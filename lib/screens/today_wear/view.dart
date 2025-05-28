@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/howWeatherColor.dart';
-import 'package:client/screens/todayWeather/model.dart';
-import 'package:client/screens/todayWeather/viewmodel.dart';
+import 'package:client/screens/today_weather/model.dart';
+import 'package:client/screens/today_weather/viewmodel.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

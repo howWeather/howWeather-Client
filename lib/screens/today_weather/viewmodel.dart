@@ -1,5 +1,5 @@
-import 'package:client/screens/todayWeather/model.dart';
-import 'package:client/screens/todayWeather/repository.dart';
+import 'package:client/screens/today_weather/model.dart';
+import 'package:client/screens/today_weather/repository.dart';
 import 'package:client/service/location_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
