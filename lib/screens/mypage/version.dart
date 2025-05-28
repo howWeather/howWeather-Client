@@ -1,6 +1,6 @@
 import 'package:client/api/alarm/alarm_view_model.dart';
-import 'package:client/designs/HowWeatherColor.dart';
-import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/designs/how_weather_color.dart';
+import 'package:client/designs/how_weather_typo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

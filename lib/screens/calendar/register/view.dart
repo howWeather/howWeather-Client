@@ -1,11 +1,11 @@
 import 'package:client/api/record/record_view_model.dart';
-import 'package:client/designs/ClothCard.dart';
-import 'package:client/designs/ClothModal.dart';
-import 'package:client/designs/HowWeatherColor.dart';
-import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/designs/cloth_card.dart';
+import 'package:client/designs/cloth_modal.dart';
+import 'package:client/designs/how_weather_color.dart';
+import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
 import 'package:client/screens/calendar/view.dart';
-import 'package:client/screens/todayWeather/viewmodel.dart';
+import 'package:client/api/weather/weather_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';

@@ -1,6 +1,6 @@
-import 'package:client/designs/HowWeatherColor.dart';
-import 'package:client/designs/HowWeatherTypo.dart';
-import 'package:client/screens/signIn/findPassword/find_password.dart';
+import 'package:client/designs/how_weather_color.dart';
+import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/screens/sign_in/find_password/find_password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';

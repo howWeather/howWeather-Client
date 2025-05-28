@@ -1,9 +1,9 @@
 import 'package:client/api/alarm/alarm_repository.dart';
 import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/api/mypage/mypage_view_model.dart';
-import 'package:client/designs/HowWeatherColor.dart';
-import 'package:client/designs/HowWeatherDialog.dart';
-import 'package:client/designs/HowWeatherTypo.dart';
+import 'package:client/designs/how_weather_color.dart';
+import 'package:client/designs/how_weather_dialog.dart';
+import 'package:client/designs/how_weather_typo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
