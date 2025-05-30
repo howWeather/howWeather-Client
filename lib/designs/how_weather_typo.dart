@@ -1,4 +1,4 @@
-import 'package:client/designs/howWeatherColor.dart';
+import 'package:client/designs/how_weather_color.dart';
 import 'package:flutter/material.dart';
 
 class Bold_64px extends StatelessWidget {
