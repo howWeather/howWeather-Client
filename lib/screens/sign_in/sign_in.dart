@@ -176,7 +176,8 @@ class _SignSplashState extends ConsumerState<SignIn> {
                 children: [
                   GestureDetector(
                       onTap: () async {
-                        kakaoSignIn();
+                        print('카카오 버튼 탭됨');
+                        await kakaoSignIn();
                       },
                       child: SvgPicture.asset("assets/icons/kakao-icon.svg")),
                   SizedBox(
@@ -195,47 +196,42 @@ class _SignSplashState extends ConsumerState<SignIn> {
     ));
   }
 
-  void kakaoSignIn() async {
-    if (await isKakaoTalkInstalled()) {
-      try {
-        await UserApi.instance.loginWithKakaoTalk();
-        print('카카오톡으로 로그인 성공');
-      } catch (error) {
-        print('카카오톡으로 로그인 실패 $error');
+  Future<void> kakaoSignIn() async {
+    try {
+      print('카카오 로그인 시도');
 
-        if (error is PlatformException && error.code == 'CANCELED') {
-          return;
-        }
-        // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
-        try {
-          await UserApi.instance.loginWithKakaoAccount();
-          print('카카오계정으로 로그인 성공');
-        } catch (error) {
-          print('카카오계정으로 로그인 실패 $error');
-        }
+      OAuthToken token;
+
+      if (await isKakaoTalkInstalled()) {
+        print('카카오톡 설치됨 → loginWithKakaoTalk 시도');
+        token = await UserApi.instance.loginWithKakaoTalk();
+      } else {
+        print('카카오톡 미설치 → loginWithKakaoAccount 시도');
+        token = await UserApi.instance.loginWithKakaoAccount();
       }
-    } else {
-      try {
-        await UserApi.instance.loginWithKakaoAccount();
-        print('카카오계정으로 로그인 성공');
-      } catch (error) {
-        print('카카오계정으로 로그인 실패 $error');
-      }
+
+      print('카카오 로그인 성공. token: ${token.accessToken}');
+      await fetchSocialLogin(token);
+    } catch (e) {
+      print('카카오 로그인 실패: $e');
     }
-
-    fetchSocialLogin();
   }
 
-  Future<void> fetchSocialLogin() async {
+  Future<void> fetchSocialLogin(OAuthToken token) async {
+    print('fetchSocialLogin() 실행');
     final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
+    final accessToken = token.accessToken;
 
-    await oauth2ViewModel.loginKakao();
+    await oauth2ViewModel.loginKakaoWithToken(accessToken);
 
     final loginState = ref.read(oauth2ViewModelProvider);
+
     if (loginState is AsyncData) {
+      print('로그인 성공 → 홈으로 이동');
       await AlarmRepository().saveFCMToken();
       context.go('/home');
     } else if (loginState is AsyncError) {
+      print('로그인 실패');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('소셜 로그인 실패: ${loginState.error}')),
       );
