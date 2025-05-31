@@ -7,12 +7,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1023935599527:android:c696e602f45fc97fcd1c82",
+        "mobilesdk_app_id": "1:1023935599527:android:8d20ee09bb6ec345cd1c82",
         "android_client_info": {
           "package_name": "com.howweather.client"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1023935599527-98p25rh00h10poqbkqvbjtiumac0ldqg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.howweather.client",
+            "certificate_hash": "dd60562e39e93a5dbc1a74de02adf4f086a4590e"
+          }
+        },
+        {
+          "client_id": "1023935599527-6uc002klcjpbs7fdrhok535qmc25ovgd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDnCtFqXDp6xwSBc8trEzcZighUE6n4LJg"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1023935599527-6uc002klcjpbs7fdrhok535qmc25ovgd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1023935599527-4qu2079dgju04aquod7dgoic9qc5maj8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.howweather.client"
+              }
+            }
+          ]
         }
       }
     }

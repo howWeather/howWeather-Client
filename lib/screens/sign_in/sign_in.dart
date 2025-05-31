@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
@@ -176,14 +177,17 @@ class _SignSplashState extends ConsumerState<SignIn> {
                 children: [
                   GestureDetector(
                       onTap: () async {
-                        print('카카오 버튼 탭됨');
                         await kakaoSignIn();
                       },
                       child: SvgPicture.asset("assets/icons/kakao-icon.svg")),
                   SizedBox(
                     width: 24,
                   ),
-                  SvgPicture.asset("assets/icons/google-icon.svg"),
+                  GestureDetector(
+                      onTap: () async {
+                        await googleSignIn();
+                      },
+                      child: SvgPicture.asset("assets/icons/google-icon.svg")),
                 ],
               ),
               SizedBox(
@@ -198,8 +202,6 @@ class _SignSplashState extends ConsumerState<SignIn> {
 
   Future<void> kakaoSignIn() async {
     try {
-      print('카카오 로그인 시도');
-
       OAuthToken token;
 
       if (await isKakaoTalkInstalled()) {
@@ -209,32 +211,49 @@ class _SignSplashState extends ConsumerState<SignIn> {
         print('카카오톡 미설치 → loginWithKakaoAccount 시도');
         token = await UserApi.instance.loginWithKakaoAccount();
       }
+      final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
+      await oauth2ViewModel.loginKakaoWithToken(token.accessToken);
 
-      print('카카오 로그인 성공. token: ${token.accessToken}');
-      await fetchSocialLogin(token);
+      final loginState = ref.read(oauth2ViewModelProvider);
+
+      if (loginState is AsyncData) {
+        print('로그인 성공 → 홈으로 이동');
+        await AlarmRepository().saveFCMToken();
+        context.go('/home');
+      } else if (loginState is AsyncError) {
+        print('로그인 실패');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('소셜 로그인 실패: ${loginState.error}')),
+        );
+      }
     } catch (e) {
       print('카카오 로그인 실패: $e');
     }
   }
 
-  Future<void> fetchSocialLogin(OAuthToken token) async {
-    print('fetchSocialLogin() 실행');
-    final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
-    final accessToken = token.accessToken;
+  Future<void> googleSignIn() async {
+    final GoogleSignInAccount? googleSignInAccount =
+        await GoogleSignIn().signIn();
+    if (googleSignInAccount != null) {
+      final GoogleSignInAuthentication googleAuth =
+          await googleSignInAccount.authentication;
+      final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
+      await oauth2ViewModel.loginGoogleWithToken(googleAuth.accessToken!);
 
-    await oauth2ViewModel.loginKakaoWithToken(accessToken);
+      final loginState = ref.read(oauth2ViewModelProvider);
 
-    final loginState = ref.read(oauth2ViewModelProvider);
-
-    if (loginState is AsyncData) {
-      print('로그인 성공 → 홈으로 이동');
-      await AlarmRepository().saveFCMToken();
-      context.go('/home');
-    } else if (loginState is AsyncError) {
-      print('로그인 실패');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('소셜 로그인 실패: ${loginState.error}')),
-      );
+      if (loginState is AsyncData) {
+        print('로그인 성공 → 홈으로 이동');
+        await AlarmRepository().saveFCMToken();
+        context.go('/home');
+      } else if (loginState is AsyncError) {
+        print('로그인 실패');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('소셜 로그인 실패: ${loginState.error}')),
+        );
+      }
+    } else {
+      print("구글계정으로 로그인 실패");
     }
   }
 
