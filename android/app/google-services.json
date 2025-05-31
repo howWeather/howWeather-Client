@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1023935599527:android:c696e602f45fc97fcd1c82",
         "android_client_info": {
-          "package_name": "com.example.client"
+          "package_name": "com.howweather.client"
         }
       },
       "oauth_client": [],

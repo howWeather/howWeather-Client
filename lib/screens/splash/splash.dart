@@ -63,11 +63,6 @@ class _SplashState extends ConsumerState<Splash>
 
   bool isTokenExpired(String token) {
     try {
-      // "Bearer " 접두사 제거
-      if (token.startsWith('Bearer ')) {
-        token = token.substring(7);
-      }
-
       final parts = token.split('.');
       if (parts.length != 3) {
         return true; // 올바른 JWT 형식이 아님

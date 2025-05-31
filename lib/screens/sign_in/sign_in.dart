@@ -1,11 +1,15 @@
 import 'package:client/api/alarm/alarm_repository.dart';
 import 'package:client/api/auth/auth_view_model.dart';
+import 'package:client/api/oauth2/oauth2_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 class SignIn extends ConsumerStatefulWidget {
   const SignIn({super.key});
@@ -170,7 +174,11 @@ class _SignSplashState extends ConsumerState<SignIn> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SvgPicture.asset("assets/icons/kakao-icon.svg"),
+                  GestureDetector(
+                      onTap: () async {
+                        kakaoSignIn();
+                      },
+                      child: SvgPicture.asset("assets/icons/kakao-icon.svg")),
                   SizedBox(
                     width: 24,
                   ),
@@ -185,6 +193,53 @@ class _SignSplashState extends ConsumerState<SignIn> {
         ),
       ),
     ));
+  }
+
+  void kakaoSignIn() async {
+    if (await isKakaoTalkInstalled()) {
+      try {
+        await UserApi.instance.loginWithKakaoTalk();
+        print('카카오톡으로 로그인 성공');
+      } catch (error) {
+        print('카카오톡으로 로그인 실패 $error');
+
+        if (error is PlatformException && error.code == 'CANCELED') {
+          return;
+        }
+        // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
+        try {
+          await UserApi.instance.loginWithKakaoAccount();
+          print('카카오계정으로 로그인 성공');
+        } catch (error) {
+          print('카카오계정으로 로그인 실패 $error');
+        }
+      }
+    } else {
+      try {
+        await UserApi.instance.loginWithKakaoAccount();
+        print('카카오계정으로 로그인 성공');
+      } catch (error) {
+        print('카카오계정으로 로그인 실패 $error');
+      }
+    }
+
+    fetchSocialLogin();
+  }
+
+  Future<void> fetchSocialLogin() async {
+    final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
+
+    await oauth2ViewModel.loginKakao();
+
+    final loginState = ref.read(oauth2ViewModelProvider);
+    if (loginState is AsyncData) {
+      await AlarmRepository().saveFCMToken();
+      context.go('/home');
+    } else if (loginState is AsyncError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('소셜 로그인 실패: ${loginState.error}')),
+      );
+    }
   }
 
   Widget IdTextField(WidgetRef ref) {
