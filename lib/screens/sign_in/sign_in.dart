@@ -211,8 +211,6 @@ class _SignSplashState extends ConsumerState<SignIn> {
         print('카카오톡 미설치 → loginWithKakaoAccount 시도');
         token = await UserApi.instance.loginWithKakaoAccount();
       }
-
-      print('카카오 로그인 성공. token: ${token.accessToken}');
       final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
       await oauth2ViewModel.loginKakaoWithToken(token.accessToken);
 
@@ -236,12 +234,11 @@ class _SignSplashState extends ConsumerState<SignIn> {
   Future<void> googleSignIn() async {
     final GoogleSignInAccount? googleSignInAccount =
         await GoogleSignIn().signIn();
-    var socialAccount = "";
     if (googleSignInAccount != null) {
-      socialAccount = googleSignInAccount.email;
-      print(socialAccount);
-      // final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
-      // await oauth2ViewModel.loginKakaoWithToken(socialAccount);
+      final GoogleSignInAuthentication googleAuth =
+          await googleSignInAccount.authentication;
+      final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
+      await oauth2ViewModel.loginGoogleWithToken(googleAuth.accessToken!);
 
       final loginState = ref.read(oauth2ViewModelProvider);
 

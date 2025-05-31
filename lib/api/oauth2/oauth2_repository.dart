@@ -22,16 +22,49 @@ class Oauth2Repository {
 
     final decodedResponse = utf8.decode(response.bodyBytes);
     final jsonBody = jsonDecode(decodedResponse);
-    print('서버 응답 상태코드: ${response.statusCode}');
-    print('서버 응답 바디: ${decodedResponse}');
 
     if (response.statusCode == 200) {
       final result = jsonBody['result'];
-
       final accessToken = result['accessToken'];
       final refreshToken = result['refreshToken'];
 
-      // 토큰 저장
+      await AuthStorage.saveTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
+
+      return {
+        'accessToken': accessToken,
+        'refreshToken': refreshToken,
+      };
+    } else {
+      throw ('${jsonBody['error']?['message'] ?? 'Unknown error occurred'}');
+    }
+  }
+
+  /// 소셜로그인-구글
+  Future<Map<String, String>> socialLoginGoogle(
+      {required String googleAccessToken}) async {
+    final url = Uri.parse('$_baseUrl/google');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'accessToken': googleAccessToken,
+      }),
+    );
+
+    final decodedResponse = utf8.decode(response.bodyBytes);
+    final jsonBody = jsonDecode(decodedResponse);
+
+    if (response.statusCode == 200) {
+      final result = jsonBody['result'];
+      final accessToken = result['accessToken'];
+      final refreshToken = result['refreshToken'];
+
       await AuthStorage.saveTokens(
         accessToken: accessToken,
         refreshToken: refreshToken,
