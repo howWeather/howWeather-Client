@@ -31,6 +31,12 @@ class _SplashState extends ConsumerState<Splash>
     _progress = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Future<void> _startApp() async {
     await Future.delayed(const Duration(seconds: 2));
 
