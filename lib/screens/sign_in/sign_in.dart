@@ -177,14 +177,17 @@ class _SignSplashState extends ConsumerState<SignIn> {
                 children: [
                   GestureDetector(
                       onTap: () async {
-                        print('카카오 버튼 탭됨');
                         await kakaoSignIn();
                       },
                       child: SvgPicture.asset("assets/icons/kakao-icon.svg")),
                   SizedBox(
                     width: 24,
                   ),
-                  SvgPicture.asset("assets/icons/google-icon.svg"),
+                  GestureDetector(
+                      onTap: () async {
+                        await googleSignIn();
+                      },
+                      child: SvgPicture.asset("assets/icons/google-icon.svg")),
                 ],
               ),
               SizedBox(
@@ -227,6 +230,33 @@ class _SignSplashState extends ConsumerState<SignIn> {
       }
     } catch (e) {
       print('카카오 로그인 실패: $e');
+    }
+  }
+
+  Future<void> googleSignIn() async {
+    final GoogleSignInAccount? googleSignInAccount =
+        await GoogleSignIn().signIn();
+    var socialAccount = "";
+    if (googleSignInAccount != null) {
+      socialAccount = googleSignInAccount.email;
+      print(socialAccount);
+      // final oauth2ViewModel = ref.read(oauth2ViewModelProvider.notifier);
+      // await oauth2ViewModel.loginKakaoWithToken(socialAccount);
+
+      final loginState = ref.read(oauth2ViewModelProvider);
+
+      if (loginState is AsyncData) {
+        print('로그인 성공 → 홈으로 이동');
+        await AlarmRepository().saveFCMToken();
+        context.go('/home');
+      } else if (loginState is AsyncError) {
+        print('로그인 실패');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('소셜 로그인 실패: ${loginState.error}')),
+        );
+      }
+    } else {
+      print("구글계정으로 로그인 실패");
     }
   }
 
