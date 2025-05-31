@@ -31,6 +31,12 @@ class _SplashState extends ConsumerState<Splash>
     _progress = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Future<void> _startApp() async {
     await Future.delayed(const Duration(seconds: 2));
 
@@ -63,11 +69,6 @@ class _SplashState extends ConsumerState<Splash>
 
   bool isTokenExpired(String token) {
     try {
-      // "Bearer " 접두사 제거
-      if (token.startsWith('Bearer ')) {
-        token = token.substring(7);
-      }
-
       final parts = token.split('.');
       if (parts.length != 3) {
         return true; // 올바른 JWT 형식이 아님

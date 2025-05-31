@@ -32,6 +32,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' hide Profile;
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -161,6 +162,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko_KR', null);
   await dotenv.load(fileName: ".env");
+
+  KakaoSdk.init(
+    nativeAppKey: dotenv.env['KAKAO_API_KEY'],
+  );
   // ✅ 중복 초기화 방지
   if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp();

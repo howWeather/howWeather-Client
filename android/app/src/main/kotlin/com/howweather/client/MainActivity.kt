@@ -1,4 +1,4 @@
-package com.example.client
+package com.howweather.client
 
 import io.flutter.embedding.android.FlutterActivity
 
