@@ -9,7 +9,7 @@
 * **Routing**: go\_router
 * **Secure Storage**: flutter\_secure\_storage
 * **Notification**: Firebase Cloud Messaging
-* **Social Login**: Kakao SDK
+* **Social Login**: Kakao SDK, Google Sign-In
 * **Design Pattern**: MVVM
 
 ---
@@ -24,7 +24,7 @@
 | 🧠 개인화 추천       | 날씨 및 과거 피드백 기반 착장 추천 기능 구현              |
 | 🔔 알림 기능        | 외출 전 알림 및 FCM 기반 푸시 알림 수신 기능            |
 | 🔐 로그인 & 인증     | 이메일 로그인/회원가입, 비밀번호 초기화, 토큰 재발급 처리       |
-| 🧑‍🤝‍🧑 소셜 로그인 | 카카오 계정 연동 로그인 기능 구현                     |
+| 🧑‍🤝‍🧑 소셜 로그인 | 카카오 및 구글 계정 연동 로그인 기능 구현                     |
 
 ---
 
