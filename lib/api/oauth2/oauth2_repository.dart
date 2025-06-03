@@ -32,6 +32,8 @@ class Oauth2Repository {
         accessToken: accessToken,
         refreshToken: refreshToken,
       );
+      await AuthStorage.setLoginType('social');
+      await AuthStorage.setSocialToken(kakaoAccessToken);
 
       return {
         'accessToken': accessToken,
@@ -69,6 +71,8 @@ class Oauth2Repository {
         accessToken: accessToken,
         refreshToken: refreshToken,
       );
+      await AuthStorage.setLoginType('social');
+      await AuthStorage.setSocialToken(googleAccessToken);
 
       return {
         'accessToken': accessToken,
