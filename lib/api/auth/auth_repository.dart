@@ -90,6 +90,7 @@ class AuthRepository {
         accessToken: accessToken,
         refreshToken: refreshToken,
       );
+      await AuthStorage.setLoginType('email');
 
       return {
         'accessToken': accessToken,
@@ -157,23 +158,36 @@ class AuthRepository {
   Future<void> withdraw() async {
     final accessToken = await AuthStorage.getAccessToken();
     final refreshToken = await AuthStorage.getRefreshToken();
+    final loginType = await AuthStorage.getLoginType();
+    final headers = {
+      "Authorization": 'Bearer $accessToken',
+      "Refresh-Token": 'Bearer $refreshToken',
+    };
+
+    // 소셜 로그인일 경우에만 Social-Access-Token 포함
+    if (loginType == 'social') {
+      final socialToken = await AuthStorage.getSocialToken();
+      if (socialToken != null) {
+        headers["Social-Access-Token"] = socialToken;
+        print('socialToken: $socialToken');
+      }
+    }
 
     final url = Uri.parse('$_baseUrl/delete');
 
     try {
-      final response = await http.delete(
-        url,
-        headers: {
-          "Authorization": 'Bearer $accessToken',
-          "Refresh-Token": 'Bearer $refreshToken',
-        },
-      );
+      final response = await http.delete(url, headers: headers);
+
+      if (response.statusCode == 204) {
+        print('✅ 회원탈퇴 성공');
+        await AuthStorage.clear();
+      } else {
+        print('❌ 서버 응답 에러: ${response.statusCode}');
+        print('body: ${response.body}');
+      }
     } catch (e) {
       print('❌ 회원탈퇴 실패: $e');
       rethrow;
-    } finally {
-      print('✅ 회원탈퇴 성공');
-      await AuthStorage.clear();
     }
   }
 
