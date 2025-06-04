@@ -1,19 +1,23 @@
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
-import 'package:client/service/location_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:lottie/lottie.dart';
 
-class NoLocationPermission extends StatelessWidget {
+class NoLocationPermission extends StatefulWidget {
   final String e;
-  NoLocationPermission({required this.e, super.key});
+  const NoLocationPermission({required this.e, super.key});
 
+  @override
+  State<NoLocationPermission> createState() => _NoLocationPermissionState();
+}
+
+class _NoLocationPermissionState extends State<NoLocationPermission> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [const Color(0xFF4093EB), const Color(0xFFABDAEF)],
@@ -21,54 +25,58 @@ class NoLocationPermission extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                "assets/icons/locator-off.svg",
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Lottie.asset(
+                'assets/lotties/Animation - 1749048637107.json',
+                repeat: true,
+                animate: true,
+                fit: BoxFit.cover,
               ),
-              SizedBox(
-                height: 32,
-              ),
-              Medium_18px(
-                text: e,
-                color: HowWeatherColor.neutral[700],
-              ),
-              SizedBox(
-                height: 12,
-              ),
-              Medium_16px(
-                text: "위치 권한을 변경하시겠습니까?",
-                color: HowWeatherColor.neutral[700],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              GestureDetector(
-                onTap: () async {
-                  await Geolocator.openAppSettings();
-                  // 권한 변경 후 화면 새로고침
-                  if (await Geolocator.checkPermission() ==
-                      LocationPermission.whileInUse) {
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: HowWeatherColor.primary[700],
-                    borderRadius: BorderRadius.circular(10),
+            ),
+            Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset("assets/icons/locator-off.svg"),
+                  SizedBox(height: 32),
+                  Medium_18px(
+                    text: widget.e,
+                    color: HowWeatherColor.neutral[700],
                   ),
-                  child: Semibold_24px(
-                    text: "설정으로 이동",
-                    color: HowWeatherColor.white,
+                  SizedBox(height: 12),
+                  Medium_16px(
+                    text: "위치 권한을 변경하시겠습니까?",
+                    color: HowWeatherColor.neutral[700],
                   ),
-                ),
+                  SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () async {
+                      await Geolocator.openAppSettings();
+                      if (await Geolocator.checkPermission() ==
+                          LocationPermission.whileInUse) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: HowWeatherColor.primary[700],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Semibold_24px(
+                        text: "설정으로 이동",
+                        color: HowWeatherColor.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
