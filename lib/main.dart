@@ -49,13 +49,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         orElse: () => false,
       );
 
-      final isNoInternetRoute = state.uri.toString() == '/no-internet';
+      final isNoInternetRoute = state.uri.path == '/no-internet';
 
-      if (isDisconnected && !isNoInternetRoute) {
-        return '/no-internet';
-      } else if (!isDisconnected && isNoInternetRoute) {
-        return '/home';
-      }
+      if (isDisconnected && !isNoInternetRoute) return '/no-internet';
+      if (!isDisconnected && isNoInternetRoute) return '/home';
       return null;
     },
     routes: [
@@ -211,26 +208,18 @@ class HowWeather extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-
     ref.listen(connectivityProvider, (previous, next) {
       next.whenData((results) {
         final isDisconnected = !results.contains(ConnectivityResult.wifi) &&
             !results.contains(ConnectivityResult.mobile);
 
-        // 1. Navigator가 여전히 mounted인지 확인
-        final navigator = Navigator.of(context);
-        if (!navigator.mounted) return;
-
-        // 2. 현재 위치 확인 (GoRouter 6.x 이상)
-        final currentLocation =
-            GoRouter.of(context).routeInformationProvider.value.location;
-
-        // 3. 화면 전환 로직을 post-frame 콜백으로 감싸기
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (isDisconnected && currentLocation != '/no-internet') {
-            GoRouter.of(context).pushReplacement('/no-internet');
-          } else if (!isDisconnected && currentLocation == '/no-internet') {
-            GoRouter.of(context).pushReplacement('/home');
+          try {
+            if (isDisconnected && Navigator.of(context).mounted) {
+              GoRouter.of(context).pushReplacement('/no-internet');
+            }
+          } catch (e) {
+            print('네트워크 감지 오류: $e');
           }
         });
       });
