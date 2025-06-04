@@ -4,7 +4,6 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/weather.dart';
 import 'package:client/api/weather/weather_view_model.dart';
-import 'package:client/screens/exception/no_location_permission.dart';
 import 'package:client/service/location_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +13,39 @@ import 'package:go_router/go_router.dart';
 
 class WeatherScreen extends ConsumerWidget {
   const WeatherScreen({super.key});
+
+  Future<void> _handleLocationError(BuildContext context, dynamic error) async {
+    print('WeatherScreen 에러 발생: $error');
+
+    try {
+      // LocationService를 사용하여 위치 사용 가능성 확인
+      final locationService = LocationService();
+      bool isLocationAvailable = await locationService.isLocationAvailable();
+
+      print('위치 사용 가능: $isLocationAvailable');
+
+      if (isLocationAvailable) {
+        print('위치 사용 가능 - LocationService 문제로 판단하여 재시도');
+
+        // LocationService 캐시 초기화
+        locationService.clearCache();
+
+        // 잠시 대기 후 자동 재시도
+        await Future.delayed(Duration(milliseconds: 1000));
+        return; // 자동 재시도를 위해 return
+      }
+
+      // 위치를 사용할 수 없는 경우에만 NoLocationPermission으로 이동
+      print('위치 사용 불가 - NoLocationPermission으로 이동');
+      GoRouter.of(context)
+          .go('/no-location-permission', extra: error.toString());
+    } catch (e) {
+      print('에러 처리 중 예외 발생: $e');
+      // 권한 확인 자체가 실패한 경우 NoLocationPermission으로 이동
+      GoRouter.of(context)
+          .go('/no-location-permission', extra: error.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -120,7 +152,20 @@ class WeatherScreen extends ConsumerWidget {
                     },
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (e, st) => Text('에러 발생: $e'),
+                    error: (e, st) => Container(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Icon(Icons.error_outline,
+                              color: Colors.white54, size: 48),
+                          SizedBox(height: 8),
+                          Text(
+                            '시간별 날씨를 불러올 수 없습니다',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 12,
@@ -155,20 +200,111 @@ class WeatherScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    loading: () => const CircularProgressIndicator(),
-                    error: (e, _) => Text('에러: $e'),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Container(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Icon(Icons.error_outline,
+                              color: Colors.white54, size: 48),
+                          SizedBox(height: 8),
+                          Text(
+                            '주간 날씨를 불러올 수 없습니다',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 70,
                   ),
                 ],
               ),
-              loading: () => CircularProgressIndicator(),
+              loading: () => Container(
+                height: MediaQuery.of(context).size.height,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: Colors.white),
+                    SizedBox(height: 16),
+                    Text(
+                      '날씨 정보를 불러오는 중...',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
               error: (e, st) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  GoRouter.of(context).go('/no-location-permission', extra: e);
+                // 에러 처리를 위한 PostFrameCallback
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  if (!context.mounted) return;
+
+                  await _handleLocationError(context, e);
+
+                  // 위치가 사용 가능한 경우 자동 재시도
+                  final locationService = LocationService();
+                  bool isLocationAvailable =
+                      await locationService.isLocationAvailable();
+
+                  if (isLocationAvailable && context.mounted) {
+                    print('위치 사용 가능 확인됨 - Provider 새로고침');
+                    // 짧은 대기 후 새로고침
+                    Future.delayed(Duration(milliseconds: 1500), () {
+                      if (context.mounted) {
+                        ref.refresh(locationProvider);
+                      }
+                    });
+                  }
                 });
-                return SizedBox.shrink();
+
+                // 에러 발생 시 임시 UI 표시
+                return Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(color: Colors.white),
+                      SizedBox(height: 16),
+                      Text(
+                        '날씨 정보를 불러오는 중입니다...',
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        '잠시만 기다려주세요',
+                        style: TextStyle(color: Colors.white54, fontSize: 14),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Provider 새로고침
+                          LocationService().clearCache();
+                          ref.refresh(locationProvider);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.refresh, size: 20),
+                            SizedBox(width: 8),
+                            Text('다시 시도'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ),
