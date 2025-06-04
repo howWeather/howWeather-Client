@@ -28,6 +28,7 @@ class Register extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weatherAsync = ref.watch(weatherByLocationProvider);
+    final weather = ref.watch(weatherProvider);
 
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
@@ -40,6 +41,8 @@ class Register extends ConsumerWidget {
             context.pop();
             ref.read(selectedTemperatureProvider.notifier).state = null;
             ref.read(addressProvider.notifier).state = "";
+            ref.read(weatherProvider.notifier).state =
+                const AsyncValue.loading();
           },
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
@@ -66,11 +69,21 @@ class Register extends ConsumerWidget {
                                 .format(ref.read(selectedDayProvider)!)),
                         Row(
                           children: [
-                            Semibold_28px(text: "오전"),
+                            Semibold_28px(
+                                text: timeSlotToText(
+                                    ref.read(selectedTimeProvider)!)),
                             SizedBox(
                               width: 8,
                             ),
-                            Bold_32px(text: "16°"),
+                            weather.when(
+                              data: (temp) => Bold_32px(
+                                  text: '${temp.toStringAsFixed(1)}°'),
+                              loading: () => CircularProgressIndicator(),
+                              error: (e, _) => SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                child: Medium_14px(text: '$e'),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -82,8 +95,20 @@ class Register extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             InkWell(
-                              onTap: () {
-                                context.push('/calendar/register/search');
+                              onTap: () async {
+                                await context.push('/calendar/register/search');
+
+                                ref.read(weatherProvider.notifier).state =
+                                    const AsyncValue.loading();
+                                // 사용자 선택에 따라 온도 조회
+                                ref
+                                    .read(weatherProvider.notifier)
+                                    .fetchTemperature(
+                                      city: ref.watch(addressProvider),
+                                      timeSlot: ref.read(selectedTimeProvider)!,
+                                      date: DateFormat('yyyy-MM-dd').format(
+                                          ref.read(selectedDayProvider)!),
+                                    );
                               },
                               child: Row(
                                 children: [
