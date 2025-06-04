@@ -4,6 +4,7 @@ import 'package:client/designs/how_weather_navi.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:client/screens/calendar/view.dart';
 import 'package:client/screens/exception/no_internet.dart';
+import 'package:client/screens/exception/no_location_permission.dart';
 import 'package:client/screens/mypage/change_password.dart';
 import 'package:client/screens/mypage/clothes/clothes_delete.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
@@ -154,6 +155,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/no-internet',
         builder: (context, state) => NoInternetScreen(),
+      ),
+      GoRoute(
+        path: '/no-location-permission',
+        builder: (context, state) {
+          final error = state.extra;
+          return NoLocationPermission(e: error.toString());
+        },
       ),
       ShellRoute(
         builder: (context, state, child) => HowWeatherNaviShell(child: child),

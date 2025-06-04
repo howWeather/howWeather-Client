@@ -15,7 +15,7 @@ class LocationService {
 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      throw Exception('위치 서비스가 비활성화되어 있습니다.');
+      throw '위치 서비스가 비활성화되어 있습니다.';
     }
 
     LocationPermission permission = await Geolocator.checkPermission();
@@ -33,12 +33,12 @@ class LocationService {
       permission = await _permissionFuture!;
 
       if (permission == LocationPermission.denied) {
-        throw Exception('위치 권한이 거부되었습니다.');
+        throw '위치 권한이 거부되었습니다.';
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      throw Exception('위치 권한이 영구적으로 거부되었습니다.');
+      throw '위치 권한이 영구적으로 거부되었습니다.';
     }
 
     // 위치 정보 가져오기

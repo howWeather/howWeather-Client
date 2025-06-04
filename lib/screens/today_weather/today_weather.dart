@@ -4,10 +4,13 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/weather.dart';
 import 'package:client/api/weather/weather_view_model.dart';
+import 'package:client/screens/exception/no_location_permission.dart';
+import 'package:client/service/location_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class WeatherScreen extends ConsumerWidget {
   const WeatherScreen({super.key});
@@ -161,7 +164,12 @@ class WeatherScreen extends ConsumerWidget {
                 ],
               ),
               loading: () => CircularProgressIndicator(),
-              error: (e, _) => Text('에러: $e'),
+              error: (e, st) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  GoRouter.of(context).go('/no-location-permission', extra: e);
+                });
+                return SizedBox.shrink();
+              },
             ),
           ),
         ),

@@ -52,6 +52,7 @@ dependencies:
   firebase_auth: ^5.5.4
   kakao_flutter_sdk: ^1.9.7+3
   connectivity_plus: ^6.1.4
+  permission_handler: ^12.0.0+1
 
 dev_dependencies:
   flutter_test:
