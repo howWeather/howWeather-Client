@@ -1,7 +1,9 @@
+import 'package:client/api/network/network_provider.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_navi.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:client/screens/calendar/view.dart';
+import 'package:client/screens/exception/no_internet.dart';
 import 'package:client/screens/mypage/change_password.dart';
 import 'package:client/screens/mypage/clothes/clothes_delete.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
@@ -25,6 +27,7 @@ import 'package:client/screens/sign_up/sign_up_clothes_enroll.dart';
 import 'package:client/screens/splash/splash.dart';
 import 'package:client/screens/today_wear/today_wear.dart';
 import 'package:client/screens/today_weather/today_weather.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +40,24 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' hide Profile;
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
+    redirect: (context, state) {
+      final connectivity = ref.watch(connectivityProvider);
+      final isDisconnected = connectivity.maybeWhen(
+        data: (results) =>
+            !results.contains(ConnectivityResult.wifi) &&
+            !results.contains(ConnectivityResult.mobile),
+        orElse: () => false,
+      );
+
+      final isNoInternetRoute = state.uri.toString() == '/no-internet';
+
+      if (isDisconnected && !isNoInternetRoute) {
+        return '/no-internet';
+      } else if (!isDisconnected && isNoInternetRoute) {
+        return '/home';
+      }
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/',
@@ -133,6 +154,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/mypage/version',
         builder: (context, state) => Version(),
       ),
+      GoRoute(
+        path: '/no-internet',
+        builder: (context, state) => NoInternetScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) => HowWeatherNaviShell(child: child),
         routes: [
@@ -186,6 +211,30 @@ class HowWeather extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+
+    ref.listen(connectivityProvider, (previous, next) {
+      next.whenData((results) {
+        final isDisconnected = !results.contains(ConnectivityResult.wifi) &&
+            !results.contains(ConnectivityResult.mobile);
+
+        // 1. Navigator가 여전히 mounted인지 확인
+        final navigator = Navigator.of(context);
+        if (!navigator.mounted) return;
+
+        // 2. 현재 위치 확인 (GoRouter 6.x 이상)
+        final currentLocation =
+            GoRouter.of(context).routeInformationProvider.value.location;
+
+        // 3. 화면 전환 로직을 post-frame 콜백으로 감싸기
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (isDisconnected && currentLocation != '/no-internet') {
+            GoRouter.of(context).pushReplacement('/no-internet');
+          } else if (!isDisconnected && currentLocation == '/no-internet') {
+            GoRouter.of(context).pushReplacement('/home');
+          }
+        });
+      });
+    });
 
     return MaterialApp.router(
       title: 'HowWeather',
