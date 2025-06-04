@@ -1,3 +1,4 @@
+import 'package:client/api/weather/weather_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:flutter/material.dart';
@@ -350,6 +351,7 @@ class _AddressSearchPageState extends ConsumerState<AddressSearchPage> {
                 onTap: () {
                   ref.read(addressProvider.notifier).state =
                       _filteredAddresses[index];
+
                   Navigator.pop(context);
                 },
               ),

@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/model/weather.dart';
 import 'package:http/http.dart' as http;
 
 class WeatherRepository {
-  final String apiKey;
+  final String? apiKey;
 
-  WeatherRepository({required this.apiKey});
+  WeatherRepository({this.apiKey});
 
   /// 한글 도시 이름 가져오기
   Future<String> fetchKoreanCityName(String city) async {
@@ -112,6 +113,47 @@ class WeatherRepository {
       }).toList();
     } else {
       throw Exception('Failed to load daily weather');
+    }
+  }
+
+  /// 지역/시간대/날짜에 따른 기온 불러오기
+  Future<double> getTemperature({
+    required String city,
+    required int timeSlot,
+    required String date,
+  }) async {
+    final accessToken = await AuthStorage.getAccessToken();
+
+    final url = Uri.parse('http://13.124.150.125:8080/api/weather/temp');
+
+    final body = jsonEncode({
+      'city': city,
+      'timeSlot': timeSlot,
+      'date': date,
+    });
+
+    final request = http.Request('GET', url)
+      ..headers.addAll({
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      })
+      ..body = body;
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+
+    if (response.statusCode == 200) {
+      if (decoded['success'] == true) {
+        return decoded['result']?.toDouble() ?? 0.0;
+      } else {
+        throw Exception(
+            '온도 조회 실패: ${decoded["error"]?["message"] ?? "알 수 없는 오류"}');
+      }
+    } else {
+      throw Exception(
+          '요청 실패: ${decoded["error"]?["message"] ?? "상태 코드 ${response.statusCode}"}');
     }
   }
 }

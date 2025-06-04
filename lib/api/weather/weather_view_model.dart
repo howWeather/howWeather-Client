@@ -40,3 +40,30 @@ final dailyWeatherProvider = FutureProvider<List<DailyWeather>>((ref) async {
 
   return await repo.fetchDailyWeather(position.latitude, position.longitude);
 });
+
+final weatherProvider =
+    StateNotifierProvider<WeatherNotifier, AsyncValue<double>>(
+        (ref) => WeatherNotifier());
+
+class WeatherNotifier extends StateNotifier<AsyncValue<double>> {
+  WeatherNotifier() : super(const AsyncValue.loading());
+
+  /// 지역/시간대/날짜에 따른 기온 불러오기
+  Future<void> fetchTemperature({
+    required String city,
+    required int timeSlot,
+    required String date,
+  }) async {
+    try {
+      final repo = WeatherRepository();
+      final temp = await repo.getTemperature(
+        city: city,
+        timeSlot: timeSlot,
+        date: date,
+      );
+      state = AsyncValue.data(temp);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+}
