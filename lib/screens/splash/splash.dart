@@ -18,17 +18,20 @@ class _SplashState extends ConsumerState<Splash>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _progress;
+
   @override
   void initState() {
     super.initState();
 
-    _startApp();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..forward();
 
     _progress = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+
+    // initState에서 비동기 작업 시작
+    _startApp();
   }
 
   @override
@@ -40,30 +43,44 @@ class _SplashState extends ConsumerState<Splash>
   Future<void> _startApp() async {
     await Future.delayed(const Duration(seconds: 2));
 
+    // mounted 체크를 통해 위젯이 여전히 활성 상태인지 확인
+    if (!mounted) return;
+
     final accessToken = await AuthStorage.getAccessToken();
     final refreshToken = await AuthStorage.getRefreshToken();
 
     print('accessToken: $accessToken');
     print('refreshToken: $refreshToken');
 
+    // 각 비동기 작업 후마다 mounted 체크
+    if (!mounted) return;
+
     if (accessToken != null && refreshToken != null) {
       try {
         if (!isTokenExpired(accessToken)) {
           print('토큰이 만료되지 않았다면 바로 홈으로 이동');
-          context.pushReplacement('/home');
+          if (mounted) {
+            context.pushReplacement('/home');
+          }
         } else {
           print('토큰 만료 시 재발급 시도');
           await AuthRepository().reissueToken();
-          context.pushReplacement('/home');
+          if (mounted) {
+            context.pushReplacement('/home');
+          }
         }
       } catch (e) {
         print('토큰 재발급 실패 시 로그인 화면으로 이동');
         await AuthStorage.clear();
-        context.pushReplacement('/signIn');
+        if (mounted) {
+          context.pushReplacement('/signIn');
+        }
       }
     } else {
       print('토큰이 없으면 로그인 화면으로 이동');
-      context.pushReplacement('/signIn');
+      if (mounted) {
+        context.pushReplacement('/signIn');
+      }
     }
   }
 
