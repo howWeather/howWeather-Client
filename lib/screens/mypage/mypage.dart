@@ -221,6 +221,8 @@ class _MyPageState extends ConsumerState<MyPage> {
                           await AuthRepository().logout();
                           ref.read(closetProvider.notifier).state =
                               const AsyncLoading();
+                          ref.read(mypageViewModelProvider.notifier).state =
+                              const AsyncLoading();
                           context.go('/');
                         },
                       ),

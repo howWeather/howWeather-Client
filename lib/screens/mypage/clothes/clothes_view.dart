@@ -3,6 +3,7 @@ import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
+import 'package:client/screens/exception/no_clothes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -61,7 +62,7 @@ class ClothesView extends ConsumerWidget {
       ),
       body: clothesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text("불러오기 실패: $error")),
+        error: (error, _) => Center(child: NoClothes()),
         data: (clothesData) {
           final uppers = clothesData.firstWhere((e) => e.category == "uppers",
               orElse: () => CategoryCloth(category: "uppers", clothList: []));

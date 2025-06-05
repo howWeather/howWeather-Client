@@ -4,8 +4,10 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
 import 'package:client/screens/calendar/register/view.dart';
+import 'package:client/screens/exception/no_clothes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class ClothModal extends ConsumerWidget {
@@ -35,7 +37,38 @@ class ClothModal extends ConsumerWidget {
     if (clothesAsync is AsyncLoading) {
       return const Center(child: CircularProgressIndicator());
     } else if (clothesAsync is AsyncError) {
-      return Center(child: Text('불러오기 실패'));
+      return Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            color: HowWeatherColor.white,
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                          onTap: () => context.pop(),
+                          child: SvgPicture.asset(
+                            'assets/icons/cancel.svg',
+                            color: HowWeatherColor.neutral[700],
+                          )),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child: NoClothes(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
     }
 
     final clothesData = clothesAsync.value!;

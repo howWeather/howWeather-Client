@@ -3,6 +3,7 @@ import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
+import 'package:client/screens/exception/no_clothes.dart';
 import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,7 +60,7 @@ class ClothesDelete extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('에러 발생: $err')),
+        error: (err, stack) => Center(child: NoClothes()),
       ),
     );
   }
