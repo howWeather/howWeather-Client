@@ -4,6 +4,7 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/weather.dart';
 import 'package:client/api/weather/weather_view_model.dart';
+import 'package:client/screens/skeleton/wear_skeleton.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,64 +16,65 @@ class TodayWear extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hourlyWeather = ref.watch(hourlyWeatherProvider);
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [const Color(0xFF4093EB), const Color(0xFFABDAEF)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 50,
+
+    return hourlyWeather.when(
+      data: (hourlyData) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color(0xFF4093EB), const Color(0xFFABDAEF)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-          Semibold_24px(
-            text: "오늘 날씨에 추천하는 옷이에요!",
-            color: HowWeatherColor.white,
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
+              SizedBox(
+                height: 50,
+              ),
+              Semibold_24px(
+                text: "오늘 날씨에 추천하는 옷이에요!",
+                color: HowWeatherColor.white,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Semibold_20px(
-                    text: "추천 상의",
-                    color: HowWeatherColor.white,
+                  Column(
+                    children: [
+                      Semibold_20px(
+                        text: "추천 상의",
+                        color: HowWeatherColor.white,
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Image.asset(width: 100, 'assets/images/windbreak.png'),
+                    ],
                   ),
-                  SizedBox(
-                    height: 12,
+                  Column(
+                    children: [
+                      Semibold_20px(
+                        text: "추천 아우터",
+                        color: HowWeatherColor.white,
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Image.asset(width: 100, 'assets/images/windbreak.png'),
+                    ],
                   ),
-                  Image.asset(width: 100, 'assets/images/windbreak.png'),
                 ],
               ),
-              Column(
-                children: [
-                  Semibold_20px(
-                    text: "추천 아우터",
-                    color: HowWeatherColor.white,
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Image.asset(width: 100, 'assets/images/windbreak.png'),
-                ],
+              SizedBox(
+                height: 40,
               ),
-            ],
-          ),
-          SizedBox(
-            height: 40,
-          ),
-          hourlyWeather.when(
-            data: (hourlyData) {
-              return Container(
+              Container(
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
                   color: HowWeatherColor.black.withOpacity(0.1),
@@ -154,13 +156,13 @@ class TodayWear extends ConsumerWidget {
                     PerceivedTemperatureChart(hourlyData: hourlyData),
                   ],
                 ),
-              );
-            },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, st) => Text('에러 발생: $e'),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
+      loading: () => TodayWearSkeleton(),
+      error: (e, st) => Text('에러 발생: $e'),
     );
   }
 }

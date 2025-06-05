@@ -3,6 +3,7 @@ import 'package:client/api/record/record_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/api/weather/weather_view_model.dart';
+import 'package:client/screens/skeleton/calendar_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,6 +22,31 @@ class Calendar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final calendarFormat = ref.watch(calendarFormatProvider);
+    final focusedDay = ref.watch(focusedDayProvider);
+    final selectedDay = ref.watch(selectedDayProvider);
+    final monthString = DateFormat('yyyy-MM').format(focusedDay);
+    final weatherAsync = ref.watch(weatherByLocationProvider);
+
+    final recordedDaysAsync = ref.watch(recordedDaysProvider(monthString));
+
+    // temperature는 날씨 API에서 가져옴
+    final similarDaysAsync = weatherAsync.when(
+      data: (weather) => ref.watch(similarDaysProvider(
+        (month: monthString, temperature: weather.temperature),
+      )),
+      loading: () => const AsyncValue.loading(),
+      error: (e, st) => AsyncValue.error(e, st),
+    );
+
+    // 모든 비동기 데이터가 로딩 중인지 체크
+    final isLoading = weatherAsync.isLoading ||
+        recordedDaysAsync.isLoading ||
+        similarDaysAsync.isLoading;
+
+    if (isLoading) {
+      return CalendarSkeleton();
+    }
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(

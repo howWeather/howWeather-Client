@@ -4,6 +4,7 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/weather.dart';
 import 'package:client/api/weather/weather_view_model.dart';
+import 'package:client/screens/skeleton/weather_skeleton.dart';
 import 'package:client/service/location_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -222,20 +223,21 @@ class WeatherScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              loading: () => Container(
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(color: Colors.white),
-                    SizedBox(height: 16),
-                    Text(
-                      '날씨 정보를 불러오는 중...',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ],
-                ),
-              ),
+              // loading: () => Container(
+              //   height: MediaQuery.of(context).size.height,
+              //   child: Column(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       CircularProgressIndicator(color: Colors.white),
+              //       SizedBox(height: 16),
+              //       Text(
+              //         '날씨 정보를 불러오는 중...',
+              //         style: TextStyle(color: Colors.white70),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              loading: () => WeatherSkeletonScreen(),
               error: (e, st) {
                 // 에러 처리를 위한 PostFrameCallback
                 WidgetsBinding.instance.addPostFrameCallback((_) async {
