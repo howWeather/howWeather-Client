@@ -1,3 +1,4 @@
+import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/api/record/record_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
@@ -452,6 +453,7 @@ class Calendar extends ConsumerWidget {
                   onTap: () {
                     context.pop();
                     context.push('/calendar/register');
+                    ref.read(closetProvider.notifier).loadClothes();
                   },
                   child: Container(
                     padding: EdgeInsets.all(16),

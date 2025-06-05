@@ -1,5 +1,6 @@
 import 'package:client/api/alarm/alarm_repository.dart';
 import 'package:client/api/auth/auth_repository.dart';
+import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/api/mypage/mypage_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_dialog.dart';
@@ -92,6 +93,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                 InkWell(
                   onTap: () {
                     context.push('/mypage/clothes/view');
+                    ref.read(closetProvider.notifier).loadClothes();
                   },
                   child: Container(
                     width: double.infinity,
@@ -109,6 +111,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                 InkWell(
                   onTap: () {
                     context.push('/mypage/clothes/delete');
+                    ref.read(closetProvider.notifier).loadClothes();
                   },
                   child: Container(
                     width: double.infinity,
@@ -216,6 +219,10 @@ class _MyPageState extends ConsumerState<MyPage> {
                         done: () async {
                           await AlarmRepository().deleteFCMToken();
                           await AuthRepository().logout();
+                          ref.read(closetProvider.notifier).state =
+                              const AsyncLoading();
+                          ref.read(mypageViewModelProvider.notifier).state =
+                              const AsyncLoading();
                           context.go('/');
                         },
                       ),
