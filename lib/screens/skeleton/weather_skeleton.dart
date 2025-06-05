@@ -12,99 +12,101 @@ class WeatherSkeletonScreen extends StatelessWidget {
     const dummyHourly = 8;
     const dummyDaily = 6;
 
-    return Shimmer(
-      duration: const Duration(seconds: 2),
-      interval: const Duration(seconds: 1),
-      color: Colors.white,
-      colorOpacity: 0.2,
-      enabled: true,
-      direction: const ShimmerDirection.fromLTRB(),
-      child: Column(
-        children: [
-          const SizedBox(height: 50),
-          // 상단 날씨 요약
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      children: [
+        const SizedBox(height: 50),
+        // 상단 날씨 요약
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _skeletonBox(width: 160, height: 20),
+                const SizedBox(height: 8),
+                _skeletonBox(width: 80, height: 80),
+                const SizedBox(height: 8),
+                _skeletonBox(width: 100, height: 20),
+              ],
+            ),
+            _skeletonCircle(size: 80),
+          ],
+        ),
+        const SizedBox(height: 40),
+
+        // 시간별 날씨
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: HowWeatherColor.black.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _skeletonBox(width: 160, height: 20),
-                  const SizedBox(height: 8),
-                  _skeletonBox(width: 80, height: 80),
-                  const SizedBox(height: 8),
-                  _skeletonBox(width: 100, height: 20),
-                ],
-              ),
-              _skeletonCircle(size: 80),
+              _skeletonBox(width: 100, height: 20),
+              const SizedBox(height: 10),
+              Divider(color: Colors.white.withOpacity(0.5), height: 1),
+              const SizedBox(height: 10),
+              _buildHourlySkeleton(dummyHourly),
             ],
           ),
-          const SizedBox(height: 40),
+        ),
 
-          // 시간별 날씨
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: HowWeatherColor.black.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _skeletonBox(width: 100, height: 20),
-                const SizedBox(height: 10),
-                Divider(color: Colors.white.withOpacity(0.5), height: 1),
-                const SizedBox(height: 10),
-                _buildHourlySkeleton(dummyHourly),
-              ],
-            ),
+        const SizedBox(height: 20),
+
+        // 주간 날씨 예보
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: HowWeatherColor.black.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
           ),
-
-          const SizedBox(height: 20),
-
-          // 주간 날씨 예보
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: HowWeatherColor.black.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _skeletonBox(width: 100, height: 20),
-                const SizedBox(height: 10),
-                Divider(color: Colors.white.withOpacity(0.5), height: 1),
-                const SizedBox(height: 10),
-                _buildDailySkeleton(dummyDaily),
-              ],
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _skeletonBox(width: 100, height: 20),
+              const SizedBox(height: 10),
+              Divider(color: Colors.white.withOpacity(0.5), height: 1),
+              const SizedBox(height: 10),
+              _buildDailySkeleton(dummyDaily),
+            ],
           ),
+        ),
 
-          const SizedBox(height: 70),
-        ],
-      ),
+        const SizedBox(height: 70),
+      ],
     );
   }
 
   Widget _skeletonBox({double width = 100, double height = 20}) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: HowWeatherColor.neutral[100],
-        borderRadius: BorderRadius.circular(20),
+    return Shimmer(
+      duration: const Duration(seconds: 2),
+      color: Colors.white,
+      colorOpacity: 0.3,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(20),
+        ),
       ),
     );
   }
 
   Widget _skeletonCircle({double size = 60}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: HowWeatherColor.neutral[100],
-        borderRadius: BorderRadius.circular(30),
+    return Shimmer(
+      duration: const Duration(seconds: 2),
+      color: Colors.white,
+      colorOpacity: 0.3,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(30),
+        ),
       ),
     );
   }
