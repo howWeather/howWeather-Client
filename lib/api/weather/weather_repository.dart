@@ -61,12 +61,19 @@ class WeatherRepository {
       final todayOrTomorrowForecast =
           list.map((item) => HourlyWeather.fromJson(item)).where((weather) {
         final date = weather.dateTime;
-        return (date.year == now.year &&
-                date.month == now.month &&
-                date.day == now.day) ||
-            (date.year == tomorrow.year &&
-                date.month == tomorrow.month &&
-                date.day == tomorrow.day);
+        final hour = date.hour;
+
+        final isToday = date.year == now.year &&
+            date.month == now.month &&
+            date.day == now.day;
+
+        final isTomorrow = date.year == tomorrow.year &&
+            date.month == tomorrow.month &&
+            date.day == tomorrow.day;
+
+        final isDesiredHour = [9, 12, 15, 18, 21].contains(hour);
+
+        return (isToday || isTomorrow) && isDesiredHour;
       }).toList();
 
       return todayOrTomorrowForecast;

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:client/designs/how_weather_color.dart';
@@ -39,7 +41,7 @@ class CalendarSkeleton extends StatelessWidget {
                       color: HowWeatherColor.primary[900],
                     ),
                   ),
-                  _buildDailyHistorySkeleton(),
+                  _buildDailyHistorySkeleton(context),
                   SizedBox(
                     height: 70,
                   ),
@@ -122,16 +124,35 @@ class CalendarSkeleton extends StatelessWidget {
               Container(
                 height: 55,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    Container(
+                      width: 20,
+                      height: 18,
+                      color: HowWeatherColor.white,
+                    ),
+                    Container(
+                      width: 20,
+                      height: 18,
+                      color: HowWeatherColor.white,
+                    ),
+                    Container(
+                      width: 20,
+                      height: 18,
+                      color: HowWeatherColor.white,
+                    ),
+                    Container(
+                      width: 20,
+                      height: 18,
+                      color: HowWeatherColor.white,
+                    ),
+                    Container(
+                      width: 20,
+                      height: 18,
+                      color: HowWeatherColor.white,
+                    ),
                     _buildDaySkeleton(0, 1),
-                    SizedBox(
-                      width: 25,
-                    ),
                     _buildDaySkeleton(5, 4),
-                    SizedBox(
-                      width: 13,
-                    ),
                   ],
                 ),
               ),
@@ -278,7 +299,7 @@ class CalendarSkeleton extends StatelessWidget {
     );
   }
 
-  Widget _buildDailyHistorySkeleton() {
+  Widget _buildDailyHistorySkeleton(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -354,25 +375,29 @@ class CalendarSkeleton extends StatelessWidget {
                   // 옷 이미지들
                   SizedBox(
                     height: 60,
-                    child: Row(
-                      children: List.generate(3, (imgIndex) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: Shimmer(
-                            duration: Duration(milliseconds: 1500),
-                            color: HowWeatherColor.neutral[300]!,
-                            colorOpacity: 0.3,
-                            child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: HowWeatherColor.neutral[200],
-                                borderRadius: BorderRadius.circular(20),
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(3, (imgIndex) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: Shimmer(
+                              duration: Duration(milliseconds: 1500),
+                              color: HowWeatherColor.neutral[300]!,
+                              colorOpacity: 0.3,
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: HowWeatherColor.neutral[200],
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
+                      ),
                     ),
                   ),
                 ],
