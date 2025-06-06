@@ -59,6 +59,20 @@ final class HowWeatherColor extends Color {
     11: Color(0xFF743C11),
   };
 
+  static List<double> createColorMatrixFromColor(Color color) {
+    // RGB 값을 0~1로 정규화
+    final r = color.red / 255.0;
+    final g = color.green / 255.0;
+    final b = color.blue / 255.0;
+
+    return <double>[
+      r, 0, 0, 0, 0, // Red
+      0, g, 0, 0, 0, // Green
+      0, 0, b, 0, 0, // Blue
+      0, 0, 0, 1, 0, // Alpha
+    ];
+  }
+
   static const Map<int, String> thicknessMap = {
     1: "얇음",
     2: "보통",

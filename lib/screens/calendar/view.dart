@@ -617,6 +617,13 @@ class _DailyHistoryState extends State<DailyHistory> {
                             child: Row(
                               children: [
                                 ...record['uppers'].map<Widget>((id) {
+                                  final color =
+                                      HowWeatherColor.colorMap[id['color']] ??
+                                          Colors.transparent;
+
+                                  final matrix = HowWeatherColor
+                                      .createColorMatrixFromColor(color);
+
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 12),
                                     child: FutureBuilder<String>(
@@ -630,13 +637,13 @@ class _DailyHistoryState extends State<DailyHistory> {
                                         } else if (snapshot.hasError) {
                                           return const Icon(Icons.error);
                                         } else if (snapshot.hasData) {
-                                          return Image.network(
-                                            snapshot.data!,
-                                            fit: BoxFit.fill,
-                                            color: HowWeatherColor
-                                                .colorMap[id['color']]!
-                                                .withOpacity(0.9),
-                                            colorBlendMode: BlendMode.srcIn,
+                                          return ColorFiltered(
+                                            colorFilter:
+                                                ColorFilter.matrix(matrix),
+                                            child: Image.network(
+                                              snapshot.data!,
+                                              fit: BoxFit.fill,
+                                            ),
                                           );
                                         } else {
                                           return const SizedBox.shrink();
@@ -646,10 +653,39 @@ class _DailyHistoryState extends State<DailyHistory> {
                                   );
                                 }).toList(),
                                 ...record['outers'].map<Widget>((id) {
+                                  final color =
+                                      HowWeatherColor.colorMap[id['color']] ??
+                                          Colors.transparent;
+
+                                  final matrix = HowWeatherColor
+                                      .createColorMatrixFromColor(color);
+
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 12),
-                                    child: Image.asset(
-                                        'assets/images/windbreak.png'),
+                                    child: FutureBuilder<String>(
+                                      future: ref
+                                          .read(clothViewModelProvider.notifier)
+                                          .getOuterClothImage(id['clothType']),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          return const Icon(Icons.error);
+                                        } else if (snapshot.hasData) {
+                                          return ColorFiltered(
+                                            colorFilter:
+                                                ColorFilter.matrix(matrix),
+                                            child: Image.network(
+                                              snapshot.data!,
+                                              fit: BoxFit.fill,
+                                            ),
+                                          );
+                                        } else {
+                                          return const SizedBox.shrink();
+                                        }
+                                      },
+                                    ),
                                   );
                                 }).toList(),
                               ],
