@@ -1,4 +1,5 @@
 import 'package:client/api/closet/closet_view_model.dart';
+import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:client/api/record/record_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
@@ -618,8 +619,30 @@ class _DailyHistoryState extends State<DailyHistory> {
                                 ...record['uppers'].map<Widget>((id) {
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 12),
-                                    child: Image.asset(
-                                        'assets/images/windbreak.png'),
+                                    child: FutureBuilder<String>(
+                                      future: ref
+                                          .read(clothViewModelProvider.notifier)
+                                          .getUpperClothImage(id['clothType']),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          return const Icon(Icons.error);
+                                        } else if (snapshot.hasData) {
+                                          return Image.network(
+                                            snapshot.data!,
+                                            fit: BoxFit.fill,
+                                            color: HowWeatherColor
+                                                .colorMap[id['color']]!
+                                                .withOpacity(0.9),
+                                            colorBlendMode: BlendMode.srcIn,
+                                          );
+                                        } else {
+                                          return const SizedBox.shrink();
+                                        }
+                                      },
+                                    ),
                                   );
                                 }).toList(),
                                 ...record['outers'].map<Widget>((id) {

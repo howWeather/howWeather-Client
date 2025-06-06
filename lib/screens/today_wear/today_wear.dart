@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/weather.dart';
@@ -16,6 +17,9 @@ class TodayWear extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hourlyWeather = ref.watch(hourlyWeatherProvider);
+    final upperClothImageAsync =
+        ref.read(clothViewModelProvider.notifier).getUpperClothImage(3);
+    final imageAsync = ref.watch(clothViewModelProvider);
 
     return hourlyWeather.when(
       data: (hourlyData) {
@@ -43,30 +47,42 @@ class TodayWear extends ConsumerWidget {
                 height: 20,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Semibold_20px(
                         text: "추천 상의",
                         color: HowWeatherColor.white,
                       ),
-                      SizedBox(
-                        height: 12,
+                      imageAsync.when(
+                        data: (url) => Image.network(
+                          url,
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          fit: BoxFit.fill,
+                        ),
+                        loading: () => const CircularProgressIndicator(),
+                        error: (e, _) => const Icon(Icons.error),
                       ),
-                      Image.asset(width: 100, 'assets/images/windbreak.png'),
                     ],
                   ),
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Semibold_20px(
                         text: "추천 아우터",
                         color: HowWeatherColor.white,
                       ),
-                      SizedBox(
-                        height: 12,
+                      imageAsync.when(
+                        data: (url) => Image.network(
+                          url,
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          fit: BoxFit.fill,
+                        ),
+                        loading: () => const CircularProgressIndicator(),
+                        error: (e, _) => const Icon(Icons.error),
                       ),
-                      Image.asset(width: 100, 'assets/images/windbreak.png'),
                     ],
                   ),
                 ],
