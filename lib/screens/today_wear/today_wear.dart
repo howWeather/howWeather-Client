@@ -17,9 +17,8 @@ class TodayWear extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hourlyWeather = ref.watch(hourlyWeatherProvider);
-    final upperClothImageAsync =
-        ref.read(clothViewModelProvider.notifier).getUpperClothImage(3);
-    final imageAsync = ref.watch(clothViewModelProvider);
+    final upperClothImageAsync = ref.watch(upperClothImageProvider(3));
+    final outerClothImageAsync = ref.watch(outerClothImageProvider(6));
 
     return hourlyWeather.when(
       data: (hourlyData) {
@@ -48,6 +47,7 @@ class TodayWear extends ConsumerWidget {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -56,7 +56,7 @@ class TodayWear extends ConsumerWidget {
                         text: "추천 상의",
                         color: HowWeatherColor.white,
                       ),
-                      imageAsync.when(
+                      upperClothImageAsync.when(
                         data: (url) => Image.network(
                           url,
                           width: MediaQuery.of(context).size.width * 0.4,
@@ -74,7 +74,7 @@ class TodayWear extends ConsumerWidget {
                         text: "추천 아우터",
                         color: HowWeatherColor.white,
                       ),
-                      imageAsync.when(
+                      outerClothImageAsync.when(
                         data: (url) => Image.network(
                           url,
                           width: MediaQuery.of(context).size.width * 0.4,
