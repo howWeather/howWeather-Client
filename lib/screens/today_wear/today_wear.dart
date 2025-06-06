@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:client/api/cloth/cloth_view_model.dart';
+import 'package:client/api/model/model_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/weather.dart';
@@ -17,8 +18,8 @@ class TodayWear extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hourlyWeather = ref.watch(hourlyWeatherProvider);
-    final upperClothImageAsync = ref.watch(upperClothImageProvider(3));
-    final outerClothImageAsync = ref.watch(outerClothImageProvider(6));
+    final modelState = ref.watch(modelViewModelProvider);
+    ref.read(modelViewModelProvider.notifier).fetchRecommendation();
 
     return hourlyWeather.when(
       data: (hourlyData) {
@@ -45,47 +46,71 @@ class TodayWear extends ConsumerWidget {
               SizedBox(
                 height: 20,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+              modelState.when(
+                loading: () => const CircularProgressIndicator(),
+                error: (e, _) => Text('에러 발생: $e'),
+                data: (recommendations) {
+                  if (recommendations.isEmpty) {
+                    return Text("추천 가능한 옷이 없습니다. 새로운 옷을 추가해 보세요.");
+                  }
+                  final upperClothImageAsync =
+                      recommendations.first.uppersTypeList.isNotEmpty
+                          ? ref.watch(upperClothImageProvider(
+                              recommendations.first.uppersTypeList.first))
+                          : null;
+
+                  final outerClothImageAsync =
+                      recommendations.first.outersTypeList.isNotEmpty
+                          ? ref.watch(outerClothImageProvider(
+                              recommendations.first.outersTypeList.first))
+                          : null;
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Semibold_20px(
-                        text: "추천 상의",
-                        color: HowWeatherColor.white,
-                      ),
-                      upperClothImageAsync.when(
-                        data: (url) => Image.network(
-                          url,
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          fit: BoxFit.fill,
+                      if (recommendations.first.uppersTypeList.isNotEmpty &&
+                          upperClothImageAsync != null)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Semibold_20px(
+                              text: "추천 상의",
+                              color: HowWeatherColor.white,
+                            ),
+                            upperClothImageAsync.when(
+                              data: (url) => Image.network(
+                                url,
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                fit: BoxFit.fill,
+                              ),
+                              loading: () => const CircularProgressIndicator(),
+                              error: (e, _) => const Icon(Icons.error),
+                            ),
+                          ],
                         ),
-                        loading: () => const CircularProgressIndicator(),
-                        error: (e, _) => const Icon(Icons.error),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Semibold_20px(
-                        text: "추천 아우터",
-                        color: HowWeatherColor.white,
-                      ),
-                      outerClothImageAsync.when(
-                        data: (url) => Image.network(
-                          url,
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          fit: BoxFit.fill,
+                      if (recommendations.first.outersTypeList.isNotEmpty &&
+                          outerClothImageAsync != null)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Semibold_20px(
+                              text: "추천 아우터",
+                              color: HowWeatherColor.white,
+                            ),
+                            outerClothImageAsync.when(
+                              data: (url) => Image.network(
+                                url,
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                fit: BoxFit.fill,
+                              ),
+                              loading: () => const CircularProgressIndicator(),
+                              error: (e, _) => const Icon(Icons.error),
+                            ),
+                          ],
                         ),
-                        loading: () => const CircularProgressIndicator(),
-                        error: (e, _) => const Icon(Icons.error),
-                      ),
                     ],
-                  ),
-                ],
+                  );
+                },
               ),
               SizedBox(
                 height: 40,
@@ -183,7 +208,7 @@ class TodayWear extends ConsumerWidget {
   }
 }
 
-class PerceivedTemperatureChart extends StatelessWidget {
+class PerceivedTemperatureChart extends ConsumerWidget {
   final List<HourlyWeather> hourlyData;
 
   const PerceivedTemperatureChart({super.key, required this.hourlyData});
@@ -192,9 +217,11 @@ class PerceivedTemperatureChart extends StatelessWidget {
   static const double graphHeight = 80.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final minTemp = hourlyData.map((e) => e.temperature).reduce(min) - 5;
     final maxTemp = hourlyData.map((e) => e.temperature).reduce(max) + 5;
+    final modelState = ref.watch(modelViewModelProvider);
+    ref.read(modelViewModelProvider.notifier).fetchRecommendation();
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -230,17 +257,52 @@ class PerceivedTemperatureChart extends StatelessWidget {
                       dotData: FlDotData(
                         show: true,
                         getDotPainter: (spot, percent, barData, index) {
-                          final temp = hourlyData[index].temperature;
-                          final color = temp > 30
-                              ? HowWeatherColor.secondary[800]!
-                              : temp >= 15
-                                  ? HowWeatherColor.secondary[500]!
-                                  : HowWeatherColor.primary[800]!;
+                          return modelState.when(
+                            loading: () => FlDotCirclePainter(
+                              radius: 4,
+                              color: HowWeatherColor.neutral[200]!,
+                              strokeColor: Colors.transparent,
+                            ),
+                            error: (e, _) => FlDotCirclePainter(
+                              radius: 4,
+                              color: HowWeatherColor.neutral[200]!,
+                              strokeColor: Colors.transparent,
+                            ),
+                            data: (recommendations) {
+                              // first + second feelingList 합치기
+                              final allFeelingList = [
+                                ...recommendations[0].feelingList,
+                                ...recommendations[1].feelingList,
+                              ];
+                              // index 범위 체크
+                              if (index >= allFeelingList.length) {
+                                return FlDotCirclePainter(
+                                  radius: 4,
+                                  color: HowWeatherColor.neutral[200]!,
+                                  strokeColor: Colors.transparent,
+                                );
+                              }
 
-                          return FlDotCirclePainter(
-                            radius: 4,
-                            color: color,
-                            strokeColor: Colors.transparent,
+                              final colorIndex = allFeelingList[index].feeling;
+
+                              late Color color;
+                              if (colorIndex == 1) {
+                                color = HowWeatherColor.secondary[800]!;
+                              } else if (colorIndex == 2) {
+                                color = HowWeatherColor.secondary[500]!;
+                              } else if (colorIndex == 3) {
+                                color = HowWeatherColor.primary[800]!;
+                              } else {
+                                color =
+                                    HowWeatherColor.neutral[200]!; // fallback
+                              }
+
+                              return FlDotCirclePainter(
+                                radius: 4,
+                                color: color,
+                                strokeColor: Colors.transparent,
+                              );
+                            },
                           );
                         },
                       ),
