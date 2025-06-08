@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:http/http.dart' as http;
 
 class RecordRepository {
-  final String _baseUrl = 'http://13.124.150.125:8080/api/record';
+  final String _baseUrl = '${API.hostConnect}/api/record';
 
   /// 일일 기록 작성
   Future<Map<String, dynamic>> writeRecord({

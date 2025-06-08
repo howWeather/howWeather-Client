@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:client/model/weather.dart';
 import 'package:http/http.dart' as http;
 
@@ -131,7 +132,7 @@ class WeatherRepository {
   }) async {
     final accessToken = await AuthStorage.getAccessToken();
 
-    final url = Uri.parse('http://13.124.150.125:8080/api/weather/temp');
+    final url = Uri.parse('${API.hostConnect}/api/weather/temp');
 
     final body = jsonEncode({
       'city': city,

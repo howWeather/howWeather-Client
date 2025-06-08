@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:client/model/model_recommendation.dart';
 import 'package:http/http.dart' as http;
 
 class ModelRepository {
-  final String _baseUrl = 'http://13.124.150.125:8080/api/model/recommendation';
+  final String _baseUrl = '${API.hostConnect}/api/model/recommendation';
 
   Future<List<ModelRecommendation>> fetchModelRecommendation() async {
     final accessToken = await AuthStorage.getAccessToken();

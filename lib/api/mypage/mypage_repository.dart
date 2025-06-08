@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:client/model/user_profile.dart';
 import 'package:http/http.dart' as http;
 
 class MypageRepository {
-  final String _baseUrl = 'http://13.124.150.125:8080/api/mypage';
+  final String _baseUrl = '${API.hostConnect}/api/mypage';
 
   Future<UserProfile> getProfile() async {
     final accessToken = await AuthStorage.getAccessToken();
