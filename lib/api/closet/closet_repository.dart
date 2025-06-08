@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:client/model/cloth_item.dart';
 import 'package:http/http.dart' as http;
 
 class ClosetRepository {
-  final String _baseUrl = 'http://13.124.150.125:8080/api/closet';
+  final String _baseUrl = '${API.hostConnect}/api/closet';
 
   Future<List<CategoryCloth>> getAllClothes() async {
     final accessToken = await AuthStorage.getAccessToken();

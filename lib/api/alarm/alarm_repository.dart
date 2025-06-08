@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 
 class AlarmRepository {
-  final String _baseUrl = 'http://13.124.150.125:8080/api/alarm';
+  final String _baseUrl = '${API.hostConnect}/api/alarm';
 
   /// 알림 설정 조회
   Future<Map<String, bool>> getAlarmSettings() async {

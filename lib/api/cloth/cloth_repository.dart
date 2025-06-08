@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:http/http.dart' as http;
 
 class ClothRepository {
-  final String _baseUrl = 'http://13.124.150.125:8080/api/cloth';
+  final String _baseUrl = '${API.hostConnect}/api/cloth';
 
   /// 상의 이미지 URL 반환
   Future<String> getUpperClothImage(int clothType) async {

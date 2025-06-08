@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:http/http.dart' as http;
 
 class Oauth2Repository {
-  final String _baseUrl = 'http://13.124.150.125:8080/api/oauth';
+  final String _baseUrl = '${API.hostConnect}/api/oauth';
 
   /// 소셜로그인-카카오
   Future<Map<String, String>> socialLoginKaKao(

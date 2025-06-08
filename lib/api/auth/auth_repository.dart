@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:client/api/auth/auth_storage.dart';
+import 'package:client/api/howweather_api.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRepository {
-  final String _baseUrl = 'http://13.124.150.125:8080/api/auth';
+  final String _baseUrl = '${API.hostConnect}/api/auth';
 
   /// 이메일 중복 검증
   Future<bool> verifyEmail(String email) async {
