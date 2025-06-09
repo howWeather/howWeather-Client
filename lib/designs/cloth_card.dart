@@ -164,10 +164,10 @@ String clothTypeToKorean(String category, int type) {
   };
 
   if (category == 'uppers') {
-    return upperMap[type] ?? "알 수 없음";
+    return upperMap[type] ?? "";
   } else if (category == 'outers') {
-    return outerMap[type] ?? "알 수 없음";
+    return outerMap[type] ?? "";
   } else {
-    return "알 수 없음";
+    return "";
   }
 }

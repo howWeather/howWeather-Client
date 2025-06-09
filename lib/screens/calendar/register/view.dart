@@ -1,3 +1,4 @@
+import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:client/api/record/record_view_model.dart';
 import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/cloth_modal.dart';
@@ -12,9 +13,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-final isAllValidProvider = Provider<bool>((ref) {
-  return true;
-});
 final selectedTemperatureProvider = StateProvider<int?>((ref) => null);
 final selectedClothProvider = StateProvider<int?>((ref) => null);
 final selectedClothInfoProvider = StateProvider<int?>((ref) => null);
@@ -38,6 +36,7 @@ class Register extends ConsumerWidget {
         centerTitle: true,
         leading: InkWell(
           onTap: () {
+            context.pop();
             context.pop();
             ref.read(selectedTemperatureProvider.notifier).state = null;
             ref.read(addressProvider.notifier).state = "";
@@ -70,18 +69,23 @@ class Register extends ConsumerWidget {
                         Row(
                           children: [
                             Semibold_28px(
-                                text: timeSlotToText(
-                                    ref.read(selectedTimeProvider)!)),
+                                text: selectedTimeProvider != null
+                                    ? timeSlotToText(
+                                        ref.read(selectedTimeProvider)!)
+                                    : ''),
                             SizedBox(
                               width: 8,
                             ),
                             weather.when(
                               data: (temp) => Bold_32px(
                                   text: '${temp.toStringAsFixed(1)}°'),
-                              loading: () => CircularProgressIndicator(),
+                              loading: () => SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                child: Medium_14px(text: '위치를 선택해주세요.'),
+                              ),
                               error: (e, _) => SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.2,
-                                child: Medium_14px(text: '$e'),
+                                child: Medium_14px(text: '위치를 선택해주세요.'),
                               ),
                             ),
                           ],
@@ -112,9 +116,16 @@ class Register extends ConsumerWidget {
                               },
                               child: Row(
                                 children: [
-                                  SvgPicture.asset("assets/icons/locator.svg"),
+                                  SvgPicture.asset(
+                                    "assets/icons/locator.svg",
+                                  ),
                                   Semibold_24px(
-                                    text: ref.watch(addressProvider),
+                                    text: ref
+                                                .read(addressProvider.notifier)
+                                                .state !=
+                                            ""
+                                        ? ref.watch(addressProvider)
+                                        : '클릭하여 위치 선택',
                                     color: HowWeatherColor.black,
                                   ),
                                 ],
@@ -145,11 +156,22 @@ class Register extends ConsumerWidget {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Cloth(context, "상의", ref, "uppers",
-                        ref.watch(registerUpperInfoProvider)?.clothType ?? 0),
-                    Cloth(context, "아우터", ref, "outers",
-                        ref.watch(registerOuterInfoProvider)?.clothType ?? 0),
+                    Cloth(
+                        context,
+                        "상의",
+                        ref,
+                        "uppers",
+                        ref.watch(registerUpperInfoProvider)?.clothType ?? 0,
+                        ref.watch(registerUpperInfoProvider)?.color ?? 0),
+                    Cloth(
+                        context,
+                        "아우터",
+                        ref,
+                        "outers",
+                        ref.watch(registerOuterInfoProvider)?.clothType ?? 0,
+                        ref.watch(registerOuterInfoProvider)?.color ?? 0),
                   ],
                 ),
               ],
@@ -165,21 +187,45 @@ class Register extends ConsumerWidget {
   }
 
   Widget bottomSheetWidget(BuildContext context, ref) {
+    final isAllValidProvider = Provider<bool>((ref) {
+      final temperature = ref.watch(selectedTemperatureProvider);
+      final location = ref.watch(addressProvider);
+      final upper = ref.watch(registerUpperInfoProvider);
+      final outer = ref.watch(registerOuterInfoProvider);
+      return temperature != null &&
+          location.isNotEmpty &&
+          (upper != null || outer != null);
+    });
     final isAllValid = ref.watch(isAllValidProvider);
 
     return GestureDetector(
       onTap: isAllValid
           ? () async {
+              final upperInfo = ref.read(registerUpperInfoProvider);
+              final outerInfo = ref.read(registerOuterInfoProvider);
+              // 둘 다 null이면 에러 처리
+              if (upperInfo == null && outerInfo == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('상의 또는 아우터 중 하나 이상을 선택해주세요.'),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                return; // 기록 중단
+              }
               try {
                 await ref.read(recordViewModelProvider.notifier).writeRecord(
                       timeSlot: ref.read(selectedTimeProvider),
                       feeling: ref.read(selectedTemperatureProvider),
                       date: DateFormat('yyyy-MM-dd')
                           .format(ref.read(selectedDayProvider)),
-                      uppers: List<int>.from(
-                          [ref.read(registerUpperInfoProvider)!.clothId]),
-                      outers: List<int>.from(
-                          [ref.read(registerOuterInfoProvider)!.clothId]),
+                      uppers: upperInfo != null
+                          ? <int?>[upperInfo.clothId]
+                          : <int>[],
+                      outers: outerInfo != null
+                          ? <int?>[outerInfo.clothId]
+                          : <int>[],
                       city: ref.read(addressProvider),
                     );
 
@@ -194,6 +240,11 @@ class Register extends ConsumerWidget {
                 await Future.delayed(const Duration(milliseconds: 1500));
                 ref.read(addressProvider.notifier).state = "";
                 context.go('/calendar');
+                context.pop();
+                ref.read(selectedTemperatureProvider.notifier).state = null;
+                ref.read(addressProvider.notifier).state = "";
+                ref.read(weatherProvider.notifier).state =
+                    const AsyncValue.loading();
               } catch (e) {
                 // ❌ 실패 스낵바
                 print(e);
@@ -286,7 +337,9 @@ class Register extends ConsumerWidget {
   }
 
   Widget Cloth(BuildContext context, String text, WidgetRef ref,
-      String category, int type) {
+      String category, int type, int color) {
+    final realcolor = HowWeatherColor.colorMap[color] ?? Colors.transparent;
+    final matrix = HowWeatherColor.createColorMatrixFromColor(realcolor);
     return Column(
       children: [
         Medium_16px(text: text),
@@ -329,7 +382,34 @@ class Register extends ConsumerWidget {
         ),
         SizedBox(
           width: MediaQuery.of(context).size.width * 0.3,
-          child: Image.asset("assets/images/windbreak.png"),
+          child: FutureBuilder<String>(
+            future: category == "uppers"
+                ? ref
+                    .read(clothViewModelProvider.notifier)
+                    .getUpperClothImage(type)
+                : ref
+                    .read(clothViewModelProvider.notifier)
+                    .getOuterClothImage(type),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return const Icon(Icons.error);
+              } else if (snapshot.hasData &&
+                  snapshot.data!.isNotEmpty &&
+                  Uri.tryParse(snapshot.data!)?.hasAbsolutePath == true) {
+                return ColorFiltered(
+                  colorFilter: ColorFilter.matrix(matrix),
+                  child: Image.network(
+                    snapshot.data!,
+                    fit: BoxFit.fill,
+                  ),
+                );
+              } else {
+                return const SizedBox.shrink(); // 데이터가 없거나 잘못된 경우
+              }
+            },
+          ),
         ),
       ],
     );

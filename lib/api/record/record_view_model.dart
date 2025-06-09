@@ -34,11 +34,12 @@ class RecordViewModel
     required int timeSlot,
     required int feeling,
     required String date,
-    required List<int> uppers,
-    required List<int> outers,
+    required List<int?> uppers,
+    required List<int?> outers,
     required String city,
   }) async {
     try {
+      print('뷰모델 체크1');
       final repo = ref.read(recordRepositoryProvider);
       final result = await repo.writeRecord(
         timeSlot: timeSlot,
