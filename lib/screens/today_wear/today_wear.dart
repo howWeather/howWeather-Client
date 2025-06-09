@@ -48,7 +48,7 @@ class TodayWear extends ConsumerWidget {
               ),
               modelState.when(
                 loading: () => const CircularProgressIndicator(),
-                error: (e, _) => Text('에러 발생: $e'),
+                error: (e, _) => Text('문제가 발생했어요.\n$e'),
                 data: (recommendations) {
                   if (recommendations.isEmpty) {
                     return Text("추천 가능한 옷이 없습니다. 새로운 옷을 추가해 보세요.");
@@ -269,12 +269,20 @@ class PerceivedTemperatureChart extends ConsumerWidget {
                               strokeColor: Colors.transparent,
                             ),
                             data: (recommendations) {
-                              // first + second feelingList 합치기
+                              if (recommendations.length < 2) {
+                                // fallback 처리
+                                return FlDotCirclePainter(
+                                  radius: 4,
+                                  color: HowWeatherColor.neutral[200]!,
+                                  strokeColor: Colors.transparent,
+                                );
+                              }
+
                               final allFeelingList = [
                                 ...recommendations[0].feelingList,
                                 ...recommendations[1].feelingList,
                               ];
-                              // index 범위 체크
+
                               if (index >= allFeelingList.length) {
                                 return FlDotCirclePainter(
                                   radius: 4,
@@ -293,8 +301,7 @@ class PerceivedTemperatureChart extends ConsumerWidget {
                               } else if (colorIndex == 3) {
                                 color = HowWeatherColor.primary[800]!;
                               } else {
-                                color =
-                                    HowWeatherColor.neutral[200]!; // fallback
+                                color = HowWeatherColor.neutral[200]!;
                               }
 
                               return FlDotCirclePainter(
