@@ -1,3 +1,4 @@
+import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:client/api/record/record_view_model.dart';
 import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/cloth_modal.dart';
@@ -39,6 +40,7 @@ class Register extends ConsumerWidget {
         leading: InkWell(
           onTap: () {
             context.pop();
+            context.pop();
             ref.read(selectedTemperatureProvider.notifier).state = null;
             ref.read(addressProvider.notifier).state = "";
             ref.read(weatherProvider.notifier).state =
@@ -70,8 +72,10 @@ class Register extends ConsumerWidget {
                         Row(
                           children: [
                             Semibold_28px(
-                                text: timeSlotToText(
-                                    ref.read(selectedTimeProvider)!)),
+                                text: selectedTimeProvider != null
+                                    ? timeSlotToText(
+                                        ref.read(selectedTimeProvider)!)
+                                    : ''),
                             SizedBox(
                               width: 8,
                             ),
@@ -145,11 +149,22 @@ class Register extends ConsumerWidget {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Cloth(context, "상의", ref, "uppers",
-                        ref.watch(registerUpperInfoProvider)?.clothType ?? 0),
-                    Cloth(context, "아우터", ref, "outers",
-                        ref.watch(registerOuterInfoProvider)?.clothType ?? 0),
+                    Cloth(
+                        context,
+                        "상의",
+                        ref,
+                        "uppers",
+                        ref.watch(registerUpperInfoProvider)?.clothType ?? 0,
+                        ref.watch(registerUpperInfoProvider)?.color ?? 0),
+                    Cloth(
+                        context,
+                        "아우터",
+                        ref,
+                        "outers",
+                        ref.watch(registerOuterInfoProvider)?.clothType ?? 0,
+                        ref.watch(registerOuterInfoProvider)?.color ?? 0),
                   ],
                 ),
               ],
@@ -286,7 +301,9 @@ class Register extends ConsumerWidget {
   }
 
   Widget Cloth(BuildContext context, String text, WidgetRef ref,
-      String category, int type) {
+      String category, int type, int color) {
+    final realcolor = HowWeatherColor.colorMap[color] ?? Colors.transparent;
+    final matrix = HowWeatherColor.createColorMatrixFromColor(realcolor);
     return Column(
       children: [
         Medium_16px(text: text),
@@ -329,7 +346,34 @@ class Register extends ConsumerWidget {
         ),
         SizedBox(
           width: MediaQuery.of(context).size.width * 0.3,
-          child: Image.asset("assets/images/windbreak.png"),
+          child: FutureBuilder<String>(
+            future: category == "uppers"
+                ? ref
+                    .read(clothViewModelProvider.notifier)
+                    .getUpperClothImage(type)
+                : ref
+                    .read(clothViewModelProvider.notifier)
+                    .getOuterClothImage(type),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return const Icon(Icons.error);
+              } else if (snapshot.hasData &&
+                  snapshot.data!.isNotEmpty &&
+                  Uri.tryParse(snapshot.data!)?.hasAbsolutePath == true) {
+                return ColorFiltered(
+                  colorFilter: ColorFilter.matrix(matrix),
+                  child: Image.network(
+                    snapshot.data!,
+                    fit: BoxFit.fill,
+                  ),
+                );
+              } else {
+                return const SizedBox.shrink(); // 데이터가 없거나 잘못된 경우
+              }
+            },
+          ),
         ),
       ],
     );
