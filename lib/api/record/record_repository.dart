@@ -11,8 +11,8 @@ class RecordRepository {
     required int timeSlot,
     required int feeling,
     required String date,
-    required List<int> uppers,
-    required List<int> outers,
+    required List<int?> uppers,
+    required List<int?> outers,
     required String city,
   }) async {
     final accessToken = await AuthStorage.getAccessToken();

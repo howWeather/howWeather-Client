@@ -13,9 +13,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-final isAllValidProvider = Provider<bool>((ref) {
-  return true;
-});
 final selectedTemperatureProvider = StateProvider<int?>((ref) => null);
 final selectedClothProvider = StateProvider<int?>((ref) => null);
 final selectedClothInfoProvider = StateProvider<int?>((ref) => null);
@@ -190,21 +187,45 @@ class Register extends ConsumerWidget {
   }
 
   Widget bottomSheetWidget(BuildContext context, ref) {
+    final isAllValidProvider = Provider<bool>((ref) {
+      final temperature = ref.watch(selectedTemperatureProvider);
+      final location = ref.watch(addressProvider);
+      final upper = ref.watch(registerUpperInfoProvider);
+      final outer = ref.watch(registerOuterInfoProvider);
+      return temperature != null &&
+          location.isNotEmpty &&
+          (upper != null || outer != null);
+    });
     final isAllValid = ref.watch(isAllValidProvider);
 
     return GestureDetector(
       onTap: isAllValid
           ? () async {
+              final upperInfo = ref.read(registerUpperInfoProvider);
+              final outerInfo = ref.read(registerOuterInfoProvider);
+              // 둘 다 null이면 에러 처리
+              if (upperInfo == null && outerInfo == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('상의 또는 아우터 중 하나 이상을 선택해주세요.'),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                return; // 기록 중단
+              }
               try {
                 await ref.read(recordViewModelProvider.notifier).writeRecord(
                       timeSlot: ref.read(selectedTimeProvider),
                       feeling: ref.read(selectedTemperatureProvider),
                       date: DateFormat('yyyy-MM-dd')
                           .format(ref.read(selectedDayProvider)),
-                      uppers: List<int>.from(
-                          [ref.read(registerUpperInfoProvider)!.clothId]),
-                      outers: List<int>.from(
-                          [ref.read(registerOuterInfoProvider)!.clothId]),
+                      uppers: upperInfo != null
+                          ? <int?>[upperInfo.clothId]
+                          : <int>[],
+                      outers: outerInfo != null
+                          ? <int?>[outerInfo.clothId]
+                          : <int>[],
                       city: ref.read(addressProvider),
                     );
 
@@ -219,6 +240,11 @@ class Register extends ConsumerWidget {
                 await Future.delayed(const Duration(milliseconds: 1500));
                 ref.read(addressProvider.notifier).state = "";
                 context.go('/calendar');
+                context.pop();
+                ref.read(selectedTemperatureProvider.notifier).state = null;
+                ref.read(addressProvider.notifier).state = "";
+                ref.read(weatherProvider.notifier).state =
+                    const AsyncValue.loading();
               } catch (e) {
                 // ❌ 실패 스낵바
                 print(e);
