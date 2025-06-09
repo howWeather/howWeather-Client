@@ -82,10 +82,13 @@ class Register extends ConsumerWidget {
                             weather.when(
                               data: (temp) => Bold_32px(
                                   text: '${temp.toStringAsFixed(1)}°'),
-                              loading: () => CircularProgressIndicator(),
+                              loading: () => SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                child: Medium_14px(text: '위치를 선택해주세요.'),
+                              ),
                               error: (e, _) => SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.2,
-                                child: Medium_14px(text: '$e'),
+                                child: Medium_14px(text: '위치를 선택해주세요.'),
                               ),
                             ),
                           ],
@@ -116,9 +119,16 @@ class Register extends ConsumerWidget {
                               },
                               child: Row(
                                 children: [
-                                  SvgPicture.asset("assets/icons/locator.svg"),
+                                  SvgPicture.asset(
+                                    "assets/icons/locator.svg",
+                                  ),
                                   Semibold_24px(
-                                    text: ref.watch(addressProvider),
+                                    text: ref
+                                                .read(addressProvider.notifier)
+                                                .state !=
+                                            ""
+                                        ? ref.watch(addressProvider)
+                                        : '클릭하여 위치 선택',
                                     color: HowWeatherColor.black,
                                   ),
                                 ],
