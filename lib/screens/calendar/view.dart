@@ -375,7 +375,10 @@ class Calendar extends ConsumerWidget {
                                       historyDialog(context, ref),
                                 );
                               },
-                            );
+                            ).then((_) {
+                              ref.read(selectedTimeProvider.notifier).state =
+                                  null;
+                            });
                           }
                         },
                         onFormatChanged: (format) {
@@ -409,15 +412,23 @@ class Calendar extends ConsumerWidget {
 
   Widget historyDialog(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedTimeProvider);
+    final now = DateTime.now();
 
-    Widget timeButton(String label, int value, WidgetRef ref) {
+    // 시간 제한 조건
+    final isMorningEnabled = now.hour >= 9;
+    final isAfternoonEnabled = now.hour >= 14;
+    final isEveningEnabled = now.hour >= 20;
+
+    Widget timeButton(String label, int value, bool isEnabled, WidgetRef ref) {
       final isSelected = selected == value;
 
       return Expanded(
         child: GestureDetector(
-          onTap: () {
-            ref.read(selectedTimeProvider.notifier).state = value;
-          },
+          onTap: isEnabled
+              ? () {
+                  ref.read(selectedTimeProvider.notifier).state = value;
+                }
+              : null,
           child: Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -433,8 +444,11 @@ class Calendar extends ConsumerWidget {
             child: Center(
               child: Medium_14px(
                 text: label,
-                color:
-                    isSelected ? HowWeatherColor.white : HowWeatherColor.black,
+                color: isEnabled
+                    ? (isSelected
+                        ? HowWeatherColor.white
+                        : HowWeatherColor.black)
+                    : HowWeatherColor.neutral[300],
               ),
             ),
           ),
@@ -451,11 +465,33 @@ class Calendar extends ConsumerWidget {
         children: [
           Row(
             children: [
-              timeButton("오전", 1, ref),
+              timeButton("오전", 1, isMorningEnabled, ref),
               SizedBox(width: 8),
-              timeButton("오후", 2, ref),
+              timeButton("오후", 2, isAfternoonEnabled, ref),
               SizedBox(width: 8),
-              timeButton("저녁", 3, ref),
+              timeButton("저녁", 3, isEveningEnabled, ref),
+            ],
+          ),
+          SizedBox(height: 16),
+          Divider(),
+          SizedBox(height: 8),
+          // 안내 문구
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Medium_14px(text: "• 전날의 기록은 다음 날 새벽 5시 30분 이전에 작성 가능합니다."),
+              Medium_14px(text: "• 오늘의 기록은 해당 시간대 이후에 작성 가능합니다."),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Medium_14px(text: "- 오전 : 9시 이후"),
+                    Medium_14px(text: "- 오후 : 14시 이후"),
+                    Medium_14px(text: "- 저녁 : 20시 이후"),
+                  ],
+                ),
+              ),
             ],
           ),
           SizedBox(height: 12),
@@ -463,7 +499,10 @@ class Calendar extends ConsumerWidget {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () => context.pop(),
+                  onTap: () {
+                    context.pop();
+                    ref.read(selectedTimeProvider.notifier).state = null;
+                  },
                   child: Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
