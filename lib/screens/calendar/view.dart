@@ -375,7 +375,10 @@ class Calendar extends ConsumerWidget {
                                       historyDialog(context, ref),
                                 );
                               },
-                            );
+                            ).then((_) {
+                              ref.read(selectedTimeProvider.notifier).state =
+                                  null;
+                            });
                           }
                         },
                         onFormatChanged: (format) {
@@ -498,6 +501,7 @@ class Calendar extends ConsumerWidget {
                 child: GestureDetector(
                   onTap: () {
                     context.pop();
+                    ref.read(selectedTimeProvider.notifier).state = null;
                   },
                   child: Container(
                     padding: EdgeInsets.all(16),
