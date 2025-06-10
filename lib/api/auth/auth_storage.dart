@@ -19,7 +19,15 @@ class AuthStorage {
 
   // 토큰 가져오기
   static Future<String?> getAccessToken() async {
-    return await _storage.read(key: _accessTokenKey);
+    try {
+      return await _storage.read(key: _accessTokenKey);
+    } catch (e) {
+      print('Failed to read access token: $e');
+      if (e.toString().contains('BAD_DECRYPT')) {
+        await clear();
+      }
+      return null;
+    }
   }
 
   static Future<String?> getRefreshToken() async {
