@@ -1,5 +1,5 @@
 class ClothItem {
-  final int clothType;
+  late final int clothType;
   final int color;
   final int thickness;
   final int clothId;

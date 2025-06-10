@@ -3,39 +3,12 @@ import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
+import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/exception/no_clothes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-
-final selectedUpperProvider = StateProvider<int?>((ref) => null);
-final selectedOuterProvider = StateProvider<int?>((ref) => null);
-final selectedUpperInfoProvider = StateProvider<int?>((ref) => null);
-final selectedOuterInfoProvider = StateProvider<int?>((ref) => null);
-
-final thicknessProvider = StateNotifierProvider<ThicknessNotifier, int>((ref) {
-  return ThicknessNotifier();
-});
-final colorProvider = StateNotifierProvider<ColorNotifier, int>((ref) {
-  return ColorNotifier();
-});
-
-class ThicknessNotifier extends StateNotifier<int> {
-  ThicknessNotifier() : super(1);
-
-  void updateThickness(int newThickness) {
-    state = newThickness;
-  }
-}
-
-class ColorNotifier extends StateNotifier<int> {
-  ColorNotifier() : super(1);
-
-  void updateColor(int newColor) {
-    state = newColor;
-  }
-}
 
 class ClothesView extends ConsumerWidget {
   ClothesView({super.key});
@@ -51,7 +24,10 @@ class ClothesView extends ConsumerWidget {
         title: Medium_18px(text: "의류 조회"),
         centerTitle: true,
         leading: InkWell(
-          onTap: () => context.pop(),
+          onTap: () {
+            context.pop();
+            ref.resetClothProviders();
+          },
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
             fit: BoxFit.scaleDown,
@@ -130,10 +106,8 @@ class ClothesView extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: ClothCard(
-            context: context,
             item: item,
             allItems: allItems,
-            ref: ref,
             category: category,
             havePalette: true, // havePalette
             haveDelete: false, // haveDelete

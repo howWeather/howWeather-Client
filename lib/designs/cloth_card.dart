@@ -2,16 +2,14 @@ import 'package:client/designs/cloth_info_card.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
-import 'package:client/screens/mypage/clothes/clothes_view.dart';
+import 'package:client/providers/cloth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class ClothCard extends ConsumerStatefulWidget {
-  final BuildContext context;
+class ClothCard extends ConsumerWidget {
   final ClothItem item;
   final List<ClothItem> allItems;
-  final WidgetRef ref;
   final String category;
   final int initColor;
   final int initThickness;
@@ -21,10 +19,8 @@ class ClothCard extends ConsumerStatefulWidget {
 
   const ClothCard({
     super.key,
-    required this.context,
     required this.item,
     required this.allItems,
-    required this.ref,
     required this.category,
     required this.initColor,
     required this.initThickness,
@@ -34,59 +30,30 @@ class ClothCard extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ClothCard> createState() => _ClothCardState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    // category에 따라 올바른 provider 사용
+    final selected = ref.watch(selectedClothProvider(category));
+    final isSelected = selected == item.clothId;
 
-class _ClothCardState extends ConsumerState<ClothCard> {
-  late StateProvider<int?> selectedProvider;
-  late StateProvider<int?> infoProvider;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // 카테고리에 따른 Provider 설정
-    if (widget.category == "uppers") {
-      selectedProvider = selectedUpperProvider;
-      infoProvider = selectedUpperInfoProvider;
-    } else if (widget.category == "outers") {
-      selectedProvider = selectedOuterProvider;
-      infoProvider = selectedOuterInfoProvider;
-    }
-
-    // 초기값 설정
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(colorProvider.notifier).state = widget.initColor;
-      ref.read(thicknessProvider.notifier).state = widget.initThickness;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final selected = ref.watch(selectedProvider);
-    final isSelected = selected == widget.item.clothId;
-    final sameTypeItems = widget.allItems
-        .where((i) => i.clothType == widget.item.clothType)
-        .toList();
+    final sameTypeItems =
+        allItems.where((i) => i.clothType == item.clothType).toList();
 
     return InkWell(
       onTap: () {
-        final isNowSelected =
-            ref.read(selectedProvider.notifier).state == widget.item.clothId;
-        ref.read(selectedProvider.notifier).state =
-            isNowSelected ? null : widget.item.clothId;
+        final currentSelected = ref.read(selectedClothProvider(category));
+        ref.read(selectedClothProvider(category).notifier).state =
+            currentSelected == item.clothId ? null : item.clothId;
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
-          color:
-              isSelected ? HowWeatherColor.primary[50] : HowWeatherColor.white,
+          color: HowWeatherColor.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
-                ? HowWeatherColor.neutral[400]!
-                : HowWeatherColor.neutral[200]!,
-            width: 1,
+                ? HowWeatherColor.neutral[200]!
+                : HowWeatherColor.neutral[100]!,
+            width: 2,
           ),
         ),
         child: Column(
@@ -95,8 +62,7 @@ class _ClothCardState extends ConsumerState<ClothCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Medium_14px(
-                  text:
-                      clothTypeToKorean(widget.category, widget.item.clothType),
+                  text: clothTypeToKorean(category, item.clothType),
                 ),
                 SvgPicture.asset(
                   isSelected
@@ -109,17 +75,16 @@ class _ClothCardState extends ConsumerState<ClothCard> {
               ...sameTypeItems.map((i) => Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: ClothInfoCard(
-                      text: widget.text,
-                      context: widget.context,
-                      ref: widget.ref,
+                      text: text,
+                      context: context,
+                      ref: ref,
                       color: i.color,
                       thicknessLabel: i.thickness,
-                      provider: infoProvider,
                       selectedItemId: i.clothId,
                       selectedItem: i,
-                      havePalette: widget.havePalette,
-                      haveDelete: widget.haveDelete,
-                      category: widget.category,
+                      havePalette: havePalette,
+                      haveDelete: haveDelete,
+                      category: category,
                     ),
                   )),
           ],
