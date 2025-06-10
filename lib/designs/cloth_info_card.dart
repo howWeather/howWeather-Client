@@ -1,11 +1,10 @@
 import 'package:client/api/closet/closet_view_model.dart';
+import 'package:client/designs/Palette.dart';
 import 'package:client/designs/cloth_card.dart';
-import 'package:client/designs/palette.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
-import 'package:client/screens/mypage/clothes/clothes_view.dart';
-import 'package:client/screens/calendar/register/view.dart';
+import 'package:client/providers/cloth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +14,6 @@ Widget ClothInfoCard({
   required WidgetRef ref,
   required int color,
   required int thicknessLabel,
-  required StateProvider<int?> provider,
   required bool havePalette,
   required bool haveDelete,
   required String category,
@@ -23,42 +21,30 @@ Widget ClothInfoCard({
   required int selectedItemId,
   String text = "등록",
 }) {
-  final selected = ref.watch(provider);
-  final isSelected = selected == selectedItemId;
+  final selectedInfo = ref.watch(selectedClothInfoProvider(category));
 
   return InkWell(
     onTap: () {
-      ref.read(provider.notifier).state = isSelected ? null : selectedItemId;
-      if (category == "uppers") {
-        ref.read(registerUpperInfoProvider.notifier).state = selectedItem;
-      }
-      if (category == "outers") {
-        ref.read(registerOuterInfoProvider.notifier).state = selectedItem;
-      }
+      ref.read(selectedClothInfoProvider(category).notifier).state =
+          selectedItem;
       if (havePalette) {
         ref.read(colorProvider.notifier).state = color;
         ref.read(thicknessProvider.notifier).state = thicknessLabel;
         showDialog(
           context: context,
           builder: (BuildContext dialogContext) {
-            return WillPopScope(
-              onWillPop: () async {
-                // 다이얼로그 닫을 때 선택 초기화
-                ref.read(provider.notifier).state = null;
-                return true;
-              },
-              child: Palette(
-                clothId: selectedItemId,
-                context: dialogContext,
-                ref: ref,
-                text: text,
-                category: category,
-              ),
+            return Palette(
+              clothId: selectedItemId,
+              text: text,
+              category: category,
+              initialColor: color,
+              initialThickness: thicknessLabel,
             );
           },
         ).then((_) {
           // 다이얼로그 닫힌 후에도 선택 초기화
-          ref.read(provider.notifier).state = null;
+          ref.resetClothInfoProviders();
+          print('등록 창 닫기');
         });
       }
 
@@ -69,7 +55,6 @@ Widget ClothInfoCard({
             return deleteDialog(
               context,
               ref,
-              provider,
               color,
               thicknessLabel,
               selectedItemId,
@@ -79,7 +64,7 @@ Widget ClothInfoCard({
           },
         ).then((_) {
           // 다이얼로그 닫힌 후 선택 초기화
-          ref.read(provider.notifier).state = null;
+          ref.resetClothInfoProviders();
         });
       }
     },
@@ -90,8 +75,8 @@ Widget ClothInfoCard({
         color: HowWeatherColor.white,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isSelected
-              ? HowWeatherColor.primary[900]!
+          color: selectedInfo == selectedItem
+              ? HowWeatherColor.neutral[700]!
               : HowWeatherColor.neutral[100]!,
           width: 2,
         ),
@@ -135,7 +120,6 @@ Widget ClothInfoCard({
 Widget deleteDialog(
   BuildContext context,
   WidgetRef ref,
-  StateProvider<int?> provider,
   int color,
   int thickness,
   selectedItemId,
@@ -164,7 +148,6 @@ Widget deleteDialog(
           ref: ref,
           color: color,
           thicknessLabel: thickness,
-          provider: provider,
           havePalette: false,
           haveDelete: false,
           selectedItemId: selectedItemId,

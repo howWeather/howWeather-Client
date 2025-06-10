@@ -4,7 +4,7 @@ import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/cloth_modal.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
-import 'package:client/model/cloth_item.dart';
+import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/calendar/view.dart';
 import 'package:client/api/weather/weather_view_model.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
-final selectedTemperatureProvider = StateProvider<int?>((ref) => null);
-final selectedClothProvider = StateProvider<int?>((ref) => null);
-final selectedClothInfoProvider = StateProvider<int?>((ref) => null);
-final registerUpperInfoProvider = StateProvider<ClothItem?>((ref) => null);
-final registerOuterInfoProvider = StateProvider<ClothItem?>((ref) => null);
-final addressProvider = StateProvider<String>((ref) => "");
 
 class Register extends ConsumerWidget {
   Register({super.key});
@@ -38,8 +31,8 @@ class Register extends ConsumerWidget {
           onTap: () {
             context.pop();
             context.pop();
-            ref.read(selectedTemperatureProvider.notifier).state = null;
-            ref.read(addressProvider.notifier).state = "";
+            // 개선된 방식으로 provider 초기화
+            ref.resetClothProviders();
             ref.read(weatherProvider.notifier).state =
                 const AsyncValue.loading();
           },
@@ -69,7 +62,7 @@ class Register extends ConsumerWidget {
                         Row(
                           children: [
                             Semibold_28px(
-                                text: selectedTimeProvider != null
+                                text: ref.read(selectedTimeProvider) != null
                                     ? timeSlotToText(
                                         ref.read(selectedTimeProvider)!)
                                     : ''),
@@ -158,20 +151,22 @@ class Register extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Cloth(
-                        context,
-                        "상의",
-                        ref,
-                        "uppers",
-                        ref.watch(registerUpperInfoProvider)?.clothType ?? 0,
-                        ref.watch(registerUpperInfoProvider)?.color ?? 0),
-                    Cloth(
-                        context,
-                        "아우터",
-                        ref,
-                        "outers",
-                        ref.watch(registerOuterInfoProvider)?.clothType ?? 0,
-                        ref.watch(registerOuterInfoProvider)?.color ?? 0),
+                    _buildClothWidget(
+                      context,
+                      "상의",
+                      ref,
+                      "uppers",
+                      ref.watch(registerUpperProvider)?.clothType ?? 0,
+                      ref.watch(registerUpperProvider)?.color ?? 0,
+                    ),
+                    _buildClothWidget(
+                      context,
+                      "아우터",
+                      ref,
+                      "outers",
+                      ref.watch(registerOuterProvider)?.clothType ?? 0,
+                      ref.watch(registerOuterProvider)?.color ?? 0,
+                    ),
                   ],
                 ),
               ],
@@ -182,16 +177,16 @@ class Register extends ConsumerWidget {
           ],
         ),
       ),
-      bottomSheet: bottomSheetWidget(context, ref),
+      bottomSheet: _buildBottomSheet(context, ref),
     );
   }
 
-  Widget bottomSheetWidget(BuildContext context, ref) {
+  Widget _buildBottomSheet(BuildContext context, WidgetRef ref) {
     final isAllValidProvider = Provider<bool>((ref) {
       final temperature = ref.watch(selectedTemperatureProvider);
       final location = ref.watch(addressProvider);
-      final upper = ref.watch(registerUpperInfoProvider);
-      final outer = ref.watch(registerOuterInfoProvider);
+      final upper = ref.watch(registerUpperProvider);
+      final outer = ref.watch(registerOuterProvider);
       return temperature != null &&
           location.isNotEmpty &&
           (upper != null || outer != null);
@@ -199,68 +194,10 @@ class Register extends ConsumerWidget {
     final isAllValid = ref.watch(isAllValidProvider);
 
     return GestureDetector(
-      onTap: isAllValid
-          ? () async {
-              final upperInfo = ref.read(registerUpperInfoProvider);
-              final outerInfo = ref.read(registerOuterInfoProvider);
-              // 둘 다 null이면 에러 처리
-              if (upperInfo == null && outerInfo == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('상의 또는 아우터 중 하나 이상을 선택해주세요.'),
-                    backgroundColor: Colors.red,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-                return; // 기록 중단
-              }
-              try {
-                await ref.read(recordViewModelProvider.notifier).writeRecord(
-                      timeSlot: ref.read(selectedTimeProvider),
-                      feeling: ref.read(selectedTemperatureProvider),
-                      date: DateFormat('yyyy-MM-dd')
-                          .format(ref.read(selectedDayProvider)),
-                      uppers: upperInfo != null
-                          ? <int?>[upperInfo.clothId]
-                          : <int>[],
-                      outers: outerInfo != null
-                          ? <int?>[outerInfo.clothId]
-                          : <int>[],
-                      city: ref.read(addressProvider),
-                    );
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('기록이 성공적으로 저장되었어요!'),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-
-                await Future.delayed(const Duration(milliseconds: 1500));
-                ref.read(addressProvider.notifier).state = "";
-                context.go('/calendar');
-                context.pop();
-                ref.read(selectedTemperatureProvider.notifier).state = null;
-                ref.read(addressProvider.notifier).state = "";
-                ref.read(weatherProvider.notifier).state =
-                    const AsyncValue.loading();
-              } catch (e) {
-                // ❌ 실패 스낵바
-                print(e);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('$e'),
-                    backgroundColor: Colors.red,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              }
-            }
-          : null,
+      onTap: isAllValid ? () => _handleSubmit(context, ref) : null,
       child: Container(
         width: double.maxFinite,
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         color: HowWeatherColor.white,
         child: Container(
           height: 72,
@@ -270,13 +207,79 @@ class Register extends ConsumerWidget {
                 ? HowWeatherColor.primary[900]
                 : HowWeatherColor.neutral[200],
           ),
-          child: Center(
+          child: const Center(
             child: Semibold_24px(
               text: "등록하기",
               color: HowWeatherColor.white,
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _handleSubmit(BuildContext context, WidgetRef ref) async {
+    final upperInfo = ref.read(registerUpperProvider);
+    final outerInfo = ref.read(registerOuterProvider);
+
+    // null 체크 먼저 수행
+    final timeSlot = ref.read(selectedTimeProvider);
+    final feeling = ref.read(selectedTemperatureProvider);
+    final selectedDay = ref.read(selectedDayProvider);
+
+    if (timeSlot == null) {
+      _showSnackBar(context, '시간을 선택해주세요.', Colors.red);
+      return;
+    }
+
+    if (feeling == null) {
+      _showSnackBar(context, '체감온도를 선택해주세요.', Colors.red);
+      return;
+    }
+
+    if (selectedDay == null) {
+      _showSnackBar(context, '날짜를 선택해주세요.', Colors.red);
+      return;
+    }
+
+    if (upperInfo == null && outerInfo == null) {
+      _showSnackBar(context, '상의 또는 아우터 중 하나 이상을 선택해주세요.', Colors.red);
+      return;
+    }
+
+    try {
+      await ref.read(recordViewModelProvider.notifier).writeRecord(
+            timeSlot: timeSlot, // 이제 non-null int
+            feeling: feeling, // 이제 non-null int
+            date: DateFormat('yyyy-MM-dd')
+                .format(selectedDay), // 이제 non-null DateTime
+            uppers: upperInfo != null
+                ? [upperInfo.clothId]
+                : [], // <int?>가 아닌 <int>
+            outers: outerInfo != null
+                ? [outerInfo.clothId]
+                : [], // <int?>가 아닌 <int>
+            city: ref.read(addressProvider),
+          );
+
+      _showSnackBar(context, '기록이 성공적으로 저장되었어요!', Colors.green);
+
+      await Future.delayed(const Duration(milliseconds: 1500));
+      ref.resetClothProviders();
+      ref.read(weatherProvider.notifier).state = const AsyncValue.loading();
+      context.go('/calendar');
+      context.pop();
+    } catch (e) {
+      _showSnackBar(context, '$e', Colors.red);
+    }
+  }
+
+  void _showSnackBar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -336,33 +339,35 @@ class Register extends ConsumerWidget {
     );
   }
 
-  Widget Cloth(BuildContext context, String text, WidgetRef ref,
-      String category, int type, int color) {
-    final realcolor = HowWeatherColor.colorMap[color] ?? Colors.transparent;
-    final matrix = HowWeatherColor.createColorMatrixFromColor(realcolor);
+  Widget _buildClothWidget(
+    BuildContext context,
+    String text,
+    WidgetRef ref,
+    String category,
+    int type,
+    int color,
+  ) {
+    final realColor = HowWeatherColor.colorMap[color] ?? Colors.transparent;
+    final matrix = HowWeatherColor.createColorMatrixFromColor(realColor);
+
     return Column(
       children: [
         Medium_16px(text: text),
-        SizedBox(
-          height: 8,
-        ),
+        const SizedBox(height: 8),
         InkWell(
           onTap: () {
             showDialog(
               context: context,
               builder: (BuildContext context) {
                 return ClothModal(
-                    context: context,
-                    ref: ref,
-                    text: text,
-                    category: category,
-                    provider: selectedClothProvider,
-                    infoProvider: selectedClothInfoProvider);
+                  text: text,
+                  category: category,
+                );
               },
             );
           },
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             width: MediaQuery.of(context).size.width * 0.4,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
@@ -377,9 +382,7 @@ class Register extends ConsumerWidget {
             ),
           ),
         ),
-        SizedBox(
-          height: 8,
-        ),
+        const SizedBox(height: 8),
         SizedBox(
           width: MediaQuery.of(context).size.width * 0.3,
           child: FutureBuilder<String>(
@@ -400,13 +403,10 @@ class Register extends ConsumerWidget {
                   Uri.tryParse(snapshot.data!)?.hasAbsolutePath == true) {
                 return ColorFiltered(
                   colorFilter: ColorFilter.matrix(matrix),
-                  child: Image.network(
-                    snapshot.data!,
-                    fit: BoxFit.fill,
-                  ),
+                  child: Image.network(snapshot.data!, fit: BoxFit.fill),
                 );
               } else {
-                return const SizedBox.shrink(); // 데이터가 없거나 잘못된 경우
+                return const SizedBox.shrink();
               }
             },
           ),

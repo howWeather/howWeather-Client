@@ -1,9 +1,10 @@
 import 'package:client/api/closet/closet_view_model.dart';
+import 'package:client/designs/Palette.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
-import 'package:client/designs/palette.dart';
-import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
-import 'package:client/screens/mypage/clothes/clothes_view.dart';
+import 'package:client/providers/cloth_providers.dart';
+import 'package:client/screens/mypage/clothes/clothes_enroll.dart'
+    hide selectedEnrollClothProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -94,30 +95,20 @@ class SignUpEnrollClothes extends ConsumerWidget {
             return WillPopScope(
               onWillPop: () async {
                 // 다이얼로그 닫을 때 선택 초기화
-                final resetMap = Map<String, int?>.from(
-                    ref.read(selectedEnrollClothProvider));
-                resetMap[category] = null;
-                ref.read(selectedEnrollClothProvider.notifier).state = resetMap;
-                ref.read(colorProvider.notifier).state = 1;
-                ref.read(thicknessProvider.notifier).state = 1;
+                ref.resetClothInfoProviders();
                 return true;
               },
               child: Palette(
-                context: dialogContext,
-                ref: ref,
                 text: '등록',
                 category: category,
+                initialColor: 1,
+                initialThickness: 1,
               ),
             );
           },
         ).then((_) {
           // 다이얼로그 닫힌 후에도 초기화
-          final resetMap =
-              Map<String, int?>.from(ref.read(selectedEnrollClothProvider));
-          resetMap[category] = null;
-          ref.read(selectedEnrollClothProvider.notifier).state = resetMap;
-          ref.read(colorProvider.notifier).state = 1;
-          ref.read(thicknessProvider.notifier).state = 1;
+          ref.resetClothInfoProviders();
         });
       },
       child: Container(

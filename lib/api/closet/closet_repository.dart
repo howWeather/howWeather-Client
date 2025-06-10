@@ -151,8 +151,10 @@ class ClosetRepository {
       },
     );
 
-    if (response.statusCode != 204) {
-      throw Exception('상의 삭제 실패: ${response.statusCode}');
+    if (response.statusCode == 204) {
+      return;
+    } else {
+      throw Exception('삭제 실패: ${response.statusCode}');
     }
   }
 
@@ -171,8 +173,10 @@ class ClosetRepository {
       },
     );
 
-    if (response.statusCode != 204) {
-      throw Exception('상의 삭제 실패: ${response.statusCode}');
+    if (response.statusCode == 204) {
+      return;
+    } else {
+      throw Exception('삭제 실패: ${response.statusCode}');
     }
   }
 }

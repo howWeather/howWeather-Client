@@ -3,6 +3,7 @@ import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/cloth_item.dart';
+import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/exception/no_clothes.dart';
 import 'package:client/screens/mypage/clothes/clothes_view.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,10 @@ class ClothesDelete extends ConsumerWidget {
         title: Medium_18px(text: "의류 삭제"),
         centerTitle: true,
         leading: InkWell(
-          onTap: () => context.pop(),
+          onTap: () {
+            context.pop();
+            ref.resetClothProviders();
+          },
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
             fit: BoxFit.scaleDown,
@@ -101,10 +105,8 @@ class ClothesDelete extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: ClothCard(
-            context: context,
             item: item,
             allItems: allItems,
-            ref: ref,
             category: category,
             havePalette: false, // havePalette
             haveDelete: true, // haveDelete

@@ -1,37 +1,49 @@
 import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
-import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
-import 'package:client/screens/mypage/clothes/clothes_view.dart';
+import 'package:client/providers/cloth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-class Palette extends ConsumerWidget {
-  final BuildContext context;
-  final WidgetRef ref;
+class Palette extends ConsumerStatefulWidget {
   final String text;
   final String category;
   final int clothId;
+  final int initialColor;
+  final int initialThickness;
 
   Palette({
     Key? key,
-    required this.context,
-    required this.ref,
     required this.text,
     required this.category,
     this.clothId = 0,
+    required this.initialColor,
+    required this.initialThickness,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<Palette> createState() => _PaletteState();
+}
+
+class _PaletteState extends ConsumerState<Palette> {
+  @override
+  void initState() {
+    super.initState();
+    // 초기 상태 세팅
+    ref.read(colorProvider.notifier).state = widget.initialColor;
+    ref.read(thicknessProvider.notifier).state = widget.initialThickness;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final selectedThickness = ref.watch(thicknessProvider);
     final selectedColor = ref.watch(colorProvider);
 
     return AlertDialog(
       backgroundColor: HowWeatherColor.white,
-      title: Center(child: Semibold_22px(text: "의류 $text")),
+      title: Center(child: Semibold_22px(text: "의류 ${widget.text}")),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -66,10 +78,12 @@ class Palette extends ConsumerWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () async {
-                    if (text == "등록") {
+                    if (widget.text == "등록") {
                       final selectedClothType =
                           ref.read(selectedEnrollClothProvider);
-                      final clothTypeForCategory = selectedClothType[category];
+                      print('selectedClothType: $selectedClothType');
+                      final clothTypeForCategory =
+                          selectedClothType[widget.category];
                       final clothData = {
                         "clothType": clothTypeForCategory,
                         "color": selectedColor,
@@ -77,14 +91,14 @@ class Palette extends ConsumerWidget {
                       };
 
                       try {
-                        if (category == "uppers") {
+                        if (widget.category == "uppers") {
                           await ref
                               .read(closetProvider.notifier)
                               .registerClothes(
                             uppers: [clothData],
                             outers: [],
                           );
-                        } else if (category == "outers") {
+                        } else if (widget.category == "outers") {
                           await ref
                               .read(closetProvider.notifier)
                               .registerClothes(
@@ -103,21 +117,21 @@ class Palette extends ConsumerWidget {
                         );
                       }
                     }
-                    if (text == "수정") {
+                    if (widget.text == "수정") {
                       try {
-                        if (category == "uppers") {
+                        if (widget.category == "uppers") {
                           await ref
                               .read(closetProvider.notifier)
                               .updateUpperCloth(
-                                clothId: clothId,
+                                clothId: widget.clothId,
                                 color: selectedColor,
                                 thickness: selectedThickness,
                               );
-                        } else if (category == "outers") {
+                        } else if (widget.category == "outers") {
                           await ref
                               .read(closetProvider.notifier)
                               .updateOuterCloth(
-                                clothId: clothId,
+                                clothId: widget.clothId,
                                 color: selectedColor,
                                 thickness: selectedThickness,
                               );
@@ -142,7 +156,7 @@ class Palette extends ConsumerWidget {
                     ),
                     child: Center(
                       child: Medium_14px(
-                        text: text,
+                        text: widget.text,
                         color: HowWeatherColor.white,
                       ),
                     ),
@@ -173,7 +187,7 @@ class Palette extends ConsumerWidget {
 
           return GestureDetector(
             onTap: () {
-              ref.read(colorProvider.notifier).updateColor(colorId);
+              ref.read(colorProvider.notifier).state = colorId;
             },
             child: Container(
               width: 22,
@@ -212,7 +226,7 @@ class Palette extends ConsumerWidget {
         return Expanded(
           child: GestureDetector(
             onTap: () {
-              ref.read(thicknessProvider.notifier).updateThickness(thicknessId);
+              ref.read(thicknessProvider.notifier).state = thicknessId;
             },
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 4), // 버튼 사이 여백

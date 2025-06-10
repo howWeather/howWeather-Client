@@ -456,6 +456,8 @@ class Calendar extends ConsumerWidget {
       );
     }
 
+    final isRegisterEnabled = selected != null;
+
     return AlertDialog(
       backgroundColor: HowWeatherColor.white,
       title: Center(child: Semibold_20px(text: "착장 기록 등록")),
@@ -508,28 +510,45 @@ class Calendar extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: HowWeatherColor.neutral[200],
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: HowWeatherColor.neutral[200]!, width: 2),
                     ),
-                    child: Center(child: Medium_14px(text: "취소")),
+                    child: Center(
+                        child: Medium_14px(
+                      text: "취소",
+                      color: HowWeatherColor.neutral[700],
+                    )),
                   ),
                 ),
               ),
               SizedBox(width: 8),
               Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    context.push('/calendar/register');
-                    ref.read(closetProvider.notifier).loadClothes();
-                  },
+                  onTap: isRegisterEnabled
+                      ? () {
+                          context.push('/calendar/register');
+                          ref.read(closetProvider.notifier).loadClothes();
+                        }
+                      : null,
                   child: Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: HowWeatherColor.primary[900],
+                      color: isRegisterEnabled
+                          ? HowWeatherColor.primary[900]
+                          : HowWeatherColor.neutral[50],
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: isRegisterEnabled
+                              ? HowWeatherColor.primary[900]!
+                              : HowWeatherColor.neutral[200]!,
+                          width: 2),
                     ),
                     child: Center(
                       child: Medium_14px(
                         text: "등록",
-                        color: HowWeatherColor.white,
+                        color: isRegisterEnabled
+                            ? HowWeatherColor.white
+                            : HowWeatherColor.neutral[500],
                       ),
                     ),
                   ),
