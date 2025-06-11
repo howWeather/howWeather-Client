@@ -41,7 +41,12 @@ class ClothModal extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildItemList(context, ref, clothes.clothList, category),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: SingleChildScrollView(
+              child: _buildItemList(context, ref, clothes.clothList, category),
+            ),
+          ),
           const SizedBox(height: 16),
           _buildBottomButtons(context, ref),
         ],
@@ -56,6 +61,7 @@ class ClothModal extends ConsumerWidget {
         child: Container(
           color: HowWeatherColor.white,
           width: MediaQuery.of(context).size.width * 0.8,
+          height: MediaQuery.of(context).size.height * 0.42,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -76,7 +82,7 @@ class ClothModal extends ConsumerWidget {
                 ),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.3,
+                height: MediaQuery.of(context).size.height * 0.34,
                 child: const NoClothes(),
               ),
             ],
