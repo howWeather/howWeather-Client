@@ -21,12 +21,50 @@ Widget ClothInfoCard({
   required int selectedItemId,
   String text = "등록",
 }) {
-  final selectedInfo = ref.watch(selectedClothInfoProvider(category));
+  // 등록된 아이템들 확인
+  final registeredUppers = ref.watch(registerUpperProvider);
+  final registeredOuters = ref.watch(registerOuterProvider);
+  // 현재 아이템이 이미 선택되었는지 확인
+  bool isRegistered = false;
+  if (category == "uppers") {
+    isRegistered =
+        registeredUppers.any((item) => item.clothId == selectedItem.clothId);
+  } else if (category == "outers") {
+    isRegistered =
+        registeredOuters.any((item) => item.clothId == selectedItem.clothId);
+  }
 
   return InkWell(
     onTap: () {
-      ref.read(selectedClothInfoProvider(category).notifier).state =
-          selectedItem;
+      if (category == "uppers") {
+        final currentList = ref.read(registerUpperProvider);
+        if (isRegistered) {
+          // 이미 선택된 경우 제거
+          ref.read(registerUpperProvider.notifier).state = currentList
+              .where((item) => item.clothId != selectedItem.clothId)
+              .toList();
+        } else {
+          // 선택되지 않은 경우 추가
+          ref.read(registerUpperProvider.notifier).state = [
+            ...currentList,
+            selectedItem
+          ];
+        }
+      } else if (category == "outers") {
+        final currentList = ref.read(registerOuterProvider);
+        if (isRegistered) {
+          // 이미 선택된 경우 제거
+          ref.read(registerOuterProvider.notifier).state = currentList
+              .where((item) => item.clothId != selectedItem.clothId)
+              .toList();
+        } else {
+          // 선택되지 않은 경우 추가
+          ref.read(registerOuterProvider.notifier).state = [
+            ...currentList,
+            selectedItem
+          ];
+        }
+      }
       if (havePalette) {
         ref.read(colorProvider.notifier).state = color;
         ref.read(thicknessProvider.notifier).state = thicknessLabel;
@@ -75,7 +113,7 @@ Widget ClothInfoCard({
         color: HowWeatherColor.white,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: selectedInfo == selectedItem
+          color: isRegistered
               ? HowWeatherColor.neutral[700]!
               : HowWeatherColor.neutral[100]!,
           width: 2,
@@ -83,6 +121,14 @@ Widget ClothInfoCard({
       ),
       child: Row(
         children: [
+          if (isRegistered) ...[
+            Icon(
+              Icons.check_circle,
+              color: HowWeatherColor.primary[400],
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+          ],
           Medium_14px(text: "색깔"),
           const SizedBox(width: 12),
           Container(

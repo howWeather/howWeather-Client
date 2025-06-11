@@ -41,6 +41,7 @@ class ClothModal extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          _buildSelectedCountInfo(ref),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.5,
             child: SingleChildScrollView(
@@ -49,6 +50,43 @@ class ClothModal extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           _buildBottomButtons(context, ref),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedCountInfo(WidgetRef ref) {
+    final registeredUppers = ref.watch(registerUpperProvider);
+    final registeredOuters = ref.watch(registerOuterProvider);
+
+    int selectedCount = 0;
+    if (category == "uppers") {
+      selectedCount = registeredUppers.length;
+    } else if (category == "outers") {
+      selectedCount = registeredOuters.length;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: HowWeatherColor.primary[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: HowWeatherColor.primary[200]!),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.check_circle_outline,
+            color: HowWeatherColor.primary[400],
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Medium_14px(
+            text: "선택된 아이템: $selectedCount개",
+            color: HowWeatherColor.primary[700],
+          ),
         ],
       ),
     );
@@ -154,9 +192,7 @@ class ClothModal extends ConsumerWidget {
         const SizedBox(width: 8),
         Expanded(
           child: GestureDetector(
-            onTap: () {
-              _handleConfirm(context, ref);
-            },
+            onTap: () => _handleConfirm(context, ref),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -165,7 +201,7 @@ class ClothModal extends ConsumerWidget {
               ),
               child: const Center(
                 child: Medium_14px(
-                  text: "등록",
+                  text: "완료",
                   color: HowWeatherColor.white,
                 ),
               ),
@@ -177,38 +213,10 @@ class ClothModal extends ConsumerWidget {
   }
 
   void _handleConfirm(BuildContext context, WidgetRef ref) {
-    final selectedInfo = ref.read(selectedClothInfoProvider(category));
-
-    if (selectedInfo != null) {
-      // 선택된 아이템을 등록 provider에 저장
-      if (category == "uppers") {
-        // allItems에서 해당 clothId를 가진 실제 ClothItem 찾기
-        final clothesAsync = ref.read(closetProvider);
-        if (clothesAsync.hasValue) {
-          final clothesData = clothesAsync.value!;
-          final clothes = clothesData.firstWhere((e) => e.category == category);
-          final allItems = clothes.clothList.expand((g) => g.items).toList();
-          final selectedItem =
-              allItems.firstWhere((item) => item == selectedInfo);
-          ref.read(registerUpperProvider.notifier).state = selectedItem;
-        }
-      } else if (category == "outers") {
-        final clothesAsync = ref.read(closetProvider);
-        if (clothesAsync.hasValue) {
-          final clothesData = clothesAsync.value!;
-          final clothes = clothesData.firstWhere((e) => e.category == category);
-          final allItems = clothes.clothList.expand((g) => g.items).toList();
-          final selectedItem =
-              allItems.firstWhere((item) => item == selectedInfo);
-          ref.read(registerOuterProvider.notifier).state = selectedItem;
-        }
-      }
-    }
-
     // 모달 닫기
     context.pop();
 
-    // 선택 상태 초기화
+    // 선택 상태 초기화 (모달 내부 선택 상태만)
     ref.read(selectedClothProvider(category).notifier).state = null;
     ref.read(selectedClothInfoProvider(category).notifier).state = null;
   }

@@ -1,6 +1,5 @@
 import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:client/api/record/record_view_model.dart';
-import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/cloth_modal.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
@@ -156,16 +155,12 @@ class Register extends ConsumerWidget {
                       "상의",
                       ref,
                       "uppers",
-                      ref.watch(registerUpperProvider)?.clothType ?? 0,
-                      ref.watch(registerUpperProvider)?.color ?? 0,
                     ),
                     _buildClothWidget(
                       context,
                       "아우터",
                       ref,
                       "outers",
-                      ref.watch(registerOuterProvider)?.clothType ?? 0,
-                      ref.watch(registerOuterProvider)?.color ?? 0,
                     ),
                   ],
                 ),
@@ -248,17 +243,15 @@ class Register extends ConsumerWidget {
     }
 
     try {
+      final upperList = ref.read(registerUpperProvider);
+      final outerList = ref.read(registerOuterProvider);
+
       await ref.read(recordViewModelProvider.notifier).writeRecord(
-            timeSlot: timeSlot, // 이제 non-null int
-            feeling: feeling, // 이제 non-null int
-            date: DateFormat('yyyy-MM-dd')
-                .format(selectedDay), // 이제 non-null DateTime
-            uppers: upperInfo != null
-                ? [upperInfo.clothId]
-                : [], // <int?>가 아닌 <int>
-            outers: outerInfo != null
-                ? [outerInfo.clothId]
-                : [], // <int?>가 아닌 <int>
+            timeSlot: timeSlot,
+            feeling: feeling,
+            date: DateFormat('yyyy-MM-dd').format(selectedDay),
+            uppers: upperList.map((e) => e.clothId).toList(),
+            outers: outerList.map((e) => e.clothId).toList(),
             city: ref.read(addressProvider),
           );
 
@@ -344,11 +337,11 @@ class Register extends ConsumerWidget {
     String text,
     WidgetRef ref,
     String category,
-    int type,
-    int color,
   ) {
-    final realColor = HowWeatherColor.colorMap[color] ?? Colors.transparent;
-    final matrix = HowWeatherColor.createColorMatrixFromColor(realColor);
+    // 선택된 아이템들 가져오기
+    final selectedItems = category == "uppers"
+        ? ref.watch(registerUpperProvider)
+        : ref.watch(registerOuterProvider);
 
     return Column(
       children: [
@@ -376,7 +369,11 @@ class Register extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Medium_16px(text: clothTypeToKorean(category, type)),
+                Expanded(
+                  child: selectedItems.isEmpty
+                      ? Medium_16px(text: "$text 선택")
+                      : Medium_16px(text: "${selectedItems.length}개 선택됨"),
+                ),
                 SvgPicture.asset("assets/icons/search.svg"),
               ],
             ),
@@ -384,32 +381,143 @@ class Register extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          width: MediaQuery.of(context).size.width * 0.3,
-          child: FutureBuilder<String>(
-            future: category == "uppers"
-                ? ref
-                    .read(clothViewModelProvider.notifier)
-                    .getUpperClothImage(type)
-                : ref
-                    .read(clothViewModelProvider.notifier)
-                    .getOuterClothImage(type),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return const Icon(Icons.error);
-              } else if (snapshot.hasData &&
-                  snapshot.data!.isNotEmpty &&
-                  Uri.tryParse(snapshot.data!)?.hasAbsolutePath == true) {
-                return ColorFiltered(
-                  colorFilter: ColorFilter.matrix(matrix),
-                  child: Image.network(snapshot.data!, fit: BoxFit.fill),
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
-            },
-          ),
+          width: MediaQuery.of(context).size.width * 0.4,
+          child: selectedItems.isEmpty
+              ? Container(
+                  width: double.infinity,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: HowWeatherColor.neutral[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: HowWeatherColor.neutral[200]!),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add_circle_outline,
+                          color: HowWeatherColor.neutral[400],
+                          size: 32,
+                        ),
+                        const SizedBox(height: 4),
+                        Medium_14px(
+                          text: "$text 선택",
+                          color: HowWeatherColor.neutral[400],
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : GridView.builder(
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 4,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: selectedItems.length,
+                  itemBuilder: (context, index) {
+                    final item = selectedItems[index];
+                    final realColor = HowWeatherColor.colorMap[item.color] ??
+                        Colors.transparent;
+                    final matrix =
+                        HowWeatherColor.createColorMatrixFromColor(realColor);
+
+                    return Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color: HowWeatherColor.neutral[200]!),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: FutureBuilder<String>(
+                              future: category == "uppers"
+                                  ? ref
+                                      .read(clothViewModelProvider.notifier)
+                                      .getUpperClothImage(item.clothType)
+                                  : ref
+                                      .read(clothViewModelProvider.notifier)
+                                      .getOuterClothImage(item.clothType),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return const Center(child: Icon(Icons.error));
+                                } else if (snapshot.hasData &&
+                                    snapshot.data!.isNotEmpty &&
+                                    Uri.tryParse(snapshot.data!)
+                                            ?.hasAbsolutePath ==
+                                        true) {
+                                  return ColorFiltered(
+                                    colorFilter: ColorFilter.matrix(matrix),
+                                    child: Image.network(
+                                      snapshot.data!,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  );
+                                } else {
+                                  return const SizedBox.shrink();
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        // 삭제 버튼
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (category == "uppers") {
+                                final currentList =
+                                    ref.read(registerUpperProvider);
+                                ref.read(registerUpperProvider.notifier).state =
+                                    currentList
+                                        .where((i) => i.clothId != item.clothId)
+                                        .toList();
+                              } else {
+                                final currentList =
+                                    ref.read(registerOuterProvider);
+                                ref.read(registerOuterProvider.notifier).state =
+                                    currentList
+                                        .where((i) => i.clothId != item.clothId)
+                                        .toList();
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: HowWeatherColor.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 2,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.close,
+                                color: HowWeatherColor.neutral[600],
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
         ),
       ],
     );

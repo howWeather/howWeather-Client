@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/model/cloth_item.dart';
 
-// 1. 카테고리별 선택된 아이템 ID 관리
+// 1. 카테고리별 선택된 아이템 ID 관리 (단일 선택 - 모달 내에서만 사용)
 final selectedClothProvider =
     StateProvider.family<int?, String>((ref, category) => null);
 
@@ -15,9 +15,9 @@ final selectedEnrollClothProvider = StateProvider<Map<String, int?>>((ref) => {
       'outers': null,
     });
 
-// 4. 등록 페이지용 최종 선택된 아이템들
-final registerUpperProvider = StateProvider<ClothItem?>((ref) => null);
-final registerOuterProvider = StateProvider<ClothItem?>((ref) => null);
+// 4. 등록 페이지용 최종 선택된 아이템들 (여러 벌 가능)
+final registerUpperProvider = StateProvider<List<ClothItem>>((ref) => []);
+final registerOuterProvider = StateProvider<List<ClothItem>>((ref) => []);
 
 // 5. 기타 설정값들
 final colorProvider = StateProvider<int>((ref) => 1);
@@ -36,8 +36,8 @@ extension ProviderHelper on WidgetRef {
       'uppers': null,
       'outers': null,
     };
-    read(registerUpperProvider.notifier).state = null;
-    read(registerOuterProvider.notifier).state = null;
+    read(registerUpperProvider.notifier).state = [];
+    read(registerOuterProvider.notifier).state = [];
     read(colorProvider.notifier).state = 1;
     read(thicknessProvider.notifier).state = 1;
     read(selectedTemperatureProvider.notifier).state = null;
@@ -53,8 +53,8 @@ extension ProviderHelper2 on WidgetRef {
       'uppers': null,
       'outers': null,
     };
-    read(registerUpperProvider.notifier).state = null;
-    read(registerOuterProvider.notifier).state = null;
+    read(registerUpperProvider.notifier).state = [];
+    read(registerOuterProvider.notifier).state = [];
     read(colorProvider.notifier).state = 1;
     read(thicknessProvider.notifier).state = 1;
   }
