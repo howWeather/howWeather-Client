@@ -20,10 +20,11 @@ class Bold_64px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 64,
-          fontWeight: FontWeight.w700),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 62,
+        fontWeight: FontWeight.w700,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -48,10 +49,11 @@ class Bold_40px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 40,
-          fontWeight: FontWeight.w700),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 38,
+        fontWeight: FontWeight.w700,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -76,10 +78,11 @@ class Bold_32px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 32,
-          fontWeight: FontWeight.w700),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 30,
+        fontWeight: FontWeight.w700,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -104,10 +107,11 @@ class Bold_26px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 26,
-          fontWeight: FontWeight.w700),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 24,
+        fontWeight: FontWeight.w700,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -132,10 +136,11 @@ class Bold_24px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 24,
-          fontWeight: FontWeight.w700),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 22,
+        fontWeight: FontWeight.w700,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -160,10 +165,11 @@ class Bold_22px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 22,
-          fontWeight: FontWeight.w700),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -188,16 +194,15 @@ class Bold_20px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 20,
-          fontWeight: FontWeight.w700),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
 }
-
-// pretendard semibold
 
 class Semibold_28px extends StatelessWidget {
   final String text;
@@ -218,10 +223,11 @@ class Semibold_28px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 28,
-          fontWeight: FontWeight.w600),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 26,
+        fontWeight: FontWeight.w600,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -246,10 +252,11 @@ class Semibold_24px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 24,
-          fontWeight: FontWeight.w600),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -279,7 +286,7 @@ class Semibold_22px extends StatelessWidget {
       style: style.copyWith(
         color: color ?? HowWeatherColor.neutral[900],
         fontFamily: 'Pretendard',
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
       overflow: overflow ?? TextOverflow.clip,
@@ -306,10 +313,11 @@ class Semibold_20px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 20,
-          fontWeight: FontWeight.w600),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -334,10 +342,11 @@ class Semibold_18px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 18,
-          fontWeight: FontWeight.w600),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -362,16 +371,15 @@ class Semibold_16px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 16,
-          fontWeight: FontWeight.w600),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
 }
-
-// pretendard medium
 
 class Medium_20px extends StatelessWidget {
   final String text;
@@ -392,10 +400,11 @@ class Medium_20px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 20,
-          fontWeight: FontWeight.w500),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -420,10 +429,11 @@ class Medium_18px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 18,
-          fontWeight: FontWeight.w500),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }
@@ -449,13 +459,14 @@ class Medium_16px extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 16,
-          fontWeight: FontWeight.w500),
-      overflow: overflow ?? TextOverflow.clip,
       textAlign: textAlign ?? TextAlign.start,
+      style: style.copyWith(
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      overflow: overflow ?? TextOverflow.clip,
     );
   }
 }
@@ -479,10 +490,11 @@ class Medium_14px extends StatelessWidget {
     return Text(
       text,
       style: style.copyWith(
-          color: color ?? HowWeatherColor.neutral[900],
-          fontFamily: 'Pretendard',
-          fontSize: 14,
-          fontWeight: FontWeight.w500),
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+      ),
       overflow: overflow ?? TextOverflow.clip,
     );
   }

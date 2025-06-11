@@ -52,7 +52,7 @@ class ClothesEnroll extends ConsumerWidget {
         title: Medium_18px(text: "의류 등록"),
         centerTitle: true,
         leading: InkWell(
-          onTap: () => context.pop(),
+          onTap: () => context.go('/mypage'),
           child: SvgPicture.asset(
             "assets/icons/chevron-left.svg",
             fit: BoxFit.scaleDown,

@@ -366,7 +366,24 @@ class Calendar extends ConsumerWidget {
                               selected;
                           ref.read(focusedDayProvider.notifier).state = focused;
 
-                          if (isSameDay(selected, DateTime.now())) {
+                          final now = DateTime.now();
+                          final today = DateTime(now.year, now.month, now.day);
+                          final yesterday =
+                              DateTime(now.year, now.month, now.day - 1);
+                          final selectedDate = DateTime(
+                              selected.year, selected.month, selected.day);
+
+                          // 새벽 5시 30분 이전인지 확인
+                          final isBeforeEarlyMorning = now.hour < 5 ||
+                              (now.hour == 5 && now.minute < 30);
+
+                          // 오늘 날짜 선택 또는 어제 날짜를 새벽 5시 30분 이전에 선택한 경우 다이얼로그 표시
+                          final shouldShowDialog =
+                              (selectedDate.isAtSameMomentAs(today)) ||
+                                  (selectedDate.isAtSameMomentAs(yesterday) &&
+                                      isBeforeEarlyMorning);
+
+                          if (shouldShowDialog) {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -412,12 +429,35 @@ class Calendar extends ConsumerWidget {
 
   Widget historyDialog(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedTimeProvider);
+    final selectedDay = ref.watch(selectedDayProvider);
     final now = DateTime.now();
 
-    // 시간 제한 조건
-    final isMorningEnabled = now.hour >= 9;
-    final isAfternoonEnabled = now.hour >= 14;
-    final isEveningEnabled = now.hour >= 20;
+    // 선택된 날짜가 어제인지 확인
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final isYesterday = selectedDay != null &&
+        selectedDay.year == yesterday.year &&
+        selectedDay.month == yesterday.month &&
+        selectedDay.day == yesterday.day;
+
+    // 새벽 5시 30분 이전인지 확인
+    final isBeforeEarlyMorning =
+        now.hour < 5 || (now.hour == 5 && now.minute < 30);
+
+    // 전날 기록 가능 여부
+    final canRecordYesterday = isYesterday && isBeforeEarlyMorning;
+
+    // 오늘 날짜의 시간 제한 조건
+    final isTodaySelected = selectedDay != null &&
+        selectedDay.year == now.year &&
+        selectedDay.month == now.month &&
+        selectedDay.day == now.day;
+
+    final isMorningEnabled =
+        canRecordYesterday || (isTodaySelected && now.hour >= 9);
+    final isAfternoonEnabled =
+        canRecordYesterday || (isTodaySelected && now.hour >= 14);
+    final isEveningEnabled =
+        canRecordYesterday || (isTodaySelected && now.hour >= 20);
 
     Widget timeButton(String label, int value, bool isEnabled, WidgetRef ref) {
       final isSelected = selected == value;
@@ -458,9 +498,15 @@ class Calendar extends ConsumerWidget {
 
     final isRegisterEnabled = selected != null;
 
+    // 다이얼로그 제목 설정
+    String dialogTitle = "착장 기록 등록";
+    if (canRecordYesterday) {
+      dialogTitle = "전날 착장 기록 등록";
+    }
+
     return AlertDialog(
       backgroundColor: HowWeatherColor.white,
-      title: Center(child: Semibold_20px(text: "착장 기록 등록")),
+      title: Center(child: Semibold_20px(text: dialogTitle)),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -481,19 +527,27 @@ class Calendar extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Medium_14px(text: "• 전날의 기록은 다음 날 새벽 5시 30분 이전에 작성 가능합니다."),
-              Medium_14px(text: "• 오늘의 기록은 해당 시간대 이후에 작성 가능합니다."),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, top: 4.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Medium_14px(text: "- 오전 : 9시 이후"),
-                    Medium_14px(text: "- 오후 : 14시 이후"),
-                    Medium_14px(text: "- 저녁 : 20시 이후"),
-                  ],
+              if (canRecordYesterday) ...[
+                Medium_14px(
+                  text: "• 전날 기록을 작성하고 있습니다.",
+                  color: HowWeatherColor.secondary[700],
                 ),
-              ),
+                Medium_14px(text: "• 새벽 5시 30분 이전까지 작성 가능합니다."),
+              ] else ...[
+                Medium_14px(text: "• 전날의 기록은 다음 날 새벽 5시 30분 이전에 작성 가능합니다."),
+                Medium_14px(text: "• 오늘의 기록은 해당 시간대 이후에 작성 가능합니다."),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Medium_14px(text: "- 오전 : 9시 이후"),
+                      Medium_14px(text: "- 오후 : 14시 이후"),
+                      Medium_14px(text: "- 저녁 : 20시 이후"),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
           SizedBox(height: 12),

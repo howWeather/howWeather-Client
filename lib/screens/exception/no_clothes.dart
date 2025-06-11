@@ -36,8 +36,7 @@ class NoClothes extends StatelessWidget {
             SizedBox(height: 20),
             GestureDetector(
               onTap: () {
-                context.go('/mypage');
-                context.push('/mypage/clothes/enroll');
+                context.go('/mypage/clothes/enroll');
               },
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
