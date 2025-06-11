@@ -51,7 +51,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
               SizedBox(
                   height: MediaQuery.of(context).size.height * 0.1), // 여유공간
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6,
+                width: MediaQuery.of(context).size.width * 0.5,
                 child: Image.asset("assets/images/logo.png"),
               ),
               SizedBox(
@@ -61,7 +61,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
                 style: TextStyle(
                   color: HowWeatherColor.white,
                   fontFamily: "BagelFatOne",
-                  fontSize: 42,
+                  fontSize: 40,
                 ),
                 "날씨어때",
               ),
@@ -264,7 +264,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
         TextFormField(
           onChanged: (value) => ref.read(idProvider.notifier).state = value,
           style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: HowWeatherColor.black),
           decoration: InputDecoration(
@@ -276,7 +276,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
               ),
             ),
             filled: true,
-            fillColor: HowWeatherColor.neutral[50],
+            fillColor: HowWeatherColor.white,
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -288,11 +288,11 @@ class _SignSplashState extends ConsumerState<SignIn> {
             labelText: "아이디 입력",
             labelStyle: TextStyle(
               fontFamily: 'Pretendard',
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: HowWeatherColor.neutral[300],
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 19),
+            contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           ),
         ),
       ],
@@ -315,7 +315,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
             onChanged: (value) =>
                 ref.read(passwordProvider.notifier).state = value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: HowWeatherColor.black,
             ),
@@ -328,7 +328,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
                     BorderSide(color: HowWeatherColor.neutral[100]!, width: 3),
               ),
               filled: true,
-              fillColor: HowWeatherColor.neutral[50],
+              fillColor: HowWeatherColor.white,
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
@@ -338,7 +338,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
               labelText: "비밀번호 입력",
               labelStyle: TextStyle(
                 fontFamily: 'Pretendard',
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: HowWeatherColor.neutral[300],
               ),
@@ -356,7 +356,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
                     )
                   : null,
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 19),
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             ),
           ),
         ),
