@@ -262,13 +262,13 @@ class Register extends ConsumerWidget {
             city: ref.read(addressProvider),
           );
 
-      _showSnackBar(context, '기록이 성공적으로 저장되었어요!', Colors.green);
-
       await Future.delayed(const Duration(milliseconds: 1500));
       ref.resetClothProviders();
       ref.read(weatherProvider.notifier).state = const AsyncValue.loading();
       context.go('/calendar');
       context.pop();
+
+      _showSnackBar(context, '기록이 성공적으로 저장되었어요!', Colors.green);
     } catch (e) {
       _showSnackBar(context, '$e', Colors.red);
     }
