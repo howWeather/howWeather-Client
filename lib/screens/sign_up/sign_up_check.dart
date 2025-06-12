@@ -58,7 +58,7 @@ class SignUpCheck extends ConsumerWidget {
                 SizedBox(
                   width: 12,
                 ),
-                Medium_14px(text: "AI가 학습을 진행할수록 정확해진다 어쩌구"),
+                Medium_16px(text: "데이터가 쌓일수록 AI 추천이 더 정확해져요."),
               ],
             ),
             SizedBox(
@@ -70,7 +70,7 @@ class SignUpCheck extends ConsumerWidget {
                 SizedBox(
                   width: 12,
                 ),
-                Medium_14px(text: "언제부터 AI 가 의상을 추천해주는지 일정 대략 적어주기"),
+                Medium_16px(text: "기록이 10개 이상 쌓이면, 딱 맞는 옷차림을 추천해드려요."),
               ],
             ),
             SizedBox(
@@ -82,7 +82,7 @@ class SignUpCheck extends ConsumerWidget {
                 SizedBox(
                   width: 12,
                 ),
-                Medium_14px(text: "AI 학습에 당신의 데이터를 사용할 거라는 거 명시"),
+                Medium_16px(text: "AI는 여러분의 데이터를 학습에 사용합니다."),
               ],
             ),
             SizedBox(
@@ -94,7 +94,7 @@ class SignUpCheck extends ConsumerWidget {
                 SizedBox(
                   width: 12,
                 ),
-                Medium_14px(text: "데이터는 암호화 + AI 학습용으로만 쓴다"),
+                Medium_16px(text: "데이터는 암호화되며 학습 외엔 사용하지 않아요."),
               ],
             ),
           ],
