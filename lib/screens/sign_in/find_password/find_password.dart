@@ -1,6 +1,7 @@
 import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/throttle_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -123,6 +124,7 @@ class FindPassword extends ConsumerWidget {
     return GestureDetector(
       onTap: isAllValid
           ? () async {
+              if (!TapThrottler.canTap('find_password')) return;
               final result =
                   await AuthRepository().resetPassword(ref.read(findProvider));
               ref.read(identifierProvider.notifier).state = result;
