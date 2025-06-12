@@ -7,7 +7,7 @@ final recordViewModelProvider = StateNotifierProvider<RecordViewModel,
     AsyncValue<List<Map<String, dynamic>>>>((ref) => RecordViewModel(ref));
 
 final recordedDaysProvider =
-    FutureProvider.family<List<int>, String>((ref, month) async {
+    FutureProvider.autoDispose.family<List<int>, String>((ref, month) async {
   final viewModel = ref.read(recordViewModelProvider.notifier);
   return await viewModel.fetchRecordedDaysByMonth(month);
 });
@@ -78,6 +78,7 @@ class RecordViewModel
   Future<List<int>> fetchRecordedDaysByMonth(String month) async {
     try {
       final repo = ref.read(recordRepositoryProvider);
+      print(month);
       final result = await repo.fetchRecordedDaysByMonth(month);
       return result;
     } catch (e) {

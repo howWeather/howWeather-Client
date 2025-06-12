@@ -4,6 +4,7 @@ import 'package:client/designs/cloth_modal.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/providers/calendar_providers.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/calendar/view.dart';
 import 'package:client/api/weather/weather_view_model.dart';
@@ -267,6 +268,10 @@ class Register extends ConsumerWidget {
       // context.go('/calendar');
       context.pop();
       context.pop();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(recordViewModelProvider.notifier).fetchRecordedDaysByMonth(
+            DateFormat('yyyy-MM').format(selectedDay));
+      });
 
       _showSnackBar(context, '기록이 성공적으로 저장되었어요!', Colors.green);
     } catch (e) {

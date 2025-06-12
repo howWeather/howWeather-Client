@@ -4,6 +4,7 @@ import 'package:client/api/record/record_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/api/weather/weather_view_model.dart';
+import 'package:client/providers/calendar_providers.dart';
 import 'package:client/screens/skeleton/calendar_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,17 +13,103 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-final selectedTimeProvider = StateProvider<int?>((ref) => null);
+// ✅ Provider들을 클래스 외부로 이동 (전역 상수로)
 final calendarFormatProvider =
     StateProvider<CalendarFormat>((ref) => CalendarFormat.month);
 final focusedDayProvider = StateProvider<DateTime>((ref) => DateTime.now());
-final selectedDayProvider = StateProvider<DateTime?>((ref) => null);
 
-class Calendar extends ConsumerWidget {
-  Calendar({super.key});
+class Calendar extends ConsumerStatefulWidget {
+  const Calendar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<Calendar> createState() => _CalendarState();
+}
+
+class _CalendarState extends ConsumerState<Calendar> {
+  ProviderSubscription<DateTime>? _subscription;
+  String? _prevMonth;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // ✅ 초기 월 설정
+    final initialDay = DateTime.now();
+    _prevMonth = DateFormat('yyyy-MM').format(initialDay);
+
+    // ✅ WidgetsBinding을 사용해 첫 빌드 후에 subscription 설정
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _setupSubscription();
+      }
+    });
+  }
+
+  void _setupSubscription() {
+    _subscription?.close(); // 기존 구독 해제
+
+    _subscription = ref.listenManual<DateTime>(
+      focusedDayProvider,
+      (previous, next) {
+        if (!mounted) return;
+
+        final newMonth = DateFormat('yyyy-MM').format(next);
+        final prevMonth = previous != null
+            ? DateFormat('yyyy-MM').format(previous)
+            : _prevMonth;
+
+        // ✅ 월이 실제로 변경된 경우에만 처리
+        if (prevMonth != newMonth) {
+          print('Month changed from $prevMonth to $newMonth'); // 디버깅용
+
+          // ✅ 이전 월 데이터 무효화
+          if (prevMonth != null) {
+            ref.invalidate(recordedDaysProvider(prevMonth));
+          }
+
+          // ✅ 새로운 월 데이터 무효화 (캐시 클리어)
+          ref.invalidate(recordedDaysProvider(newMonth));
+
+          // ✅ 날씨 데이터와 관련된 유사 날짜도 무효화
+          final weather = ref.read(weatherByLocationProvider).maybeWhen(
+                data: (w) => w,
+                orElse: () => null,
+              );
+
+          if (weather != null) {
+            if (prevMonth != null) {
+              ref.invalidate(similarDaysProvider(
+                (month: prevMonth, temperature: weather.temperature),
+              ));
+            }
+            ref.invalidate(similarDaysProvider(
+              (month: newMonth, temperature: weather.temperature),
+            ));
+          }
+
+          _prevMonth = newMonth;
+
+          // ✅ 새 데이터 강제 로드
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              ref
+                  .read(recordViewModelProvider.notifier)
+                  .fetchRecordedDaysByMonth(newMonth);
+            }
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _subscription?.close(); // ✅ 메모리 누수 방지
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final calendarFormat = ref.watch(calendarFormatProvider);
     final focusedDay = ref.watch(focusedDayProvider);
     final selectedDay = ref.watch(selectedDayProvider);
@@ -48,6 +135,7 @@ class Calendar extends ConsumerWidget {
     if (isLoading) {
       return CalendarSkeleton();
     }
+
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
@@ -93,14 +181,6 @@ class Calendar extends ConsumerWidget {
   }
 
   Widget MonthCalendar() {
-    Map<DateTime, List<String>> generateEvents(
-        DateTime month, List<int> recordedDays) {
-      return {
-        for (var day in recordedDays)
-          DateTime.utc(month.year, month.month, day): ['기록됨']
-      };
-    }
-
     return Consumer(
       builder: (context, ref, _) {
         final calendarFormat = ref.watch(calendarFormatProvider);
@@ -131,8 +211,25 @@ class Calendar extends ConsumerWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      ref.read(focusedDayProvider.notifier).state =
-                          focusedDay.subtract(Duration(days: 30));
+                      final newMonth = DateTime(
+                        focusedDay.year,
+                        focusedDay.month - 1,
+                        1, // ✅ 정확한 월 계산
+                      );
+
+                      // 2025년 1월 이전 체크
+                      if (newMonth.year < 2025 ||
+                          (newMonth.year == 2025 && newMonth.month < 1)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('2025년 1월 이전 데이터는 제공되지 않습니다.'),
+                            backgroundColor: HowWeatherColor.primary[700],
+                          ),
+                        );
+                        return;
+                      }
+
+                      ref.read(focusedDayProvider.notifier).state = newMonth;
                     },
                     child: SvgPicture.asset(
                       'assets/icons/circle-left.svg',
@@ -150,8 +247,25 @@ class Calendar extends ConsumerWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      ref.read(focusedDayProvider.notifier).state =
-                          focusedDay.add(Duration(days: 30));
+                      final newMonth = DateTime(
+                        focusedDay.year,
+                        focusedDay.month + 1,
+                        1, // ✅ 정확한 월 계산
+                      );
+
+                      // 2026년 12월 이후 체크
+                      if (newMonth.year > 2026 ||
+                          (newMonth.year == 2026 && newMonth.month > 12)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('2026년 12월 이후 데이터는 제공되지 않습니다.'),
+                            backgroundColor: HowWeatherColor.primary[700],
+                          ),
+                        );
+                        return;
+                      }
+
+                      ref.read(focusedDayProvider.notifier).state = newMonth;
                     },
                     child: SvgPicture.asset(
                       'assets/icons/circle-right.svg',
@@ -175,25 +289,24 @@ class Calendar extends ConsumerWidget {
                     data: (similarDays) {
                       Map<DateTime, List<String>> events = {};
 
-                      recordedDaysAsync.whenData((recordedDays) {
-                        for (final day in recordedDays) {
-                          final date = DateTime.utc(
-                              focusedDay.year, focusedDay.month, day);
-                          events[date] = ['record'];
-                        }
-                      });
+                      // recordedDays 처리
+                      for (final day in recordedDays) {
+                        final date = DateTime.utc(
+                            focusedDay.year, focusedDay.month, day);
+                        events[date] = ['record'];
+                      }
 
-                      similarDaysAsync.whenData((similarDays) {
-                        for (final day in similarDays) {
-                          final date = DateTime.utc(
-                              focusedDay.year, focusedDay.month, day);
-                          events.update(
-                            date,
-                            (existing) => [...existing, 'similar'],
-                            ifAbsent: () => ['similar'],
-                          );
-                        }
-                      });
+                      // similarDays 처리
+                      for (final day in similarDays) {
+                        final date = DateTime.utc(
+                            focusedDay.year, focusedDay.month, day);
+                        events.update(
+                          date,
+                          (existing) => [...existing, 'similar'],
+                          ifAbsent: () => ['similar'],
+                        );
+                      }
+
                       return TableCalendar(
                         headerVisible: false,
                         daysOfWeekHeight: 55,
@@ -393,18 +506,45 @@ class Calendar extends ConsumerWidget {
                                 );
                               },
                             ).then((_) {
-                              ref.read(selectedTimeProvider.notifier).state =
-                                  null;
+                              if (context.mounted) {
+                                final container =
+                                    ProviderScope.containerOf(context);
+                                final currentMonth =
+                                    DateFormat('yyyy-MM').format(focused);
+                                container
+                                    .read(selectedTimeProvider.notifier)
+                                    .state = null;
+                                container.invalidate(
+                                    recordedDaysProvider(currentMonth));
+                                container
+                                    .read(recordViewModelProvider.notifier)
+                                    .fetchRecordedDaysByMonth(currentMonth);
+                              }
                             });
                           }
                         },
+
                         onFormatChanged: (format) {
                           ref.read(calendarFormatProvider.notifier).state =
                               format;
                         },
+
                         onPageChanged: (focused) {
+                          // 페이지 변경 시 날짜 범위 체크
+                          if (focused.year < 2025 ||
+                              (focused.year == 2025 && focused.month < 1)) {
+                            return;
+                          }
+                          if (focused.year > 2026 ||
+                              (focused.year == 2026 && focused.month > 12)) {
+                            return;
+                          }
+
+                          // ✅ focusedDayProvider 업데이트만 하면
+                          // _setupSubscription에서 자동으로 처리됨
                           ref.read(focusedDayProvider.notifier).state = focused;
                         },
+
                         calendarFormat: calendarFormat,
                         eventLoader: (day) {
                           return events[
@@ -426,194 +566,192 @@ class Calendar extends ConsumerWidget {
       },
     );
   }
+}
 
-  Widget historyDialog(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(selectedTimeProvider);
-    final selectedDay = ref.watch(selectedDayProvider);
-    final now = DateTime.now();
+Widget historyDialog(BuildContext context, WidgetRef ref) {
+  final selected = ref.watch(selectedTimeProvider);
+  final selectedDay = ref.watch(selectedDayProvider);
+  final now = DateTime.now();
 
-    // 선택된 날짜가 어제인지 확인
-    final yesterday = DateTime(now.year, now.month, now.day - 1);
-    final isYesterday = selectedDay != null &&
-        selectedDay.year == yesterday.year &&
-        selectedDay.month == yesterday.month &&
-        selectedDay.day == yesterday.day;
+  // 선택된 날짜가 어제인지 확인
+  final yesterday = DateTime(now.year, now.month, now.day - 1);
+  final isYesterday = selectedDay != null &&
+      selectedDay.year == yesterday.year &&
+      selectedDay.month == yesterday.month &&
+      selectedDay.day == yesterday.day;
 
-    // 새벽 5시 30분 이전인지 확인
-    final isBeforeEarlyMorning =
-        now.hour < 5 || (now.hour == 5 && now.minute < 30);
+  // 새벽 5시 30분 이전인지 확인
+  final isBeforeEarlyMorning =
+      now.hour < 5 || (now.hour == 5 && now.minute < 30);
 
-    // 전날 기록 가능 여부
-    final canRecordYesterday = isYesterday && isBeforeEarlyMorning;
+  // 전날 기록 가능 여부
+  final canRecordYesterday = isYesterday && isBeforeEarlyMorning;
 
-    // 오늘 날짜의 시간 제한 조건
-    final isTodaySelected = selectedDay != null &&
-        selectedDay.year == now.year &&
-        selectedDay.month == now.month &&
-        selectedDay.day == now.day;
+  // 오늘 날짜의 시간 제한 조건
+  final isTodaySelected = selectedDay != null &&
+      selectedDay.year == now.year &&
+      selectedDay.month == now.month &&
+      selectedDay.day == now.day;
 
-    final isMorningEnabled =
-        canRecordYesterday || (isTodaySelected && now.hour >= 9);
-    final isAfternoonEnabled =
-        canRecordYesterday || (isTodaySelected && now.hour >= 14);
-    final isEveningEnabled =
-        canRecordYesterday || (isTodaySelected && now.hour >= 20);
+  final isMorningEnabled =
+      canRecordYesterday || (isTodaySelected && now.hour >= 9);
+  final isAfternoonEnabled =
+      canRecordYesterday || (isTodaySelected && now.hour >= 14);
+  final isEveningEnabled =
+      canRecordYesterday || (isTodaySelected && now.hour >= 20);
 
-    Widget timeButton(String label, int value, bool isEnabled, WidgetRef ref) {
-      final isSelected = selected == value;
+  Widget timeButton(String label, int value, bool isEnabled, WidgetRef ref) {
+    final isSelected = selected == value;
 
-      return Expanded(
-        child: GestureDetector(
-          onTap: isEnabled
-              ? () {
-                  ref.read(selectedTimeProvider.notifier).state = value;
-                }
-              : null,
-          child: Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? HowWeatherColor.primary[400]
-                  : HowWeatherColor.white,
-              border: Border.all(
-                color: HowWeatherColor.neutral[200]!,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(12),
+    return Expanded(
+      child: GestureDetector(
+        onTap: isEnabled
+            ? () {
+                ref.read(selectedTimeProvider.notifier).state = value;
+              }
+            : null,
+        child: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? HowWeatherColor.primary[400]
+                : HowWeatherColor.white,
+            border: Border.all(
+              color: HowWeatherColor.neutral[200]!,
+              width: 2,
             ),
-            child: Center(
-              child: Medium_14px(
-                text: label,
-                color: isEnabled
-                    ? (isSelected
-                        ? HowWeatherColor.white
-                        : HowWeatherColor.black)
-                    : HowWeatherColor.neutral[300],
-              ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Medium_14px(
+              text: label,
+              color: isEnabled
+                  ? (isSelected ? HowWeatherColor.white : HowWeatherColor.black)
+                  : HowWeatherColor.neutral[300],
             ),
           ),
         ),
-      );
-    }
-
-    final isRegisterEnabled = selected != null;
-
-    // 다이얼로그 제목 설정
-    String dialogTitle = "착장 기록 등록";
-    if (canRecordYesterday) {
-      dialogTitle = "전날 착장 기록 등록";
-    }
-
-    return AlertDialog(
-      backgroundColor: HowWeatherColor.white,
-      title: Center(child: Semibold_20px(text: dialogTitle)),
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              timeButton("오전", 1, isMorningEnabled, ref),
-              SizedBox(width: 8),
-              timeButton("오후", 2, isAfternoonEnabled, ref),
-              SizedBox(width: 8),
-              timeButton("저녁", 3, isEveningEnabled, ref),
-            ],
-          ),
-          SizedBox(height: 16),
-          Divider(),
-          SizedBox(height: 8),
-          // 안내 문구
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (canRecordYesterday) ...[
-                Medium_14px(
-                  text: "• 전날 기록을 작성하고 있습니다.",
-                  color: HowWeatherColor.secondary[700],
-                ),
-                Medium_14px(text: "• 새벽 5시 30분 이전까지 작성 가능합니다."),
-              ] else ...[
-                Medium_14px(text: "• 전날의 기록은 다음 날 새벽 5시 30분 이전에 작성 가능합니다."),
-                Medium_14px(text: "• 오늘의 기록은 해당 시간대 이후에 작성 가능합니다."),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 4.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Medium_14px(text: "- 오전 : 9시 이후"),
-                      Medium_14px(text: "- 오후 : 14시 이후"),
-                      Medium_14px(text: "- 저녁 : 20시 이후"),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-          SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    context.pop();
-                    ref.read(selectedTimeProvider.notifier).state = null;
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: HowWeatherColor.neutral[200],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                          color: HowWeatherColor.neutral[200]!, width: 2),
-                    ),
-                    child: Center(
-                        child: Medium_14px(
-                      text: "취소",
-                      color: HowWeatherColor.neutral[700],
-                    )),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: GestureDetector(
-                  onTap: isRegisterEnabled
-                      ? () {
-                          context.push('/calendar/register');
-                          ref.read(closetProvider.notifier).loadClothes();
-                        }
-                      : null,
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isRegisterEnabled
-                          ? HowWeatherColor.primary[900]
-                          : HowWeatherColor.neutral[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                          color: isRegisterEnabled
-                              ? HowWeatherColor.primary[900]!
-                              : HowWeatherColor.neutral[200]!,
-                          width: 2),
-                    ),
-                    child: Center(
-                      child: Medium_14px(
-                        text: "등록",
-                        color: isRegisterEnabled
-                            ? HowWeatherColor.white
-                            : HowWeatherColor.neutral[500],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
+
+  final isRegisterEnabled = selected != null;
+
+  // 다이얼로그 제목 설정
+  String dialogTitle = "착장 기록 등록";
+  if (canRecordYesterday) {
+    dialogTitle = "전날 착장 기록 등록";
+  }
+
+  return AlertDialog(
+    backgroundColor: HowWeatherColor.white,
+    title: Center(child: Semibold_20px(text: dialogTitle)),
+    content: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            timeButton("오전", 1, isMorningEnabled, ref),
+            SizedBox(width: 8),
+            timeButton("오후", 2, isAfternoonEnabled, ref),
+            SizedBox(width: 8),
+            timeButton("저녁", 3, isEveningEnabled, ref),
+          ],
+        ),
+        SizedBox(height: 16),
+        Divider(),
+        SizedBox(height: 8),
+        // 안내 문구
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (canRecordYesterday) ...[
+              Medium_14px(
+                text: "• 전날 기록을 작성하고 있습니다.",
+                color: HowWeatherColor.secondary[700],
+              ),
+              Medium_14px(text: "• 새벽 5시 30분 이전까지 작성 가능합니다."),
+            ] else ...[
+              Medium_14px(text: "• 전날의 기록은 다음 날 새벽 5시 30분 이전에 작성 가능합니다."),
+              Medium_14px(text: "• 오늘의 기록은 해당 시간대 이후에 작성 가능합니다."),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Medium_14px(text: "- 오전 : 9시 이후"),
+                    Medium_14px(text: "- 오후 : 14시 이후"),
+                    Medium_14px(text: "- 저녁 : 20시 이후"),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+        SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  context.pop();
+                  ref.read(selectedTimeProvider.notifier).state = null;
+                },
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: HowWeatherColor.neutral[200],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: HowWeatherColor.neutral[200]!, width: 2),
+                  ),
+                  child: Center(
+                      child: Medium_14px(
+                    text: "취소",
+                    color: HowWeatherColor.neutral[700],
+                  )),
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: GestureDetector(
+                onTap: isRegisterEnabled
+                    ? () {
+                        context.push('/calendar/register');
+                        ref.read(closetProvider.notifier).loadClothes();
+                      }
+                    : null,
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isRegisterEnabled
+                        ? HowWeatherColor.primary[900]
+                        : HowWeatherColor.neutral[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: isRegisterEnabled
+                            ? HowWeatherColor.primary[900]!
+                            : HowWeatherColor.neutral[200]!,
+                        width: 2),
+                  ),
+                  child: Center(
+                    child: Medium_14px(
+                      text: "등록",
+                      color: isRegisterEnabled
+                          ? HowWeatherColor.white
+                          : HowWeatherColor.neutral[500],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }
 
 String timeSlotToText(int slot) {
@@ -707,99 +845,141 @@ class _DailyHistoryState extends State<DailyHistory> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
+                          // 왼쪽 정보 섹션
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Medium_20px(
-                                  text: timeSlotToText(record['timeSlot'])),
-                              SizedBox(width: 4),
-                              Bold_20px(
-                                  text: "${record['temperature'].round()}°"),
-                              SizedBox(width: 8),
+                              Row(
+                                children: [
+                                  Medium_20px(
+                                      text: timeSlotToText(record['timeSlot'])),
+                                  SizedBox(width: 4),
+                                  Bold_20px(
+                                      text:
+                                          "${record['temperature'].round()}°"),
+                                ],
+                              ),
+                              SizedBox(height: 4),
                               Bold_20px(
                                 text: feelingToText(record['feeling']),
                                 color: feelingToColor(record['feeling']),
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 60,
-                            child: Row(
-                              children: [
-                                ...record['uppers'].map<Widget>((id) {
-                                  final color =
-                                      HowWeatherColor.colorMap[id['color']] ??
+                          SizedBox(width: 16),
+                          // 오른쪽 착장 섹션 - Flexible로 감싸서 오버플로우 방지
+                          Expanded(
+                            child: SizedBox(
+                              height: 60,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    ...record['uppers'].map<Widget>((id) {
+                                      final color = HowWeatherColor
+                                              .colorMap[id['color']] ??
                                           Colors.transparent;
 
-                                  final matrix = HowWeatherColor
-                                      .createColorMatrixFromColor(color);
+                                      final matrix = HowWeatherColor
+                                          .createColorMatrixFromColor(color);
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 12),
-                                    child: FutureBuilder<String>(
-                                      future: ref
-                                          .read(clothViewModelProvider.notifier)
-                                          .getUpperClothImage(id['clothType']),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const CircularProgressIndicator();
-                                        } else if (snapshot.hasError) {
-                                          return const Icon(Icons.error);
-                                        } else if (snapshot.hasData) {
-                                          return ColorFiltered(
-                                            colorFilter:
-                                                ColorFilter.matrix(matrix),
-                                            child: Image.network(
-                                              snapshot.data!,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          );
-                                        } else {
-                                          return const SizedBox.shrink();
-                                        }
-                                      },
-                                    ),
-                                  );
-                                }).toList(),
-                                ...record['outers'].map<Widget>((id) {
-                                  final color =
-                                      HowWeatherColor.colorMap[id['color']] ??
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 12),
+                                        child: FutureBuilder<String>(
+                                          future: ref
+                                              .read(clothViewModelProvider
+                                                  .notifier)
+                                              .getUpperClothImage(
+                                                  id['clothType']),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const SizedBox(
+                                                width: 50,
+                                                height: 50,
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            } else if (snapshot.hasError) {
+                                              return const SizedBox(
+                                                width: 50,
+                                                height: 50,
+                                                child: Icon(Icons.error),
+                                              );
+                                            } else if (snapshot.hasData) {
+                                              return ColorFiltered(
+                                                colorFilter:
+                                                    ColorFilter.matrix(matrix),
+                                                child: Image.network(
+                                                  snapshot.data!,
+                                                  width: 60,
+                                                  height: 60,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              );
+                                            } else {
+                                              return const SizedBox.shrink();
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    }).toList(),
+                                    ...record['outers'].map<Widget>((id) {
+                                      final color = HowWeatherColor
+                                              .colorMap[id['color']] ??
                                           Colors.transparent;
 
-                                  final matrix = HowWeatherColor
-                                      .createColorMatrixFromColor(color);
+                                      final matrix = HowWeatherColor
+                                          .createColorMatrixFromColor(color);
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 12),
-                                    child: FutureBuilder<String>(
-                                      future: ref
-                                          .read(clothViewModelProvider.notifier)
-                                          .getOuterClothImage(id['clothType']),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const CircularProgressIndicator();
-                                        } else if (snapshot.hasError) {
-                                          return const Icon(Icons.error);
-                                        } else if (snapshot.hasData) {
-                                          return ColorFiltered(
-                                            colorFilter:
-                                                ColorFilter.matrix(matrix),
-                                            child: Image.network(
-                                              snapshot.data!,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          );
-                                        } else {
-                                          return const SizedBox.shrink();
-                                        }
-                                      },
-                                    ),
-                                  );
-                                }).toList(),
-                              ],
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 12),
+                                        child: FutureBuilder<String>(
+                                          future: ref
+                                              .read(clothViewModelProvider
+                                                  .notifier)
+                                              .getOuterClothImage(
+                                                  id['clothType']),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const SizedBox(
+                                                width: 40,
+                                                height: 40,
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            } else if (snapshot.hasError) {
+                                              return const SizedBox(
+                                                width: 40,
+                                                height: 40,
+                                                child: Icon(Icons.error),
+                                              );
+                                            } else if (snapshot.hasData) {
+                                              return ColorFiltered(
+                                                colorFilter:
+                                                    ColorFilter.matrix(matrix),
+                                                child: Image.network(
+                                                  snapshot.data!,
+                                                  width: 40,
+                                                  height: 40,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              );
+                                            } else {
+                                              return const SizedBox.shrink();
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
