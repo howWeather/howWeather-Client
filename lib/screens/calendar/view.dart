@@ -707,99 +707,141 @@ class _DailyHistoryState extends State<DailyHistory> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
+                          // 왼쪽 정보 섹션
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Medium_20px(
-                                  text: timeSlotToText(record['timeSlot'])),
-                              SizedBox(width: 4),
-                              Bold_20px(
-                                  text: "${record['temperature'].round()}°"),
-                              SizedBox(width: 8),
+                              Row(
+                                children: [
+                                  Medium_20px(
+                                      text: timeSlotToText(record['timeSlot'])),
+                                  SizedBox(width: 4),
+                                  Bold_20px(
+                                      text:
+                                          "${record['temperature'].round()}°"),
+                                ],
+                              ),
+                              SizedBox(height: 4),
                               Bold_20px(
                                 text: feelingToText(record['feeling']),
                                 color: feelingToColor(record['feeling']),
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 60,
-                            child: Row(
-                              children: [
-                                ...record['uppers'].map<Widget>((id) {
-                                  final color =
-                                      HowWeatherColor.colorMap[id['color']] ??
+                          SizedBox(width: 16),
+                          // 오른쪽 착장 섹션 - Flexible로 감싸서 오버플로우 방지
+                          Expanded(
+                            child: SizedBox(
+                              height: 60,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    ...record['uppers'].map<Widget>((id) {
+                                      final color = HowWeatherColor
+                                              .colorMap[id['color']] ??
                                           Colors.transparent;
 
-                                  final matrix = HowWeatherColor
-                                      .createColorMatrixFromColor(color);
+                                      final matrix = HowWeatherColor
+                                          .createColorMatrixFromColor(color);
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 12),
-                                    child: FutureBuilder<String>(
-                                      future: ref
-                                          .read(clothViewModelProvider.notifier)
-                                          .getUpperClothImage(id['clothType']),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const CircularProgressIndicator();
-                                        } else if (snapshot.hasError) {
-                                          return const Icon(Icons.error);
-                                        } else if (snapshot.hasData) {
-                                          return ColorFiltered(
-                                            colorFilter:
-                                                ColorFilter.matrix(matrix),
-                                            child: Image.network(
-                                              snapshot.data!,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          );
-                                        } else {
-                                          return const SizedBox.shrink();
-                                        }
-                                      },
-                                    ),
-                                  );
-                                }).toList(),
-                                ...record['outers'].map<Widget>((id) {
-                                  final color =
-                                      HowWeatherColor.colorMap[id['color']] ??
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 12),
+                                        child: FutureBuilder<String>(
+                                          future: ref
+                                              .read(clothViewModelProvider
+                                                  .notifier)
+                                              .getUpperClothImage(
+                                                  id['clothType']),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const SizedBox(
+                                                width: 50,
+                                                height: 50,
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            } else if (snapshot.hasError) {
+                                              return const SizedBox(
+                                                width: 50,
+                                                height: 50,
+                                                child: Icon(Icons.error),
+                                              );
+                                            } else if (snapshot.hasData) {
+                                              return ColorFiltered(
+                                                colorFilter:
+                                                    ColorFilter.matrix(matrix),
+                                                child: Image.network(
+                                                  snapshot.data!,
+                                                  width: 60,
+                                                  height: 60,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              );
+                                            } else {
+                                              return const SizedBox.shrink();
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    }).toList(),
+                                    ...record['outers'].map<Widget>((id) {
+                                      final color = HowWeatherColor
+                                              .colorMap[id['color']] ??
                                           Colors.transparent;
 
-                                  final matrix = HowWeatherColor
-                                      .createColorMatrixFromColor(color);
+                                      final matrix = HowWeatherColor
+                                          .createColorMatrixFromColor(color);
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 12),
-                                    child: FutureBuilder<String>(
-                                      future: ref
-                                          .read(clothViewModelProvider.notifier)
-                                          .getOuterClothImage(id['clothType']),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const CircularProgressIndicator();
-                                        } else if (snapshot.hasError) {
-                                          return const Icon(Icons.error);
-                                        } else if (snapshot.hasData) {
-                                          return ColorFiltered(
-                                            colorFilter:
-                                                ColorFilter.matrix(matrix),
-                                            child: Image.network(
-                                              snapshot.data!,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          );
-                                        } else {
-                                          return const SizedBox.shrink();
-                                        }
-                                      },
-                                    ),
-                                  );
-                                }).toList(),
-                              ],
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 12),
+                                        child: FutureBuilder<String>(
+                                          future: ref
+                                              .read(clothViewModelProvider
+                                                  .notifier)
+                                              .getOuterClothImage(
+                                                  id['clothType']),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const SizedBox(
+                                                width: 40,
+                                                height: 40,
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            } else if (snapshot.hasError) {
+                                              return const SizedBox(
+                                                width: 40,
+                                                height: 40,
+                                                child: Icon(Icons.error),
+                                              );
+                                            } else if (snapshot.hasData) {
+                                              return ColorFiltered(
+                                                colorFilter:
+                                                    ColorFilter.matrix(matrix),
+                                                child: Image.network(
+                                                  snapshot.data!,
+                                                  width: 40,
+                                                  height: 40,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              );
+                                            } else {
+                                              return const SizedBox.shrink();
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
