@@ -3,6 +3,7 @@ import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/api/oauth2/oauth2_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/throttle_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,6 +84,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
               InkWell(
                 onTap: isAllValid
                     ? () async {
+                        if (!TapThrottler.canTap('login')) return;
                         final username = ref.read(idProvider);
                         final password = ref.read(passwordProvider);
                         final authViewModel =
@@ -177,6 +179,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
                 children: [
                   GestureDetector(
                       onTap: () async {
+                        if (!TapThrottler.canTap('login_kakao')) return;
                         await kakaoSignIn();
                       },
                       child: SvgPicture.asset("assets/icons/kakao-icon.svg")),
@@ -185,6 +188,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
                   ),
                   GestureDetector(
                       onTap: () async {
+                        if (!TapThrottler.canTap('logint_google')) return;
                         await googleSignIn();
                       },
                       child: SvgPicture.asset("assets/icons/google-icon.svg")),

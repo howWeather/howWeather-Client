@@ -2,6 +2,7 @@ import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/designs/Palette.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/throttle_util.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart'
     hide selectedEnrollClothProvider;
@@ -146,6 +147,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
     return GestureDetector(
       onTap: isAllValid
           ? () {
+              if (!TapThrottler.canTap('signup_clothes')) return;
               context.push('/');
             }
           : null,
@@ -156,6 +158,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
           children: [
             InkWell(
               onTap: () {
+                if (!TapThrottler.canTap('signup_clothes')) return;
                 context.push('/');
               },
               child: Medium_20px(text: '나중에 등록하기'),

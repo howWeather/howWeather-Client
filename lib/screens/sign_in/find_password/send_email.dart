@@ -57,60 +57,60 @@ class SendEmail extends ConsumerWidget {
   }
 
   Widget bottomSheetWidget(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () {
-        context.push('/signIn');
-      },
-      child: Container(
-        width: double.maxFinite,
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        color: HowWeatherColor.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/Info.svg',
-                  color: HowWeatherColor.neutral[600],
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                    child: Medium_14px(
-                  text: '메일이 오지 않은 경우 스팸함을 확인해주세요.',
-                  color: HowWeatherColor.neutral[600],
-                )),
-              ],
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/Info.svg',
-                  color: HowWeatherColor.neutral[600],
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
+    return Container(
+      width: double.maxFinite,
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      color: HowWeatherColor.white,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/Info.svg',
+                color: HowWeatherColor.neutral[600],
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(
                   child: Medium_14px(
-                    text: '임시 비밀번호로 로그인 후 보안을 위해 비밀번호를 변경해주세요.',
-                    color: HowWeatherColor.neutral[600],
-                  ),
+                text: '메일이 오지 않은 경우 스팸함을 확인해주세요.',
+                color: HowWeatherColor.neutral[600],
+              )),
+            ],
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/Info.svg',
+                color: HowWeatherColor.neutral[600],
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                child: Medium_14px(
+                  text: '임시 비밀번호로 로그인 후 보안을 위해 비밀번호를 변경해주세요.',
+                  color: HowWeatherColor.neutral[600],
                 ),
-              ],
-            ),
-            SizedBox(
-              height: 12,
-            ),
-            Container(
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          GestureDetector(
+            onTap: () {
+              context.push('/signIn');
+            },
+            child: Container(
               child: Container(
                 height: 72,
                 decoration: BoxDecoration(
@@ -125,8 +125,8 @@ class SendEmail extends ConsumerWidget {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

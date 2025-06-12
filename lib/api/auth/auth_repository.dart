@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/api/howweather_api.dart';
 import 'package:client/model/sign_up.dart';
+import 'package:client/screens/sign_up/sign_up_id.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRepository {
@@ -35,11 +36,12 @@ class AuthRepository {
       headers: {'Content-Type': 'application/json'},
     );
 
+    final decodedResponse = utf8.decode(response.bodyBytes);
+    final responseBody = jsonDecode(decodedResponse);
     if (response.statusCode == 200) {
-      final responseBody = jsonDecode(response.body);
       return responseBody['success'];
     } else {
-      print(jsonDecode(response.body)['error']['message']);
+      print(responseBody['error']['message']);
       throw Exception('아이디 중복 검증 실패: ${response.statusCode}');
     }
   }

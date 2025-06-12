@@ -5,6 +5,7 @@ import 'package:client/api/mypage/mypage_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_dialog.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/throttle_util.dart';
 import 'package:client/screens/skeleton/mypage_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -223,12 +224,14 @@ class _MyPageState extends ConsumerState<MyPage> {
                       ),
                       InkWell(
                         onTap: () {
+                          if (!TapThrottler.canTap('dialog_confirm')) return;
                           showDialog(
                             context: context,
                             builder: (context) => HowWeatherDialog(
                               titleText: "로그아웃",
                               contentText: "로그아웃하시겠습니까?",
                               done: () async {
+                                if (!TapThrottler.canTap('logout')) return;
                                 await AlarmRepository().deleteFCMToken();
                                 await AuthRepository().logout();
                                 ref.read(closetProvider.notifier).state =
@@ -257,12 +260,14 @@ class _MyPageState extends ConsumerState<MyPage> {
                       ),
                       InkWell(
                         onTap: () {
+                          if (!TapThrottler.canTap('dialog_confirm')) return;
                           showDialog(
                             context: context,
                             builder: (context) => HowWeatherDialog(
                               titleText: "탈퇴",
                               contentText: "탈퇴하시겠습니까?\n모든 기록이 사라집니다.",
                               done: () async {
+                                if (!TapThrottler.canTap('withdraw')) return;
                                 await AuthRepository().withdraw();
                                 context.go('/');
                               },

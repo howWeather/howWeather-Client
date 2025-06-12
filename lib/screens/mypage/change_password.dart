@@ -1,6 +1,7 @@
 import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/throttle_util.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -84,67 +85,76 @@ class ChangePassword extends ConsumerWidget {
           ),
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Semibold_24px(text: "현재 비밀번호를 입력해주세요."),
-            SizedBox(
-              height: 12,
-            ),
-            currentPasswordTextField(ref),
-            SizedBox(
-              height: 12,
-            ),
-            Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/Info.svg',
-                  color: HowWeatherColor.neutral[600],
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Medium_14px(
-                  text: '비밀번호를 잊으셨나요?',
-                  color: HowWeatherColor.neutral[600],
-                ),
-                Spacer(),
-                InkWell(
-                  onTap: () {
-                    context.push('/signIn/findPassword');
-                  },
-                  child: Medium_14px(
-                    text: '비밀번호 찾기',
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Semibold_20px(text: "현재 비밀번호를 입력해주세요."),
+              SizedBox(
+                height: 12,
+              ),
+              currentPasswordTextField(ref),
+              SizedBox(
+                height: 12,
+              ),
+              Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/Info.svg',
                     color: HowWeatherColor.neutral[600],
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 40),
-            Semibold_24px(text: "변경할 비밀번호를 입력해주세요."),
-            SizedBox(
-              height: 12,
-            ),
-            passwordTextField(ref),
-            SizedBox(
-              height: 12,
-            ),
-            validationPassword(ref),
-            SizedBox(
-              height: 20,
-            ),
-            checkPasswordTextField(ref),
-            SizedBox(
-              height: 12,
-            ),
-            if (checkPassword.isNotEmpty && !isMatch)
-              Medium_16px(
-                text: "비밀번호가 일치하지 않습니다. 다시 입력해 주세요.",
-                color: HowWeatherColor.error,
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Medium_14px(
+                    text: '비밀번호를 잊으셨나요?',
+                    color: HowWeatherColor.neutral[600],
+                  ),
+                  Spacer(),
+                  InkWell(
+                    onTap: () {
+                      context.push('/signIn/findPassword');
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                              color: HowWeatherColor.neutral[500]!, width: 1)),
+                      child: Medium_14px(
+                        text: '비밀번호 찾기',
+                        color: HowWeatherColor.neutral[500],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-          ],
+              SizedBox(height: 40),
+              Semibold_20px(text: "변경할 비밀번호를 입력해주세요."),
+              SizedBox(
+                height: 12,
+              ),
+              passwordTextField(ref),
+              SizedBox(
+                height: 12,
+              ),
+              validationPassword(ref),
+              SizedBox(
+                height: 20,
+              ),
+              checkPasswordTextField(ref),
+              SizedBox(
+                height: 12,
+              ),
+              if (checkPassword.isNotEmpty && !isMatch)
+                Medium_16px(
+                  text: "비밀번호가 일치하지 않습니다. 다시 입력해 주세요.",
+                  color: HowWeatherColor.error,
+                ),
+            ],
+          ),
         ),
       ),
       bottomSheet: bottomSheetWidget(context, ref),
@@ -424,6 +434,7 @@ class ChangePassword extends ConsumerWidget {
     return GestureDetector(
       onTap: isAllValid
           ? () async {
+              if (!TapThrottler.canTap('change_password')) return;
               try {
                 await AuthRepository().updatePassword(
                   ref.watch(curruentPasswordProvider),
