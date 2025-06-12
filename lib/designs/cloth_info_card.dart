@@ -3,6 +3,7 @@ import 'package:client/designs/Palette.dart';
 import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/throttle_util.dart';
 import 'package:client/model/cloth_item.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:flutter/material.dart';
@@ -222,6 +223,7 @@ Widget deleteDialog(
             Expanded(
               child: GestureDetector(
                 onTap: () {
+                  if (!TapThrottler.canTap('delete_clothes')) return;
                   if (category == 'uppers') {
                     ref
                         .read(closetProvider.notifier)

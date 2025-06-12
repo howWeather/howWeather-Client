@@ -1,6 +1,7 @@
 import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/throttle_util.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,6 +79,7 @@ class _PaletteState extends ConsumerState<Palette> {
               Expanded(
                 child: GestureDetector(
                   onTap: () async {
+                    if (!TapThrottler.canTap('palette')) return;
                     if (widget.text == "등록") {
                       final selectedClothType =
                           ref.read(selectedEnrollClothProvider);
