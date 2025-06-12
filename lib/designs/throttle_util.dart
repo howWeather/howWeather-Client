@@ -6,7 +6,7 @@ class TapThrottler {
     final lastTapTime = _lastTapTimes[key];
 
     if (lastTapTime == null ||
-        now.difference(lastTapTime).inMilliseconds > 500) {
+        now.difference(lastTapTime).inMilliseconds > 1000) {
       _lastTapTimes[key] = now;
       return true;
     }

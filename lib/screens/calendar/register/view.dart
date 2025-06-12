@@ -3,6 +3,7 @@ import 'package:client/api/record/record_view_model.dart';
 import 'package:client/designs/cloth_modal.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/throttle_util.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/calendar/view.dart';
 import 'package:client/api/weather/weather_view_model.dart';
@@ -189,7 +190,12 @@ class Register extends ConsumerWidget {
     final isAllValid = ref.watch(isAllValidProvider);
 
     return GestureDetector(
-      onTap: isAllValid ? () => _handleSubmit(context, ref) : null,
+      onTap: isAllValid
+          ? () {
+              if (!TapThrottler.canTap('register')) return;
+              _handleSubmit(context, ref);
+            }
+          : null,
       child: Container(
         width: double.maxFinite,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -258,7 +264,8 @@ class Register extends ConsumerWidget {
       await Future.delayed(const Duration(milliseconds: 1500));
       ref.resetClothProviders();
       ref.read(weatherProvider.notifier).state = const AsyncValue.loading();
-      context.go('/calendar');
+      // context.go('/calendar');
+      context.pop();
       context.pop();
 
       _showSnackBar(context, '기록이 성공적으로 저장되었어요!', Colors.green);
