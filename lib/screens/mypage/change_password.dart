@@ -8,52 +8,52 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-final curruentPasswordProvider = StateProvider<String>((ref) => '');
-final passwordProvider = StateProvider<String>((ref) => '');
-final checkPasswordProvider = StateProvider<String>((ref) => '');
-final obscureCurrentProvider = StateProvider<bool>((ref) => true);
-final obscureProvider = StateProvider<bool>((ref) => true);
-final obscureCheckProvider = StateProvider<bool>((ref) => true);
+final curruentPasswordProvider = StateProvider.autoDispose<String>((ref) => '');
+final passwordProvider = StateProvider.autoDispose<String>((ref) => '');
+final checkPasswordProvider = StateProvider.autoDispose<String>((ref) => '');
+final obscureCurrentProvider = StateProvider.autoDispose<bool>((ref) => true);
+final obscureProvider = StateProvider.autoDispose<bool>((ref) => true);
+final obscureCheckProvider = StateProvider.autoDispose<bool>((ref) => true);
 
 // 영문 포함 여부
-final hasLetterProvider = Provider<bool>((ref) {
+final hasLetterProvider = Provider.autoDispose<bool>((ref) {
   final password = ref.watch(passwordProvider);
   return RegExp(r'[a-zA-Z]').hasMatch(password);
 });
 
 // 숫자 포함 여부
-final hasNumberProvider = Provider<bool>((ref) {
+final hasNumberProvider = Provider.autoDispose<bool>((ref) {
   final password = ref.watch(passwordProvider);
   return RegExp(r'\d').hasMatch(password);
 });
 
 // 특수문자 포함 여부
-final hasSpecialCharProvider = Provider<bool>((ref) {
+final hasSpecialCharProvider = Provider.autoDispose<bool>((ref) {
   final password = ref.watch(passwordProvider);
   return RegExp(r'[!@#\$%^&*()_+|~=`{}\[\]:";<>?,./]').hasMatch(password);
 });
 
 // 길이 조건 (8자 이상 20자 이하)
-final isLengthValidProvider = Provider<bool>((ref) {
+final isLengthValidProvider = Provider.autoDispose<bool>((ref) {
   final password = ref.watch(passwordProvider);
   return password.length >= 8 && password.length <= 20;
 });
 
-final isPasswordFormatValidProvider = Provider<bool>((ref) {
+final isPasswordFormatValidProvider = Provider.autoDispose<bool>((ref) {
   return ref.watch(hasLetterProvider) &&
       ref.watch(hasNumberProvider) &&
       ref.watch(hasSpecialCharProvider) &&
       ref.watch(isLengthValidProvider);
 });
 
-final isPasswordMatchProvider = Provider<bool>((ref) {
+final isPasswordMatchProvider = Provider.autoDispose<bool>((ref) {
   final password = ref.watch(passwordProvider);
   final checkPassword = ref.watch(checkPasswordProvider);
   return checkPassword.isNotEmpty && password == checkPassword;
 });
 
 // 최종 유효성
-final isAllValidProvider = Provider<bool>((ref) {
+final isAllValidProvider = Provider.autoDispose<bool>((ref) {
   return ref.watch(isPasswordFormatValidProvider) &&
       ref.watch(isPasswordMatchProvider) &&
       ref.watch(curruentPasswordProvider).isNotEmpty;
