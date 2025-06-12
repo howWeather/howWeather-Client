@@ -1,5 +1,6 @@
 import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/model/sign_up.dart';
+import 'package:client/screens/sign_up/sign_up_id.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository());
@@ -31,9 +32,11 @@ class AuthViewModel extends StateNotifier<AsyncValue<void>> {
     final repo = ref.read(authRepositoryProvider);
     try {
       await repo.verifyLoginId(loginId);
+      ref.read(duplicateProvider.notifier).state = '';
       print('✅ 아이디 중복 검증 확인 완료');
     } catch (e) {
       print('❌ 아이디 중복 검증 확인 실패: $e');
+      ref.read(duplicateProvider.notifier).state = 'duplicated';
       throw e;
     }
   }
