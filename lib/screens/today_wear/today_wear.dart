@@ -51,7 +51,10 @@ class TodayWear extends ConsumerWidget {
                 error: (e, _) => Text('문제가 발생했어요.\n$e'),
                 data: (recommendations) {
                   if (recommendations.isEmpty) {
-                    return Text("추천 가능한 옷이 없습니다. 새로운 옷을 추가해 보세요.");
+                    return Semibold_18px(
+                      text: "추천 가능한 옷이 없습니다. 새로운 옷을 추가해 보세요.",
+                      color: HowWeatherColor.white,
+                    );
                   }
                   final upperClothImageAsync =
                       recommendations.first.uppersTypeList.isNotEmpty
