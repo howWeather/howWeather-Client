@@ -93,6 +93,8 @@ class RecordRepository {
     final decoded = utf8.decode(response.bodyBytes);
     final jsonBody = jsonDecode(decoded);
 
+    print('기록된 날짜 조회 $jsonBody');
+
     if (response.statusCode == 200) {
       return List<int>.from(jsonBody);
     } else {

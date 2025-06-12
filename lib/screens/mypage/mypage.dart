@@ -2,10 +2,14 @@ import 'package:client/api/alarm/alarm_repository.dart';
 import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/api/mypage/mypage_view_model.dart';
+import 'package:client/api/record/record_view_model.dart';
+import 'package:client/api/weather/weather_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_dialog.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/providers/calendar_providers.dart';
+import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/skeleton/mypage_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -236,9 +240,15 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 await AuthRepository().logout();
                                 ref.read(closetProvider.notifier).state =
                                     const AsyncLoading();
+                                ref.resetClothProviders();
                                 ref
                                     .read(mypageViewModelProvider.notifier)
                                     .state = const AsyncLoading();
+                                ref.resetCalendarProviders();
+                                ref.invalidate(recordedDaysProvider);
+                                ref.invalidate(similarDaysProvider);
+                                ref.invalidate(weatherByLocationProvider);
+                                ref.invalidate(recordViewModelProvider);
                                 context.go('/');
                               },
                             ),
@@ -269,6 +279,15 @@ class _MyPageState extends ConsumerState<MyPage> {
                               done: () async {
                                 if (!TapThrottler.canTap('withdraw')) return;
                                 await AuthRepository().withdraw();
+                                ref.resetClothProviders();
+                                ref
+                                    .read(mypageViewModelProvider.notifier)
+                                    .state = const AsyncLoading();
+                                ref.resetCalendarProviders();
+                                ref.invalidate(recordedDaysProvider);
+                                ref.invalidate(similarDaysProvider);
+                                ref.invalidate(weatherByLocationProvider);
+                                ref.invalidate(recordViewModelProvider);
                                 context.go('/');
                               },
                             ),
