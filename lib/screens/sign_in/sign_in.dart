@@ -84,23 +84,31 @@ class _SignSplashState extends ConsumerState<SignIn> {
               InkWell(
                 onTap: isAllValid
                     ? () async {
-                        if (!TapThrottler.canTap('login')) return;
-                        final username = ref.read(idProvider);
-                        final password = ref.read(passwordProvider);
-                        final authViewModel =
-                            ref.read(authViewModelProvider.notifier);
+                        try {
+                          if (!TapThrottler.canTap('login')) return;
+                          final username = ref.read(idProvider);
+                          final password = ref.read(passwordProvider);
+                          await ref
+                              .read(authViewModelProvider.notifier)
+                              .login(username, password);
 
-                        await authViewModel.login(username, password);
-
-                        final loginState = ref.read(authViewModelProvider);
-                        if (loginState is AsyncData) {
-                          await AlarmRepository().saveFCMToken();
-                          context.go('/home');
-                        } else if (loginState is AsyncError) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text('로그인 실패: ${loginState.error}')),
-                          );
+                          // ✅ 로그인 성공시에만 페이지 이동
+                          if (context.mounted) {
+                            await AlarmRepository().saveFCMToken();
+                            context.go('/home');
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '로그인 실패: ${e.toString().replaceAll('Exception: ', '')}',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.redAccent,
+                              ),
+                            );
+                          }
                         }
                       }
                     : null,
