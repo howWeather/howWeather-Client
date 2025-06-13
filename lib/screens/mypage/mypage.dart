@@ -50,7 +50,9 @@ class _MyPageState extends ConsumerState<MyPage> {
         centerTitle: true,
       ),
       body: profileState.isLoading
-          ? MyPageSkeleton()
+          ? SingleChildScrollView(
+              child: MyPageSkeleton(),
+            )
           : SingleChildScrollView(
               child: Container(
                   padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
