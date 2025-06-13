@@ -53,14 +53,40 @@ class WeatherRepository {
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      final body = utf8.decode(response.bodyBytes);
+      final data = json.decode(body);
       final List list = data['list'];
+
+      // print('=== 전체 날씨 데이터 ===');
+      // print('총 데이터 개수: ${list.length}');
+
+      // 모든 시간별 데이터 출력
+      // for (int i = 0; i < list.length; i++) {
+      //   final item = list[i];
+      //   final dtText = item['dt_txt'];
+      //   final temp = item['main']['temp'];
+      //   final description = item['weather'][0]['description'];
+
+      //   print('[$i] $dtText - ${temp}°C - $description');
+      // }
 
       final now = DateTime.now();
       final tomorrow = now.add(Duration(days: 1));
 
-      final todayOrTomorrowForecast =
-          list.map((item) => HourlyWeather.fromJson(item)).where((weather) {
+      // print('\n=== 현재 시간 정보 ===');
+      // print('현재 시간 (KST): $now');
+      // print('내일 날짜: $tomorrow');
+
+      final allWeatherData =
+          list.map((item) => HourlyWeather.fromJson(item)).toList();
+
+      // print('\n=== 파싱된 HourlyWeather 데이터 ===');
+      // for (int i = 0; i < allWeatherData.length; i++) {
+      //   final weather = allWeatherData[i];
+      //   print('[$i] ${weather.dateTime} - ${weather.temperature}°C');
+      // }
+
+      final todayOrTomorrowForecast = allWeatherData.where((weather) {
         final date = weather.dateTime;
         final hour = date.hour;
 
@@ -74,12 +100,25 @@ class WeatherRepository {
 
         final isDesiredHour = [9, 12, 15, 18, 21].contains(hour);
 
+        // 디버깅 정보 출력
+        // if (isToday || isTomorrow) {
+        //   print(
+        //       '날짜 체크: ${date} -> 오늘: $isToday, 내일: $isTomorrow, 시간: $hour, 원하는시간: $isDesiredHour');
+        // }
+
         return (isToday || isTomorrow) && isDesiredHour;
       }).toList();
 
+      // print('\n=== 필터링된 결과 ===');
+      // print('필터링된 데이터 개수: ${todayOrTomorrowForecast.length}');
+      // for (int i = 0; i < todayOrTomorrowForecast.length; i++) {
+      //   final weather = todayOrTomorrowForecast[i];
+      //   print('[$i] ${weather.dateTime} - ${weather.temperature}°C');
+      // }
+
       return todayOrTomorrowForecast;
     } else {
-      throw Exception('시간별 날씨 데이터를 가져오지 못했습니다.');
+      throw Exception('시간별 날씨 데이터를 가져오지 못했습니다. Status: ${response.statusCode}');
     }
   }
 

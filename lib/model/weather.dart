@@ -37,8 +37,12 @@ class HourlyWeather {
   });
 
   factory HourlyWeather.fromJson(Map<String, dynamic> json) {
+    final dtText = json['dt_txt'] as String;
+    final utcDateTime = DateTime.parse(dtText);
+    final kstDateTime = utcDateTime.add(Duration(hours: 9));
+
     return HourlyWeather(
-      dateTime: DateTime.parse(json['dt_txt']),
+      dateTime: kstDateTime,
       temperature: (json['main']['temp'] as num).toDouble(),
       humidity: (json['main']['humidity'] as num).toDouble(),
       icon: (json['weather'][0]['icon']),
