@@ -21,6 +21,7 @@ class ClosetRepository {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
+      print('옷장 $data');
       return data.map((json) => CategoryCloth.fromJson(json)).toList();
     } else {
       throw Exception('옷장을 불러오는데 실패했습니다: ${response.statusCode}');

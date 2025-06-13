@@ -12,11 +12,21 @@ class ClosetNotifier extends StateNotifier<AsyncValue<List<CategoryCloth>>> {
   }
 
   /// 의류 조회
+  /// 의류 조회
   Future<void> loadClothes() async {
     try {
       final repo = ClosetRepository();
       final clothes = await repo.getAllClothes();
-      state = AsyncValue.data(clothes);
+
+      // 🔥 빈 리스트 체크 (모든 카테고리의 clothList가 비어있는지 확인)
+      final isEmpty = clothes.every((category) => category.clothList.isEmpty);
+
+      if (isEmpty) {
+        state = AsyncValue.error(
+            Exception('아직 등록된 옷이 없습니다.\n새로운 옷을 추가해보세요!'), StackTrace.current);
+      } else {
+        state = AsyncValue.data(clothes);
+      }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

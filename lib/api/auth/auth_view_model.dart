@@ -48,10 +48,11 @@ class AuthViewModel extends StateNotifier<AsyncValue<void>> {
     try {
       final repo = ref.read(authRepositoryProvider);
       await repo.signUp(data);
-
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
+      // 🔥 에러를 UI까지 전파하기 위해 다시 던지기
+      rethrow;
     }
   }
 
@@ -69,6 +70,8 @@ class AuthViewModel extends StateNotifier<AsyncValue<void>> {
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
+      // 🔥 에러를 UI까지 전파하기 위해 다시 던지기
+      rethrow;
     }
   }
 }
