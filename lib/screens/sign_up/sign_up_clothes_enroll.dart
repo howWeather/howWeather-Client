@@ -27,7 +27,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         title: Medium_18px(text: "보유한 의류를 등록해주세요!"),
         centerTitle: true,
-        leading: null,
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
@@ -156,13 +156,14 @@ class SignUpEnrollClothes extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            InkWell(
-              onTap: () {
-                if (!TapThrottler.canTap('signup_clothes')) return;
-                context.push('/');
-              },
-              child: Medium_20px(text: '나중에 등록하기'),
-            ),
+            if (!isAllValid)
+              InkWell(
+                onTap: () {
+                  if (!TapThrottler.canTap('signup_clothes')) return;
+                  context.push('/');
+                },
+                child: Medium_20px(text: '나중에 등록하기'),
+              ),
             Container(
               width: double.maxFinite,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),

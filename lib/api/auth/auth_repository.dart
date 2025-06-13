@@ -56,12 +56,21 @@ class AuthRepository {
       body: jsonEncode(signUp.toJson()),
     );
 
-    if (response.statusCode == 200) {
-      final responseBody = jsonDecode(response.body);
-      return responseBody['success'];
+    final body = utf8.decode(response.bodyBytes);
+    final responseBody = jsonDecode(body);
+
+    // 🔍 디버깅용 로그 추가
+    print('Signup Response Status Code: ${response.statusCode}');
+    print('Signup Response Body: $responseBody');
+
+    if (response.statusCode == 200 && responseBody['success'] == true) {
+      return true;
     } else {
-      print(jsonDecode(response.body)['error']['message']);
-      throw Exception('회원가입 실패: ${response.statusCode}');
+      // success가 false이거나 HTTP 상태코드가 에러인 경우
+      final errorMessage = responseBody['error']?['message'] ??
+          responseBody['message'] ??
+          '회원가입에 실패했습니다.';
+      throw Exception(errorMessage);
     }
   }
 
@@ -72,19 +81,21 @@ class AuthRepository {
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(
-        {
-          "loginId": loginId,
-          "password": password,
-        },
-      ),
+      body: jsonEncode({
+        "loginId": loginId,
+        "password": password,
+      }),
     );
 
     final decodedResponse = utf8.decode(response.bodyBytes);
     final jsonBody = jsonDecode(decodedResponse);
-    if (response.statusCode == 200) {
-      final result = jsonBody['result'];
 
+    // 🔍 디버깅용 로그 추가
+    print('Login Response Status Code: ${response.statusCode}');
+    print('Login Response Body: $jsonBody');
+
+    if (response.statusCode == 200 && jsonBody['success'] == true) {
+      final result = jsonBody['result'];
       final accessToken = result['accessToken'];
       final refreshToken = result['refreshToken'];
 
@@ -100,7 +111,11 @@ class AuthRepository {
         'refreshToken': refreshToken,
       };
     } else {
-      throw ('${jsonBody['error']['message']}');
+      // 에러 메시지 추출
+      final errorMessage = jsonBody['error']?['message'] ??
+          jsonBody['message'] ??
+          '로그인에 실패했습니다.';
+      throw Exception(errorMessage);
     }
   }
 

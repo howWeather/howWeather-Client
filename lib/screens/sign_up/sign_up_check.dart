@@ -53,48 +53,54 @@ class SignUpCheck extends ConsumerWidget {
               height: 32,
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SvgPicture.asset("assets/icons/winter.svg"),
-                SizedBox(
-                  width: 12,
+                SizedBox(width: 12),
+                Expanded(
+                  child: Medium_16px(
+                    text: "데이터가 쌓일수록 AI 추천이 더 정확해져요.",
+                  ),
                 ),
-                Medium_16px(text: "데이터가 쌓일수록 AI 추천이 더 정확해져요."),
               ],
             ),
-            SizedBox(
-              height: 32,
-            ),
+            SizedBox(height: 32),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SvgPicture.asset("assets/icons/rain.svg"),
-                SizedBox(
-                  width: 12,
+                SizedBox(width: 12),
+                Expanded(
+                  child: Medium_16px(
+                    text: "기록이 10개 이상 쌓이면, 딱 맞는 옷차림을 추천해드려요.",
+                  ),
                 ),
-                Medium_16px(text: "기록이 10개 이상 쌓이면, 딱 맞는 옷차림을 추천해드려요."),
               ],
             ),
-            SizedBox(
-              height: 32,
-            ),
+            SizedBox(height: 32),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SvgPicture.asset("assets/icons/moon.svg"),
-                SizedBox(
-                  width: 12,
+                SizedBox(width: 12),
+                Expanded(
+                  child: Medium_16px(
+                    text: "AI는 여러분의 데이터를 학습에 사용합니다.",
+                  ),
                 ),
-                Medium_16px(text: "AI는 여러분의 데이터를 학습에 사용합니다."),
               ],
             ),
-            SizedBox(
-              height: 32,
-            ),
+            SizedBox(height: 32),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SvgPicture.asset("assets/icons/sun.svg"),
-                SizedBox(
-                  width: 12,
+                SizedBox(width: 12),
+                Expanded(
+                  child: Medium_16px(
+                    text: "데이터는 암호화되며 학습 외엔 사용하지 않아요.",
+                  ),
                 ),
-                Medium_16px(text: "데이터는 암호화되며 학습 외엔 사용하지 않아요."),
               ],
             ),
           ],
@@ -110,13 +116,50 @@ class SignUpCheck extends ConsumerWidget {
       onTap: isCheck
           ? () async {
               if (!TapThrottler.canTap('signup_final')) return;
-              await ref
-                  .read(authViewModelProvider.notifier)
-                  .signUpWithFullData(signupData);
-              await ref
-                  .read(authViewModelProvider.notifier)
-                  .login(signupData.loginId, signupData.password);
-              context.push('/signUp/enrollClothes');
+
+              // 🔥 회원가입 처리
+              try {
+                await ref
+                    .read(authViewModelProvider.notifier)
+                    .signUpWithFullData(signupData);
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        e.toString().replaceAll('Exception: ', ''),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
+                return; // 회원가입 실패시 여기서 중단
+              }
+
+              // ✅ 회원가입 성공 후 로그인
+              try {
+                await ref
+                    .read(authViewModelProvider.notifier)
+                    .login(signupData.loginId, signupData.password);
+
+                // ✅ 로그인 성공시에만 페이지 이동
+                if (context.mounted) {
+                  context.push('/signUp/enrollClothes');
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '로그인 실패: ${e.toString().replaceAll('Exception: ', '')}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
+              }
             }
           : null,
       child: Container(
