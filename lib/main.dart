@@ -5,6 +5,7 @@ import 'package:client/model/sign_up.dart';
 import 'package:client/screens/calendar/view.dart';
 import 'package:client/screens/exception/no_internet.dart';
 import 'package:client/screens/exception/no_location_permission.dart';
+import 'package:client/screens/home_widget/home_widget.dart';
 import 'package:client/screens/mypage/change_password.dart';
 import 'package:client/screens/mypage/clothes/clothes_delete.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
@@ -35,6 +36,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' hide Profile;
 
@@ -188,6 +190,8 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
+late ProviderContainer globalContainer;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko_KR', null);
@@ -207,6 +211,8 @@ void main() async {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Foreground 알림 수신: ${message.notification?.title}');
   });
+  globalContainer = ProviderContainer();
+  HomeWidget.registerBackgroundCallback(backgroundCallback);
   runApp(const ProviderScope(child: HowWeather()));
 }
 

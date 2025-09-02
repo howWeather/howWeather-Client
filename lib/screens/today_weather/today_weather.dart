@@ -4,6 +4,7 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/model/weather.dart';
 import 'package:client/api/weather/weather_view_model.dart';
+import 'package:client/screens/home_widget/home_widget.dart';
 import 'package:client/screens/skeleton/weather_skeleton.dart';
 import 'package:client/service/location_service.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -84,43 +85,98 @@ class WeatherScreen extends ConsumerWidget {
           ),
           child: Center(
             child: weatherAsync.when(
-              data: (weather) => Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Semibold_24px(
-                            text: weather.name,
-                            color: HowWeatherColor.white,
+              data: (weather) {
+                updateHomeWidgetWithAllData();
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 50,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Semibold_24px(
+                              text: weather.name,
+                              color: HowWeatherColor.white,
+                            ),
+                            Bold_64px(
+                              text:
+                                  '${weather.temperature.toStringAsFixed(0)}°',
+                              color: HowWeatherColor.white,
+                            ),
+                            Medium_20px(
+                              text: weather.description,
+                              color: HowWeatherColor.white,
+                            ),
+                          ],
+                        ),
+                        Image.network(
+                            scale: 0.8,
+                            'http://openweathermap.org/img/wn/${weather.icon}@2x.png'),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    hourlyWeather.when(
+                      data: (hourlyData) {
+                        return Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: HowWeatherColor.black.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          Bold_64px(
-                            text: '${weather.temperature.toStringAsFixed(0)}°',
-                            color: HowWeatherColor.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Medium_16px(
+                                  text: '오늘의 날씨 예보',
+                                  color: HowWeatherColor.white,
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Divider(
+                                  height: 1,
+                                  color: HowWeatherColor.white.withOpacity(0.5),
+                                ),
+                              ),
+                              HourlyTemperatureChart(hourlyData: hourlyData),
+                            ],
                           ),
-                          Medium_20px(
-                            text: weather.description,
-                            color: HowWeatherColor.white,
-                          ),
-                        ],
+                        );
+                      },
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (e, st) => Container(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            Icon(Icons.error_outline,
+                                color: Colors.white54, size: 48),
+                            SizedBox(height: 8),
+                            Text(
+                              '시간별 날씨를 불러올 수 없습니다',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
                       ),
-                      Image.network(
-                          scale: 0.8,
-                          'http://openweathermap.org/img/wn/${weather.icon}@2x.png'),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  hourlyWeather.when(
-                    data: (hourlyData) {
-                      return Container(
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    dailyForecast.when(
+                      data: (forecastList) => Container(
                         padding:
                             EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                         decoration: BoxDecoration(
@@ -134,7 +190,7 @@ class WeatherScreen extends ConsumerWidget {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Medium_16px(
-                                text: '오늘의 날씨 예보',
+                                text: '주간 날씨 예보',
                                 color: HowWeatherColor.white,
                               ),
                             ),
@@ -146,83 +202,33 @@ class WeatherScreen extends ConsumerWidget {
                                 color: HowWeatherColor.white.withOpacity(0.5),
                               ),
                             ),
-                            HourlyTemperatureChart(hourlyData: hourlyData),
+                            WeeklyForecastList(dailyForecast: forecastList),
                           ],
                         ),
-                      );
-                    },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (e, st) => Container(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Icon(Icons.error_outline,
-                              color: Colors.white54, size: 48),
-                          SizedBox(height: 8),
-                          Text(
-                            '시간별 날씨를 불러올 수 없습니다',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ],
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  dailyForecast.when(
-                    data: (forecastList) => Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: HowWeatherColor.black.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Medium_16px(
-                              text: '주간 날씨 예보',
-                              color: HowWeatherColor.white,
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (e, _) => Container(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            Icon(Icons.error_outline,
+                                color: Colors.white54, size: 48),
+                            SizedBox(height: 8),
+                            Text(
+                              '주간 날씨를 불러올 수 없습니다',
+                              style: TextStyle(color: Colors.white70),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                            child: Divider(
-                              height: 1,
-                              color: HowWeatherColor.white.withOpacity(0.5),
-                            ),
-                          ),
-                          WeeklyForecastList(dailyForecast: forecastList),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Container(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Icon(Icons.error_outline,
-                              color: Colors.white54, size: 48),
-                          SizedBox(height: 8),
-                          Text(
-                            '주간 날씨를 불러올 수 없습니다',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ],
-                      ),
+                    SizedBox(
+                      height: 70,
                     ),
-                  ),
-                  SizedBox(
-                    height: 70,
-                  ),
-                ],
-              ),
+                  ],
+                );
+              },
               // loading: () => Container(
               //   height: MediaQuery.of(context).size.height,
               //   child: Column(

@@ -1,0 +1,116 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_gradient_background"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="--°"
+                android:textColor="#FFFFFF"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:text="맑음"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/widget_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="서울"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/widget_weather_icon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="16dp"
+            android:src="@mipmap/ic_launcher" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_clothing_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/widget_upper_column"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_upper_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="상의"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/widget_upper_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:scaleType="centerCrop" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/widget_outer_column"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_outer_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="아우터"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/widget_outer_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:scaleType="centerCrop" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
