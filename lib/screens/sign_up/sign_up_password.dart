@@ -63,134 +63,139 @@ class SignUpPassword extends ConsumerWidget {
     final checkPassword = ref.watch(checkPasswordProvider);
     final isMatch = ref.watch(isPasswordMatchProvider);
 
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "회원가입"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.pop();
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "회원가입"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.pop();
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 100),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LinearProgressIndicator(
-                value: 0.48,
-                backgroundColor: HowWeatherColor.neutral[200],
-                color: HowWeatherColor.primary[900],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              SizedBox(height: 32),
-              Semibold_24px(text: "비밀번호를 입력해주세요."),
-              SizedBox(height: 60),
-              passwordTextField(ref),
-              SizedBox(
-                height: 12,
-              ),
-              Row(
+          body: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: 100),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SvgPicture.asset(
-                    "assets/icons/check.svg",
-                    color: ref.watch(hasLetterProvider)
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[400],
+                  LinearProgressIndicator(
+                    value: 0.48,
+                    backgroundColor: HowWeatherColor.neutral[200],
+                    color: HowWeatherColor.primary[900],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  SizedBox(height: 32),
+                  Semibold_24px(text: "비밀번호를 입력해주세요."),
+                  SizedBox(height: 60),
+                  passwordTextField(ref),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        "assets/icons/check.svg",
+                        color: ref.watch(hasLetterProvider)
+                            ? HowWeatherColor.primary[900]
+                            : HowWeatherColor.neutral[400],
+                      ),
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Medium_16px(
+                        text: "영문",
+                        color: ref.watch(hasLetterProvider)
+                            ? HowWeatherColor.primary[900]
+                            : HowWeatherColor.neutral[400],
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      SvgPicture.asset(
+                        "assets/icons/check.svg",
+                        color: ref.watch(hasNumberProvider)
+                            ? HowWeatherColor.primary[900]
+                            : HowWeatherColor.neutral[400],
+                      ),
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Medium_16px(
+                        text: "숫자",
+                        color: ref.watch(hasNumberProvider)
+                            ? HowWeatherColor.primary[900]
+                            : HowWeatherColor.neutral[400],
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      SvgPicture.asset(
+                        "assets/icons/check.svg",
+                        color: ref.watch(hasSpecialCharProvider)
+                            ? HowWeatherColor.primary[900]
+                            : HowWeatherColor.neutral[400],
+                      ),
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Medium_16px(
+                        text: "특수문자",
+                        color: ref.watch(hasSpecialCharProvider)
+                            ? HowWeatherColor.primary[900]
+                            : HowWeatherColor.neutral[400],
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      SvgPicture.asset(
+                        "assets/icons/check.svg",
+                        color: ref.watch(isLengthValidProvider)
+                            ? HowWeatherColor.primary[900]
+                            : HowWeatherColor.neutral[400],
+                      ),
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Medium_16px(
+                        text: "8~20자",
+                        color: ref.watch(isLengthValidProvider)
+                            ? HowWeatherColor.primary[900]
+                            : HowWeatherColor.neutral[400],
+                      ),
+                    ],
                   ),
                   SizedBox(
-                    width: 4,
+                    height: 20,
                   ),
-                  Medium_16px(
-                    text: "영문",
-                    color: ref.watch(hasLetterProvider)
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[400],
-                  ),
+                  checkPasswordTextField(ref),
                   SizedBox(
-                    width: 12,
+                    height: 12,
                   ),
-                  SvgPicture.asset(
-                    "assets/icons/check.svg",
-                    color: ref.watch(hasNumberProvider)
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[400],
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Medium_16px(
-                    text: "숫자",
-                    color: ref.watch(hasNumberProvider)
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[400],
-                  ),
-                  SizedBox(
-                    width: 12,
-                  ),
-                  SvgPicture.asset(
-                    "assets/icons/check.svg",
-                    color: ref.watch(hasSpecialCharProvider)
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[400],
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Medium_16px(
-                    text: "특수문자",
-                    color: ref.watch(hasSpecialCharProvider)
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[400],
-                  ),
-                  SizedBox(
-                    width: 12,
-                  ),
-                  SvgPicture.asset(
-                    "assets/icons/check.svg",
-                    color: ref.watch(isLengthValidProvider)
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[400],
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Medium_16px(
-                    text: "8~20자",
-                    color: ref.watch(isLengthValidProvider)
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[400],
-                  ),
+                  if (checkPassword.isNotEmpty && !isMatch)
+                    Medium_16px(
+                      text: "비밀번호가 일치하지 않습니다. 다시 입력해 주세요.",
+                      color: HowWeatherColor.error,
+                    ),
                 ],
               ),
-              SizedBox(
-                height: 20,
-              ),
-              checkPasswordTextField(ref),
-              SizedBox(
-                height: 12,
-              ),
-              if (checkPassword.isNotEmpty && !isMatch)
-                Medium_16px(
-                  text: "비밀번호가 일치하지 않습니다. 다시 입력해 주세요.",
-                  color: HowWeatherColor.error,
-                ),
-            ],
+            ),
           ),
+          bottomSheet: bottomSheetWidget(context, ref),
         ),
       ),
-      bottomSheet: bottomSheetWidget(context, ref),
     );
   }
 

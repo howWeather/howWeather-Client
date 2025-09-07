@@ -67,97 +67,104 @@ class ChangePassword extends ConsumerWidget {
     final checkPassword = ref.watch(checkPasswordProvider);
     final isMatch = ref.watch(isPasswordMatchProvider);
 
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "비밀번호 변경"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.pop();
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "비밀번호 변경"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.pop();
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Semibold_20px(text: "현재 비밀번호를 입력해주세요."),
-              SizedBox(
-                height: 12,
-              ),
-              currentPasswordTextField(ref),
-              SizedBox(
-                height: 12,
-              ),
-              Row(
+          body: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SvgPicture.asset(
-                    'assets/icons/Info.svg',
-                    color: HowWeatherColor.neutral[600],
-                  ),
+                  Semibold_20px(text: "현재 비밀번호를 입력해주세요."),
                   SizedBox(
-                    width: 8,
+                    height: 12,
                   ),
-                  Medium_14px(
-                    text: '비밀번호를 잊으셨나요?',
-                    color: HowWeatherColor.neutral[600],
+                  currentPasswordTextField(ref),
+                  SizedBox(
+                    height: 12,
                   ),
-                  Spacer(),
-                  InkWell(
-                    onTap: () {
-                      context.push('/signIn/findPassword');
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                              color: HowWeatherColor.neutral[500]!, width: 1)),
-                      child: Medium_14px(
-                        text: '비밀번호 찾기',
-                        color: HowWeatherColor.neutral[500],
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/Info.svg',
+                        color: HowWeatherColor.neutral[600],
                       ),
-                    ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Medium_14px(
+                        text: '비밀번호를 잊으셨나요?',
+                        color: HowWeatherColor.neutral[600],
+                      ),
+                      Spacer(),
+                      InkWell(
+                        onTap: () {
+                          context.push('/signIn/findPassword');
+                        },
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: HowWeatherColor.neutral[500]!,
+                                  width: 1)),
+                          child: Medium_14px(
+                            text: '비밀번호 찾기',
+                            color: HowWeatherColor.neutral[500],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  SizedBox(height: 40),
+                  Semibold_20px(text: "변경할 비밀번호를 입력해주세요."),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  passwordTextField(ref),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  validationPassword(ref),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  checkPasswordTextField(ref),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  if (checkPassword.isNotEmpty && !isMatch)
+                    Medium_16px(
+                      text: "비밀번호가 일치하지 않습니다. 다시 입력해 주세요.",
+                      color: HowWeatherColor.error,
+                    ),
                 ],
               ),
-              SizedBox(height: 40),
-              Semibold_20px(text: "변경할 비밀번호를 입력해주세요."),
-              SizedBox(
-                height: 12,
-              ),
-              passwordTextField(ref),
-              SizedBox(
-                height: 12,
-              ),
-              validationPassword(ref),
-              SizedBox(
-                height: 20,
-              ),
-              checkPasswordTextField(ref),
-              SizedBox(
-                height: 12,
-              ),
-              if (checkPassword.isNotEmpty && !isMatch)
-                Medium_16px(
-                  text: "비밀번호가 일치하지 않습니다. 다시 입력해 주세요.",
-                  color: HowWeatherColor.error,
-                ),
-            ],
+            ),
           ),
+          bottomSheet: bottomSheetWidget(context, ref),
         ),
       ),
-      bottomSheet: bottomSheetWidget(context, ref),
     );
   }
 

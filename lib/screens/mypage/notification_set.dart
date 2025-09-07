@@ -19,44 +19,49 @@ class NotificationSet extends ConsumerWidget {
       alarmNotifier.fetchAlarmSettings();
     });
 
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "알림 설정"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.pop();
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
-          ),
-        ),
-      ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Medium_18px(text: "전체 알림"),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Divider(
-                color: HowWeatherColor.primary[900],
-                height: 1,
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "알림 설정"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.pop();
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
               ),
             ),
-            TimeNotification("오전 알림", "오전 9시에 알림이 와요", alarmState.morning,
-                alarmNotifier.toggleMorning),
-            TimeNotification("오후 알림", "오후 2시에 알림이 와요", alarmState.afternoon,
-                alarmNotifier.toggleAfternoon),
-            TimeNotification("저녁 알림", "오후 8시에 알림이 와요", alarmState.evening,
-                alarmNotifier.toggleEvening),
-          ],
+          ),
+          body: Container(
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Medium_18px(text: "전체 알림"),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Divider(
+                    color: HowWeatherColor.primary[900],
+                    height: 1,
+                  ),
+                ),
+                TimeNotification("오전 알림", "오전 9시에 알림이 와요", alarmState.morning,
+                    alarmNotifier.toggleMorning),
+                TimeNotification("오후 알림", "오후 2시에 알림이 와요", alarmState.afternoon,
+                    alarmNotifier.toggleAfternoon),
+                TimeNotification("저녁 알림", "오후 8시에 알림이 와요", alarmState.evening,
+                    alarmNotifier.toggleEvening),
+              ],
+            ),
+          ),
         ),
       ),
     );

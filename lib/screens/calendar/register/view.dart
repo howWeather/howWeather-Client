@@ -22,159 +22,169 @@ class Register extends ConsumerWidget {
     final weatherAsync = ref.watch(weatherByLocationProvider);
     final weather = ref.watch(weatherProvider);
 
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "착장 기록 등록하기"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.pop();
-            context.pop();
-            // 개선된 방식으로 provider 초기화
-            ref.resetClothProviders();
-            ref.read(weatherProvider.notifier).state =
-                const AsyncValue.loading();
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "착장 기록 등록하기"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.pop();
+                context.pop();
+                // 개선된 방식으로 provider 초기화
+                ref.resetClothProviders();
+                ref.read(weatherProvider.notifier).state =
+                    const AsyncValue.loading();
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
+          body: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Semibold_20px(
-                            text: DateFormat('yyyy-MM-dd')
-                                .format(ref.read(selectedDayProvider)!)),
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Semibold_28px(
-                                text: ref.read(selectedTimeProvider) != null
-                                    ? timeSlotToText(
-                                        ref.read(selectedTimeProvider)!)
-                                    : ''),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            weather.when(
-                              data: (temp) => Bold_32px(
-                                  text: '${temp.toStringAsFixed(1)}°'),
-                              loading: () => SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.2,
-                                child: Medium_14px(text: '위치를 선택해주세요.'),
-                              ),
-                              error: (e, _) => SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.2,
-                                child: Medium_14px(text: '위치를 선택해주세요.'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    weatherAsync.when(
-                      data: (weather) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            InkWell(
-                              onTap: () async {
-                                await context.push('/calendar/register/search');
-
-                                ref.read(weatherProvider.notifier).state =
-                                    const AsyncValue.loading();
-                                // 사용자 선택에 따라 온도 조회
-                                ref
-                                    .read(weatherProvider.notifier)
-                                    .fetchTemperature(
-                                      city: ref.watch(addressProvider),
-                                      timeSlot: ref.read(selectedTimeProvider)!,
-                                      date: DateFormat('yyyy-MM-dd').format(
-                                          ref.read(selectedDayProvider)!),
-                                    );
-                              },
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    "assets/icons/locator.svg",
-                                  ),
-                                  Semibold_24px(
-                                    text: ref
-                                                .read(addressProvider.notifier)
-                                                .state !=
-                                            ""
-                                        ? ref.watch(addressProvider)
-                                        : '클릭하여 위치 선택',
-                                    color: HowWeatherColor.black,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
+                            Semibold_20px(
+                                text: DateFormat('yyyy-MM-dd')
+                                    .format(ref.read(selectedDayProvider)!)),
                             Row(
                               children: [
-                                TemperatureButton(1, ref),
-                                SizedBox(width: 8),
-                                TemperatureButton(2, ref),
-                                SizedBox(width: 8),
-                                TemperatureButton(3, ref),
+                                Semibold_28px(
+                                    text: ref.read(selectedTimeProvider) != null
+                                        ? timeSlotToText(
+                                            ref.read(selectedTimeProvider)!)
+                                        : ''),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                weather.when(
+                                  data: (temp) => Bold_32px(
+                                      text: '${temp.toStringAsFixed(1)}°'),
+                                  loading: () => SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.2,
+                                    child: Medium_14px(text: '위치를 선택해주세요.'),
+                                  ),
+                                  error: (e, _) => SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.2,
+                                    child: Medium_14px(text: '위치를 선택해주세요.'),
+                                  ),
+                                ),
                               ],
                             ),
                           ],
-                        );
-                      },
-                      loading: () => CircularProgressIndicator(),
-                      error: (e, _) => Text('에러: $e'),
+                        ),
+                        Spacer(),
+                        weatherAsync.when(
+                          data: (weather) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    await context
+                                        .push('/calendar/register/search');
+
+                                    ref.read(weatherProvider.notifier).state =
+                                        const AsyncValue.loading();
+                                    // 사용자 선택에 따라 온도 조회
+                                    ref
+                                        .read(weatherProvider.notifier)
+                                        .fetchTemperature(
+                                          city: ref.watch(addressProvider),
+                                          timeSlot:
+                                              ref.read(selectedTimeProvider)!,
+                                          date: DateFormat('yyyy-MM-dd').format(
+                                              ref.read(selectedDayProvider)!),
+                                        );
+                                  },
+                                  child: Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/icons/locator.svg",
+                                      ),
+                                      Semibold_24px(
+                                        text: ref
+                                                    .read(addressProvider
+                                                        .notifier)
+                                                    .state !=
+                                                ""
+                                            ? ref.watch(addressProvider)
+                                            : '클릭하여 위치 선택',
+                                        color: HowWeatherColor.black,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 8,
+                                ),
+                                Row(
+                                  children: [
+                                    TemperatureButton(1, ref),
+                                    SizedBox(width: 8),
+                                    TemperatureButton(2, ref),
+                                    SizedBox(width: 8),
+                                    TemperatureButton(3, ref),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                          loading: () => CircularProgressIndicator(),
+                          error: (e, _) => Text('에러: $e'),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildClothWidget(
+                          context,
+                          "상의",
+                          ref,
+                          "uppers",
+                        ),
+                        _buildClothWidget(
+                          context,
+                          "아우터",
+                          ref,
+                          "outers",
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 SizedBox(
-                  height: 12,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildClothWidget(
-                      context,
-                      "상의",
-                      ref,
-                      "uppers",
-                    ),
-                    _buildClothWidget(
-                      context,
-                      "아우터",
-                      ref,
-                      "outers",
-                    ),
-                  ],
+                  height: 60,
                 ),
               ],
             ),
-            SizedBox(
-              height: 60,
-            ),
-          ],
+          ),
+          bottomSheet: _buildBottomSheet(context, ref),
         ),
       ),
-      bottomSheet: _buildBottomSheet(context, ref),
     );
   }
 

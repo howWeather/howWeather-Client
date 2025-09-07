@@ -21,37 +21,42 @@ class SignUpEnrollClothes extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isAllValid = ref.watch(isAllValidProvider);
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "보유한 의류를 등록해주세요!"),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              sectionTitle("상의", "assets/icons/clothes-upper.svg"),
-              const SizedBox(height: 12),
-              buildGrid(context, ref, "uppers", upperMap),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Divider(
-                  color: HowWeatherColor.primary[900],
-                  height: 1,
-                ),
-              ),
-              sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
-              const SizedBox(height: 12),
-              buildGrid(context, ref, "outers", outerMap),
-            ],
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "보유한 의류를 등록해주세요!"),
+            centerTitle: true,
+            automaticallyImplyLeading: false,
           ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  sectionTitle("상의", "assets/icons/clothes-upper.svg"),
+                  const SizedBox(height: 12),
+                  buildGrid(context, ref, "uppers", upperMap),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Divider(
+                      color: HowWeatherColor.primary[900],
+                      height: 1,
+                    ),
+                  ),
+                  sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
+                  const SizedBox(height: 12),
+                  buildGrid(context, ref, "outers", outerMap),
+                ],
+              ),
+            ),
+          ),
+          bottomSheet: bottomSheetWidget(context, isAllValid, ref),
         ),
       ),
-      bottomSheet: bottomSheetWidget(context, isAllValid, ref),
     );
   }
 
