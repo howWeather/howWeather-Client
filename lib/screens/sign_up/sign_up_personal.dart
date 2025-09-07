@@ -253,15 +253,13 @@ class SignUpPersonal extends ConsumerWidget {
   }
 
   int? mapConstitution(int? value) {
-    // 화면 표시 순서: 더위(0), 보통(1), 추위(2)
-    // API 요구: 추위(1), 보통(2), 더위(3)
     switch (value) {
       case 0:
-        return 3;
+        return 1;
       case 1:
         return 2;
       case 2:
-        return 1;
+        return 3;
       default:
         return null;
     }
