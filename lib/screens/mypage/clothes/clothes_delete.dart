@@ -18,53 +18,61 @@ class ClothesDelete extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final clothesAsync = ref.watch(closetProvider);
 
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "의류 삭제"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.pop();
-            ref.resetClothProviders();
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
-          ),
-        ),
-      ),
-      body: clothesAsync.when(
-        data: (clothesData) {
-          final uppers = clothesData.firstWhere((e) => e.category == "uppers");
-          final outers = clothesData.firstWhere((e) => e.category == "outers");
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  sectionTitle("상의", "assets/icons/clothes-upper.svg"),
-                  itemList(context, ref, uppers.clothList, "uppers"),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Divider(
-                      color: HowWeatherColor.primary[900],
-                      height: 1,
-                    ),
-                  ),
-                  sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
-                  itemList(context, ref, outers.clothList, "outers"),
-                ],
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "의류 삭제"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.pop();
+                ref.resetClothProviders();
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
               ),
             ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: NoClothes()),
+          ),
+          body: clothesAsync.when(
+            data: (clothesData) {
+              final uppers =
+                  clothesData.firstWhere((e) => e.category == "uppers");
+              final outers =
+                  clothesData.firstWhere((e) => e.category == "outers");
+
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      sectionTitle("상의", "assets/icons/clothes-upper.svg"),
+                      itemList(context, ref, uppers.clothList, "uppers"),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Divider(
+                          color: HowWeatherColor.primary[900],
+                          height: 1,
+                        ),
+                      ),
+                      sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
+                      itemList(context, ref, outers.clothList, "outers"),
+                    ],
+                  ),
+                ),
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: NoClothes()),
+          ),
+        ),
       ),
     );
   }

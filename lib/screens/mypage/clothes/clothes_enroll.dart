@@ -45,41 +45,46 @@ class ClothesEnroll extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "의류 등록"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () => context.go('/mypage'),
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              sectionTitle("상의", "assets/icons/clothes-upper.svg"),
-              const SizedBox(height: 12),
-              buildGrid(context, ref, "uppers", upperMap),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Divider(
-                  color: HowWeatherColor.primary[900],
-                  height: 1,
-                ),
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "의류 등록"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () => context.go('/mypage'),
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
               ),
-              sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
-              const SizedBox(height: 12),
-              buildGrid(context, ref, "outers", outerMap),
-            ],
+            ),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  sectionTitle("상의", "assets/icons/clothes-upper.svg"),
+                  const SizedBox(height: 12),
+                  buildGrid(context, ref, "uppers", upperMap),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Divider(
+                      color: HowWeatherColor.primary[900],
+                      height: 1,
+                    ),
+                  ),
+                  sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
+                  const SizedBox(height: 12),
+                  buildGrid(context, ref, "outers", outerMap),
+                ],
+              ),
+            ),
           ),
         ),
       ),

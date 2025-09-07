@@ -16,97 +16,102 @@ class SignUpCheck extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "회원가입"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.pop();
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "회원가입"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.pop();
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
+              ),
+            ),
           ),
+          body: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LinearProgressIndicator(
+                  value: 1,
+                  backgroundColor: HowWeatherColor.neutral[200],
+                  color: HowWeatherColor.primary[900],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                SizedBox(
+                  height: 32,
+                ),
+                Semibold_24px(text: "날씨어때의 AI를 소개합니다!"),
+                SizedBox(
+                  height: 32,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SvgPicture.asset("assets/icons/winter.svg"),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Medium_16px(
+                        text: "데이터가 쌓일수록 AI 추천이 더 정확해져요.",
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 32),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SvgPicture.asset("assets/icons/rain.svg"),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Medium_16px(
+                        text: "기록이 10개 이상 쌓이면, 딱 맞는 옷차림을 추천해드려요.",
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 32),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SvgPicture.asset("assets/icons/moon.svg"),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Medium_16px(
+                        text: "AI는 여러분의 데이터를 학습에 사용합니다.",
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 32),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SvgPicture.asset("assets/icons/sun.svg"),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Medium_16px(
+                        text: "데이터는 암호화되며 학습 외엔 사용하지 않아요.",
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          bottomSheet: bottomSheetWidget(context, ref),
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LinearProgressIndicator(
-              value: 1,
-              backgroundColor: HowWeatherColor.neutral[200],
-              color: HowWeatherColor.primary[900],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            SizedBox(
-              height: 32,
-            ),
-            Semibold_24px(text: "날씨어때의 AI를 소개합니다!"),
-            SizedBox(
-              height: 32,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SvgPicture.asset("assets/icons/winter.svg"),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Medium_16px(
-                    text: "데이터가 쌓일수록 AI 추천이 더 정확해져요.",
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 32),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SvgPicture.asset("assets/icons/rain.svg"),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Medium_16px(
-                    text: "기록이 10개 이상 쌓이면, 딱 맞는 옷차림을 추천해드려요.",
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 32),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SvgPicture.asset("assets/icons/moon.svg"),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Medium_16px(
-                    text: "AI는 여러분의 데이터를 학습에 사용합니다.",
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 32),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SvgPicture.asset("assets/icons/sun.svg"),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Medium_16px(
-                    text: "데이터는 암호화되며 학습 외엔 사용하지 않아요.",
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      bottomSheet: bottomSheetWidget(context, ref),
     );
   }
 

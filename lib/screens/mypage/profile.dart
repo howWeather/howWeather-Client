@@ -80,143 +80,154 @@ class Profile extends ConsumerWidget {
       error: (_, __) {},
     );
 
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "프로필"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.go('/mypage');
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "프로필"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.go('/mypage');
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: profileState.when(
-        data: (profile) => Container(
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              titleCard(
-                context,
-                ref,
-                "닉네임",
-                "닉네임 변경",
-                (setState) => changeNickname(ref),
-                () async {
-                  final viewModel = ref.read(mypageViewModelProvider.notifier);
-                  final value = ref.read(nicknameProvider);
-                  await viewModel.updateNickname(value);
-                  // 프로필 상태 새로고침
-                  ref.invalidate(mypageViewModelProvider);
-                },
-              ),
-              ContainerCard(profile?.nickname),
-              SizedBox(
-                height: 8,
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Medium_18px(text: "이메일"),
-              ),
-              Row(
+          body: profileState.when(
+            data: (profile) => Container(
+              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                      flex: 2,
-                      child: ContainerCard(getEmailFront(profile?.email))),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Medium_18px(
-                      text: "@",
-                      color: HowWeatherColor.neutral[200],
-                    ),
+                  titleCard(
+                    context,
+                    ref,
+                    "닉네임",
+                    "닉네임 변경",
+                    (setState) => changeNickname(ref),
+                    () async {
+                      final viewModel =
+                          ref.read(mypageViewModelProvider.notifier);
+                      final value = ref.read(nicknameProvider);
+                      await viewModel.updateNickname(value);
+                      // 프로필 상태 새로고침
+                      ref.invalidate(mypageViewModelProvider);
+                    },
                   ),
-                  Expanded(
-                      flex: 1,
-                      child: ContainerCard(getEmailBack(profile?.email))),
+                  ContainerCard(profile?.nickname),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    child: Medium_18px(text: "이메일"),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 2,
+                          child: ContainerCard(getEmailFront(profile?.email))),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Medium_18px(
+                          text: "@",
+                          color: HowWeatherColor.neutral[200],
+                        ),
+                      ),
+                      Expanded(
+                          flex: 1,
+                          child: ContainerCard(getEmailBack(profile?.email))),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    child: Medium_18px(text: "아이디"),
+                  ),
+                  ContainerCard(profile?.loginId),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  titleCard(
+                    context,
+                    ref,
+                    "체질",
+                    "체질 변경",
+                    (setState) => changeTemperament(),
+                    () async {
+                      final viewModel =
+                          ref.read(mypageViewModelProvider.notifier);
+                      final value =
+                          ref.read(temperamentProvider.notifier).state;
+                      await viewModel
+                          .updateConstitution(value! + 1); // 1부터 시작하므로 +1 추가
+                      // 프로필 상태 새로고침
+                      ref.invalidate(mypageViewModelProvider);
+                    },
+                  ),
+                  ContainerCard(getTemperamentText(profile?.constitution)),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  titleCard(
+                    context,
+                    ref,
+                    "성별",
+                    "성별 변경",
+                    (setState) => changeGender(),
+                    () async {
+                      final viewModel =
+                          ref.read(mypageViewModelProvider.notifier);
+                      final value = ref.read(genderProvider.notifier).state;
+                      await viewModel
+                          .updateGender(value! + 1); // 1부터 시작하므로 +1 추가
+                      // 프로필 상태 새로고침
+                      ref.invalidate(mypageViewModelProvider);
+                    },
+                  ),
+                  ContainerCard(getGenderText(profile?.gender)),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  titleCard(
+                    context,
+                    ref,
+                    "나이",
+                    "나이 변경",
+                    (setState) => changeAge(),
+                    () async {
+                      final viewModel =
+                          ref.read(mypageViewModelProvider.notifier);
+                      final value = ref.read(ageProvider.notifier).state;
+                      await viewModel.updateAge(value!);
+                      // 프로필 상태 새로고침
+                      ref.invalidate(mypageViewModelProvider);
+                    },
+                  ),
+                  ContainerCard(getAgeText(profile?.ageGroup)),
                 ],
               ),
-              SizedBox(
-                height: 8,
+            ),
+            loading: () => Center(
+              child: SizedBox(
+                height: 28,
+                width: 28,
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Medium_18px(text: "아이디"),
-              ),
-              ContainerCard(profile?.loginId),
-              SizedBox(
-                height: 8,
-              ),
-              titleCard(
-                context,
-                ref,
-                "체질",
-                "체질 변경",
-                (setState) => changeTemperament(),
-                () async {
-                  final viewModel = ref.read(mypageViewModelProvider.notifier);
-                  final value = ref.read(temperamentProvider.notifier).state;
-                  await viewModel
-                      .updateConstitution(value! + 1); // 1부터 시작하므로 +1 추가
-                  // 프로필 상태 새로고침
-                  ref.invalidate(mypageViewModelProvider);
-                },
-              ),
-              ContainerCard(getTemperamentText(profile?.constitution)),
-              SizedBox(
-                height: 8,
-              ),
-              titleCard(
-                context,
-                ref,
-                "성별",
-                "성별 변경",
-                (setState) => changeGender(),
-                () async {
-                  final viewModel = ref.read(mypageViewModelProvider.notifier);
-                  final value = ref.read(genderProvider.notifier).state;
-                  await viewModel.updateGender(value! + 1); // 1부터 시작하므로 +1 추가
-                  // 프로필 상태 새로고침
-                  ref.invalidate(mypageViewModelProvider);
-                },
-              ),
-              ContainerCard(getGenderText(profile?.gender)),
-              SizedBox(
-                height: 8,
-              ),
-              titleCard(
-                context,
-                ref,
-                "나이",
-                "나이 변경",
-                (setState) => changeAge(),
-                () async {
-                  final viewModel = ref.read(mypageViewModelProvider.notifier);
-                  final value = ref.read(ageProvider.notifier).state;
-                  await viewModel.updateAge(value!);
-                  // 프로필 상태 새로고침
-                  ref.invalidate(mypageViewModelProvider);
-                },
-              ),
-              ContainerCard(getAgeText(profile?.ageGroup)),
-            ],
+            ),
+            error: (error, _) => Center(child: Text("에러가 발생했습니다: $error")),
           ),
         ),
-        loading: () => Center(
-          child: SizedBox(
-            height: 28,
-            width: 28,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-        error: (error, _) => Center(child: Text("에러가 발생했습니다: $error")),
       ),
     );
   }

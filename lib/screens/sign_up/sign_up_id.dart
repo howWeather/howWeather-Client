@@ -49,151 +49,162 @@ class SignUpId extends ConsumerWidget {
     final isDuplicateCheckEnabled = ref.watch(isDuplicateCheckEnabledProvider);
     final isFormatValid = ref.watch(isIdFormatValidProvider);
 
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "회원가입"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.pop();
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
-          ),
-        ),
-      ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LinearProgressIndicator(
-              value: 0.32,
-              backgroundColor: HowWeatherColor.neutral[200],
-              color: HowWeatherColor.primary[900],
-              borderRadius: BorderRadius.circular(10),
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "회원가입"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.pop();
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
+              ),
             ),
-            SizedBox(height: 32),
-            Semibold_24px(text: "아이디를 입력해주세요."),
-            SizedBox(height: 60),
-            Row(
+          ),
+          body: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: TextFormField(
-                    onChanged: (value) {
-                      ref.read(idProvider.notifier).state = value;
-                      ref.read(duplicateProvider.notifier).state = '';
-                      ref.read(duplicateCheckedProvider.notifier).state = false;
-                    },
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: HowWeatherColor.black,
-                    ),
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: HowWeatherColor.neutral[100]!,
-                          width: 3,
+                LinearProgressIndicator(
+                  value: 0.32,
+                  backgroundColor: HowWeatherColor.neutral[200],
+                  color: HowWeatherColor.primary[900],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                SizedBox(height: 32),
+                Semibold_24px(text: "아이디를 입력해주세요."),
+                SizedBox(height: 60),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        onChanged: (value) {
+                          ref.read(idProvider.notifier).state = value;
+                          ref.read(duplicateProvider.notifier).state = '';
+                          ref.read(duplicateCheckedProvider.notifier).state =
+                              false;
+                        },
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: HowWeatherColor.black,
                         ),
-                      ),
-                      filled: true,
-                      fillColor: HowWeatherColor.neutral[50],
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: HowWeatherColor.neutral[200]!,
-                          width: 3,
-                        ),
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      labelText: "아이디 입력",
-                      labelStyle: TextStyle(
-                        fontFamily: 'Pretendard',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: HowWeatherColor.neutral[200],
-                      ),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                      suffixIcon: isDuplicateCheckEnabled
-                          ? null
-                          : SvgPicture.asset(
-                              isAllValid
-                                  ? "assets/icons/circle-check.svg"
-                                  : "assets/icons/circle-cancel.svg",
-                              fit: BoxFit.scaleDown,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: HowWeatherColor.neutral[100]!,
+                              width: 3,
                             ),
+                          ),
+                          filled: true,
+                          fillColor: HowWeatherColor.neutral[50],
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: HowWeatherColor.neutral[200]!,
+                              width: 3,
+                            ),
+                          ),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          labelText: "아이디 입력",
+                          labelStyle: TextStyle(
+                            fontFamily: 'Pretendard',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: HowWeatherColor.neutral[200],
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                          suffixIcon: isDuplicateCheckEnabled
+                              ? null
+                              : SvgPicture.asset(
+                                  isAllValid
+                                      ? "assets/icons/circle-check.svg"
+                                      : "assets/icons/circle-cancel.svg",
+                                  fit: BoxFit.scaleDown,
+                                ),
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(width: 8),
+                    InkWell(
+                      onTap: isDuplicateCheckEnabled
+                          ? () async {
+                              if (!TapThrottler.canTap('signup_id')) return;
+                              final viewModel =
+                                  ref.read(authViewModelProvider.notifier);
+                              try {
+                                await viewModel
+                                    .verifyloginId(ref.read(idProvider));
+                                ref
+                                    .read(
+                                        isVerificationSuccessProvider.notifier)
+                                    .state = true;
+                                ref
+                                    .read(duplicateCheckedProvider.notifier)
+                                    .state = true;
+                              } catch (_) {
+                                ref
+                                    .read(
+                                        isVerificationSuccessProvider.notifier)
+                                    .state = false;
+                              }
+                            }
+                          : null,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isDuplicateCheckEnabled
+                              ? HowWeatherColor.primary[900]
+                              : HowWeatherColor.neutral[200],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Medium_16px(
+                          text: "중복 확인",
+                          color: HowWeatherColor.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 8),
-                InkWell(
-                  onTap: isDuplicateCheckEnabled
-                      ? () async {
-                          if (!TapThrottler.canTap('signup_id')) return;
-                          final viewModel =
-                              ref.read(authViewModelProvider.notifier);
-                          try {
-                            await viewModel.verifyloginId(ref.read(idProvider));
-                            ref
-                                .read(isVerificationSuccessProvider.notifier)
-                                .state = true;
-                            ref.read(duplicateCheckedProvider.notifier).state =
-                                true;
-                          } catch (_) {
-                            ref
-                                .read(isVerificationSuccessProvider.notifier)
-                                .state = false;
-                          }
-                        }
-                      : null,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isDuplicateCheckEnabled
-                          ? HowWeatherColor.primary[900]
-                          : HowWeatherColor.neutral[200],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Medium_16px(
-                      text: "중복 확인",
-                      color: HowWeatherColor.white,
-                    ),
-                  ),
+                SizedBox(
+                  height: 12,
                 ),
+                if (isFormatValid)
+                  SizedBox()
+                else
+                  Medium_16px(
+                    text: "아이디는 영문, 숫자, 특수문자를 포함할 수 있으며 \n6~20자 이내여야 합니다.",
+                    color: HowWeatherColor.error,
+                  ),
+                if (isDuplicate == 'duplicated')
+                  Medium_16px(
+                    text: "이미 존재하는 아이디입니다.",
+                    color: HowWeatherColor.error,
+                  ),
+                if (isAllValid)
+                  Medium_16px(
+                    text: "사용 가능한 아이디입니다.",
+                    color: HowWeatherColor.primary[900],
+                  ),
               ],
             ),
-            SizedBox(
-              height: 12,
-            ),
-            if (isFormatValid)
-              SizedBox()
-            else
-              Medium_16px(
-                text: "아이디는 영문, 숫자, 특수문자를 포함할 수 있으며 \n6~20자 이내여야 합니다.",
-                color: HowWeatherColor.error,
-              ),
-            if (isDuplicate == 'duplicated')
-              Medium_16px(
-                text: "이미 존재하는 아이디입니다.",
-                color: HowWeatherColor.error,
-              ),
-            if (isAllValid)
-              Medium_16px(
-                text: "사용 가능한 아이디입니다.",
-                color: HowWeatherColor.primary[900],
-              ),
-          ],
+          ),
+          bottomSheet: bottomSheetWidget(context, isAllValid, ref),
         ),
       ),
-      bottomSheet: bottomSheetWidget(context, isAllValid, ref),
     );
   }
 

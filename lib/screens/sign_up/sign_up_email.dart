@@ -24,134 +24,140 @@ class SignUpEmail extends ConsumerWidget {
 
     final isAllValid = ref.watch(isAllValidProvider);
 
-    return Scaffold(
-      backgroundColor: HowWeatherColor.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Medium_18px(text: "회원가입"),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            context.pop();
-          },
-          child: SvgPicture.asset(
-            "assets/icons/chevron-left.svg",
-            fit: BoxFit.scaleDown,
-            height: 20,
-            width: 20,
+    return Container(
+      color: HowWeatherColor.white,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: HowWeatherColor.white,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Medium_18px(text: "회원가입"),
+            centerTitle: true,
+            leading: InkWell(
+              onTap: () {
+                context.pop();
+              },
+              child: SvgPicture.asset(
+                "assets/icons/chevron-left.svg",
+                fit: BoxFit.scaleDown,
+                height: 20,
+                width: 20,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LinearProgressIndicator(
-              value: 0.16,
-              backgroundColor: HowWeatherColor.neutral[200],
-              color: HowWeatherColor.primary[900],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            SizedBox(
-              height: 32,
-            ),
-            Semibold_24px(text: "이메일을 입력해주세요."),
-            SizedBox(
-              height: 60,
-            ),
-            Row(
+          body: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  flex: 2,
-                  child: TextFormField(
-                    onChanged: (value) =>
-                        ref.read(emailIdProvider.notifier).state = value,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: HowWeatherColor.black),
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: HowWeatherColor.neutral[100]!,
-                          width: 3,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: HowWeatherColor.neutral[50],
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: HowWeatherColor.neutral[200]!,
-                          width: 3,
-                        ),
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      labelText: "이메일 입력",
-                      labelStyle: TextStyle(
-                        fontFamily: 'Pretendard',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: HowWeatherColor.neutral[200],
-                      ),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    ),
-                  ),
+                LinearProgressIndicator(
+                  value: 0.16,
+                  backgroundColor: HowWeatherColor.neutral[200],
+                  color: HowWeatherColor.primary[900],
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                Container(
-                    margin: EdgeInsets.symmetric(horizontal: 8),
-                    child: Semibold_20px(
-                      text: "@",
-                      color: HowWeatherColor.neutral[200],
-                    )),
-                Expanded(
-                  flex: 1,
-                  child: TextFormField(
-                    onChanged: (value) =>
-                        ref.read(emailDomainProvider.notifier).state = value,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: HowWeatherColor.black),
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: HowWeatherColor.neutral[100]!,
-                          width: 3,
+                SizedBox(
+                  height: 32,
+                ),
+                Semibold_24px(text: "이메일을 입력해주세요."),
+                SizedBox(
+                  height: 60,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextFormField(
+                        onChanged: (value) =>
+                            ref.read(emailIdProvider.notifier).state = value,
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: HowWeatherColor.black),
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: HowWeatherColor.neutral[100]!,
+                              width: 3,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: HowWeatherColor.neutral[50],
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: HowWeatherColor.neutral[200]!,
+                              width: 3,
+                            ),
+                          ),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          labelText: "이메일 입력",
+                          labelStyle: TextStyle(
+                            fontFamily: 'Pretendard',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: HowWeatherColor.neutral[200],
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
                         ),
                       ),
-                      filled: true,
-                      fillColor: HowWeatherColor.neutral[50],
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: HowWeatherColor.neutral[200]!,
-                          width: 3,
-                        ),
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      labelText: "선택",
-                      labelStyle: TextStyle(
-                        fontFamily: 'Pretendard',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: HowWeatherColor.neutral[200],
-                      ),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     ),
-                  ),
+                    Container(
+                        margin: EdgeInsets.symmetric(horizontal: 8),
+                        child: Semibold_20px(
+                          text: "@",
+                          color: HowWeatherColor.neutral[200],
+                        )),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        onChanged: (value) => ref
+                            .read(emailDomainProvider.notifier)
+                            .state = value,
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: HowWeatherColor.black),
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: HowWeatherColor.neutral[100]!,
+                              width: 3,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: HowWeatherColor.neutral[50],
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: HowWeatherColor.neutral[200]!,
+                              width: 3,
+                            ),
+                          ),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          labelText: "선택",
+                          labelStyle: TextStyle(
+                            fontFamily: 'Pretendard',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: HowWeatherColor.neutral[200],
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
+          bottomSheet: bottomSheetWidget(context, isAllValid, ref),
         ),
       ),
-      bottomSheet: bottomSheetWidget(context, isAllValid, ref),
     );
   }
 

@@ -35,7 +35,8 @@ class _HowWeatherNaviShellState extends State<HowWeatherNaviShell> {
     return Scaffold(
       body: widget.child,
       // 기존 bottomNavigationBar 대신 커스텀 위젯 사용
-      bottomNavigationBar: _buildRoundedBottomNavigationBar(selectedIndex),
+      bottomNavigationBar:
+          SafeArea(child: _buildRoundedBottomNavigationBar(selectedIndex)),
       extendBody: true, // 중요: 본문이 네비바 뒤로 확장되도록 설정
     );
   }
