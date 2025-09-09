@@ -5,6 +5,8 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/api/weather/weather_view_model.dart';
 import 'package:client/providers/calendar_providers.dart';
+import 'package:client/providers/cloth_providers.dart';
+import 'package:client/providers/location_provider.dart';
 import 'package:client/screens/skeleton/calendar_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -718,9 +720,23 @@ Widget historyDialog(BuildContext context, WidgetRef ref) {
             Expanded(
               child: GestureDetector(
                 onTap: isRegisterEnabled
-                    ? () {
+                    ? () async {
                         context.push('/calendar/register');
+
+                        ref.read(addressProvider.notifier).state = "";
                         ref.read(closetProvider.notifier).loadClothes();
+                        // 위치 기반 데이터 로딩
+                        final selectedTime = ref.read(selectedTimeProvider);
+                        final selectedDay = ref.read(selectedDayProvider);
+                        if (selectedTime != null && selectedDay != null) {
+                          await ref
+                              .read(locationViewModelProvider.notifier)
+                              .fetchLocationTemperature(
+                                timeSlot: selectedTime,
+                                date: DateFormat('yyyy-MM-dd')
+                                    .format(selectedDay),
+                              );
+                        }
                       }
                     : null,
                 child: Container(

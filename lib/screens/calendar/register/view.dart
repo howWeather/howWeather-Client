@@ -6,6 +6,7 @@ import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
 import 'package:client/providers/calendar_providers.dart';
 import 'package:client/providers/cloth_providers.dart';
+import 'package:client/providers/location_provider.dart';
 import 'package:client/screens/calendar/view.dart';
 import 'package:client/api/weather/weather_view_model.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class Register extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final weatherAsync = ref.watch(weatherByLocationProvider);
     final weather = ref.watch(weatherProvider);
+    final locationWeather = ref.watch(locationViewModelProvider);
 
     return Container(
       color: HowWeatherColor.white,
@@ -65,7 +67,7 @@ class Register extends ConsumerWidget {
                                     .format(ref.read(selectedDayProvider)!)),
                             Row(
                               children: [
-                                Semibold_28px(
+                                Bold_24px(
                                     text: ref.read(selectedTimeProvider) != null
                                         ? timeSlotToText(
                                             ref.read(selectedTimeProvider)!)
@@ -73,20 +75,7 @@ class Register extends ConsumerWidget {
                                 SizedBox(
                                   width: 8,
                                 ),
-                                weather.when(
-                                  data: (temp) => Bold_32px(
-                                      text: '${temp.toStringAsFixed(1)}°'),
-                                  loading: () => SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.2,
-                                    child: Medium_14px(text: '위치를 선택해주세요.'),
-                                  ),
-                                  error: (e, _) => SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.2,
-                                    child: Medium_14px(text: '위치를 선택해주세요.'),
-                                  ),
-                                ),
+                                buildTemperatureDisplay(ref),
                               ],
                             ),
                           ],
@@ -102,18 +91,25 @@ class Register extends ConsumerWidget {
                                     await context
                                         .push('/calendar/register/search');
 
-                                    ref.read(weatherProvider.notifier).state =
-                                        const AsyncValue.loading();
-                                    // 사용자 선택에 따라 온도 조회
-                                    ref
-                                        .read(weatherProvider.notifier)
-                                        .fetchTemperature(
-                                          city: ref.watch(addressProvider),
-                                          timeSlot:
-                                              ref.read(selectedTimeProvider)!,
-                                          date: DateFormat('yyyy-MM-dd').format(
-                                              ref.read(selectedDayProvider)!),
-                                        );
+                                    // 위치가 선택되었는지 확인
+                                    final selectedAddress =
+                                        ref.read(addressProvider);
+                                    if (selectedAddress.isNotEmpty) {
+                                      ref.read(weatherProvider.notifier).state =
+                                          const AsyncValue.loading();
+
+                                      // 선택된 위치의 온도 조회
+                                      ref
+                                          .read(weatherProvider.notifier)
+                                          .fetchTemperature(
+                                            city: selectedAddress,
+                                            timeSlot:
+                                                ref.read(selectedTimeProvider)!,
+                                            date: DateFormat('yyyy-MM-dd')
+                                                .format(ref.read(
+                                                    selectedDayProvider)!),
+                                          );
+                                    }
                                   },
                                   child: Row(
                                     children: [
@@ -188,6 +184,46 @@ class Register extends ConsumerWidget {
     );
   }
 
+  // Register 위젯 안에서 온도 표시 부분
+  Widget buildTemperatureDisplay(WidgetRef ref) {
+    final locationWeather = ref.watch(locationViewModelProvider);
+    final weather = ref.watch(weatherProvider);
+    final selectedAddress = ref.watch(addressProvider);
+    final isUserSelectedLocation =
+        weather.hasValue && selectedAddress.isNotEmpty;
+
+    if (isUserSelectedLocation) {
+      return weather.when(
+        data: (temp) => Bold_24px(text: '${temp.toStringAsFixed(1)}°'),
+        loading: () => SizedBox(
+          width: 50,
+          child: Medium_14px(text: '로딩중...'),
+        ),
+        error: (e, _) => SizedBox(
+          width: 50,
+          child: Medium_14px(text: '오류'),
+        ),
+      );
+    } else {
+      return locationWeather.when(
+        data: (locationTemp) {
+          if (locationTemp == null) {
+            return Medium_14px(text: 'null');
+          }
+          return Bold_24px(
+            text: '${locationTemp.temperature.toStringAsFixed(1)}°',
+          );
+        },
+        loading: () {
+          return Medium_14px(text: '...');
+        },
+        error: (e, _) {
+          return Medium_14px(text: '실패');
+        },
+      );
+    }
+  }
+
   Widget _buildBottomSheet(BuildContext context, WidgetRef ref) {
     final isAllValidProvider = Provider<bool>((ref) {
       final temperature = ref.watch(selectedTemperatureProvider);
@@ -260,6 +296,8 @@ class Register extends ConsumerWidget {
     }
 
     try {
+      final selectedCity = ref.read(addressProvider);
+
       final upperList = ref.read(registerUpperProvider);
       final outerList = ref.read(registerOuterProvider);
 
@@ -269,7 +307,7 @@ class Register extends ConsumerWidget {
             date: DateFormat('yyyy-MM-dd').format(selectedDay),
             uppers: upperList.map((e) => e.clothId).toList(),
             outers: outerList.map((e) => e.clothId).toList(),
-            city: ref.read(addressProvider),
+            city: selectedCity,
           );
 
       await Future.delayed(const Duration(milliseconds: 1500));

@@ -1,12 +1,15 @@
 import 'package:client/api/weather/weather_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/providers/calendar_providers.dart';
 import 'package:client/providers/cloth_providers.dart';
+import 'package:client/providers/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/screens/calendar/register/view.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class AddressSearchPage extends ConsumerStatefulWidget {
   const AddressSearchPage({super.key});
@@ -353,9 +356,11 @@ class _AddressSearchPageState extends ConsumerState<AddressSearchPage> {
                   itemBuilder: (context, index) => ListTile(
                     title: Text(_filteredAddresses[index]),
                     onTap: () {
+                      // 주소 설정
                       ref.read(addressProvider.notifier).state =
                           _filteredAddresses[index];
 
+                      // 페이지 닫기 - 이후 Register 페이지의 onTap이 실행됩니다
                       Navigator.pop(context);
                     },
                   ),
