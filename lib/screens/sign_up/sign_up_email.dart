@@ -12,7 +12,6 @@ class SignUpEmail extends ConsumerWidget {
 
   final emailIdProvider = StateProvider<String>((ref) => '');
   final emailDomainProvider = StateProvider<String>((ref) => '');
-  final isVerificationSuccessProvider = StateProvider<bool>((ref) => false);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,6 +29,7 @@ class SignUpEmail extends ConsumerWidget {
         child: Scaffold(
           backgroundColor: HowWeatherColor.white,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             backgroundColor: Colors.transparent,
             title: Medium_18px(text: "회원가입"),
             centerTitle: true,
@@ -161,7 +161,8 @@ class SignUpEmail extends ConsumerWidget {
     );
   }
 
-  Widget bottomSheetWidget(BuildContext context, isAllValid, WidgetRef ref) {
+  Widget bottomSheetWidget(
+      BuildContext context, bool isAllValid, WidgetRef ref) {
     return GestureDetector(
       onTap: isAllValid
           ? () async {
@@ -169,15 +170,17 @@ class SignUpEmail extends ConsumerWidget {
               final email =
                   '${ref.read(emailIdProvider)}@${ref.read(emailDomainProvider)}';
               try {
-                await viewModel.verifyEmail(
-                  email,
+                await viewModel.verifyEmail(email);
+                final signupData = SignupData(email: email);
+                context.push('/signUp/email/check', extra: signupData);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('이메일 중복 검증 실패: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                  ),
                 );
-                ref.read(isVerificationSuccessProvider.notifier).state = true;
-              } catch (_) {
-                ref.read(isVerificationSuccessProvider.notifier).state = false;
               }
-              final signupData = SignupData(email: email);
-              context.push('/signUp/id', extra: signupData);
             }
           : null,
       child: Container(

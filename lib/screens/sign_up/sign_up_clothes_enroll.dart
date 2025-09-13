@@ -27,6 +27,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
         child: Scaffold(
           backgroundColor: HowWeatherColor.white,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             backgroundColor: Colors.transparent,
             title: Medium_18px(text: "보유한 의류를 등록해주세요!"),
             centerTitle: true,

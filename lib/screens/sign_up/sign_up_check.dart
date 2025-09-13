@@ -22,6 +22,7 @@ class SignUpCheck extends ConsumerWidget {
         child: Scaffold(
           backgroundColor: HowWeatherColor.white,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             backgroundColor: Colors.transparent,
             title: Medium_18px(text: "회원가입"),
             centerTitle: true,
