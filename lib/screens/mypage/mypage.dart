@@ -41,6 +41,7 @@ class _MyPageState extends ConsumerState<MyPage> {
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: HowWeatherColor.white,
         surfaceTintColor: Colors.transparent,
         title: Bold_22px(
@@ -53,263 +54,263 @@ class _MyPageState extends ConsumerState<MyPage> {
           ? SingleChildScrollView(
               child: MyPageSkeleton(),
             )
-          : SingleChildScrollView(
-              child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: () async {
-                          await context.push('/mypage/profile');
-                          ref
-                              .read(mypageViewModelProvider.notifier)
-                              .loadProfile();
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            profileState.when(
-                              data: (profile) => Semibold_24px(
-                                  text: profile?.nickname ?? "닉네임 없음"),
-                              loading: () => const SizedBox(
-                                height: 28,
-                                width: 28,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
+          : SafeArea(
+              child: SingleChildScrollView(
+                child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            await context.push('/mypage/profile');
+                            ref
+                                .read(mypageViewModelProvider.notifier)
+                                .loadProfile();
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              profileState.when(
+                                data: (profile) => Semibold_24px(
+                                    text: profile?.nickname ?? "닉네임 없음"),
+                                loading: () => const SizedBox(
+                                  height: 28,
+                                  width: 28,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                                error: (error, _) => Text("에러"),
                               ),
-                              error: (error, _) => Text("에러"),
+                              SvgPicture.asset(
+                                  "assets/icons/chevron-right.svg"),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Divider(
+                            color: HowWeatherColor.primary[900],
+                            height: 1,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            SvgPicture.asset("assets/icons/closet.svg"),
+                            SizedBox(
+                              width: 8,
                             ),
-                            SvgPicture.asset("assets/icons/chevron-right.svg"),
+                            Semibold_20px(text: "나의 옷장"),
                           ],
                         ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 24),
-                        child: Divider(
-                          color: HowWeatherColor.primary[900],
+                        SizedBox(
+                          height: 8,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            context.push('/mypage/clothes/view');
+                            ref.read(closetProvider.notifier).loadClothes();
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            child: Medium_18px(
+                              text: "의류 조회",
+                              color: HowWeatherColor.neutral[600],
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          color: HowWeatherColor.neutral[200],
                           height: 1,
                         ),
-                      ),
-                      Row(
-                        children: [
-                          SvgPicture.asset("assets/icons/closet.svg"),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Semibold_20px(text: "나의 옷장"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          context.push('/mypage/clothes/view');
-                          ref.read(closetProvider.notifier).loadClothes();
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Medium_18px(
-                            text: "의류 조회",
-                            color: HowWeatherColor.neutral[600],
+                        InkWell(
+                          onTap: () {
+                            context.push('/mypage/clothes/delete');
+                            ref.read(closetProvider.notifier).loadClothes();
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            child: Medium_18px(
+                              text: "의류 삭제",
+                              color: HowWeatherColor.neutral[600],
+                            ),
                           ),
                         ),
-                      ),
-                      Divider(
-                        color: HowWeatherColor.neutral[200],
-                        height: 1,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          context.push('/mypage/clothes/delete');
-                          ref.read(closetProvider.notifier).loadClothes();
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Medium_18px(
-                            text: "의류 삭제",
-                            color: HowWeatherColor.neutral[600],
-                          ),
-                        ),
-                      ),
-                      Divider(
-                        color: HowWeatherColor.neutral[200],
-                        height: 1,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          context.push('/mypage/clothes/enroll');
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Medium_18px(
-                            text: "의류 등록",
-                            color: HowWeatherColor.neutral[600],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 24),
-                        child: Divider(
-                          color: HowWeatherColor.primary[900],
+                        Divider(
+                          color: HowWeatherColor.neutral[200],
                           height: 1,
                         ),
-                      ),
-                      Row(
-                        children: [
-                          SvgPicture.asset("assets/icons/setting.svg"),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Semibold_20px(text: "설정"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          context.push('/mypage/notification');
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Medium_18px(
-                            text: "알림 설정",
-                            color: HowWeatherColor.neutral[600],
-                          ),
-                        ),
-                      ),
-                      Divider(
-                        color: HowWeatherColor.neutral[200],
-                        height: 1,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          context.push('/mypage/version');
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Medium_18px(
-                            text: "버전 정보",
-                            color: HowWeatherColor.neutral[600],
-                          ),
-                        ),
-                      ),
-                      Divider(
-                        color: HowWeatherColor.neutral[200],
-                        height: 1,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          context.push('/mypage/changePassword');
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Medium_18px(
-                            text: "비밀번호 변경",
-                            color: HowWeatherColor.neutral[600],
-                          ),
-                        ),
-                      ),
-                      Divider(
-                        color: HowWeatherColor.neutral[200],
-                        height: 1,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          if (!TapThrottler.canTap('dialog_confirm')) return;
-                          showDialog(
-                            context: context,
-                            builder: (context) => HowWeatherDialog(
-                              titleText: "로그아웃",
-                              contentText: "로그아웃하시겠습니까?",
-                              done: () async {
-                                if (!TapThrottler.canTap('logout')) return;
-                                await AlarmRepository().deleteFCMToken();
-                                await AuthRepository().logout();
-                                ref.read(closetProvider.notifier).state =
-                                    const AsyncLoading();
-                                ref.resetClothProviders();
-                                ref
-                                    .read(mypageViewModelProvider.notifier)
-                                    .state = const AsyncLoading();
-                                ref.resetCalendarProviders();
-                                ref.invalidate(recordedDaysProvider);
-                                ref.invalidate(similarDaysProvider);
-                                ref.invalidate(weatherByLocationProvider);
-                                ref.invalidate(recordViewModelProvider);
-                                context.go('/');
-                              },
+                        InkWell(
+                          onTap: () {
+                            context.push('/mypage/clothes/enroll');
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            child: Medium_18px(
+                              text: "의류 등록",
+                              color: HowWeatherColor.neutral[600],
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Medium_18px(
-                            text: "로그아웃",
-                            color: HowWeatherColor.neutral[600],
                           ),
                         ),
-                      ),
-                      Divider(
-                        color: HowWeatherColor.neutral[200],
-                        height: 1,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          if (!TapThrottler.canTap('dialog_confirm')) return;
-                          showDialog(
-                            context: context,
-                            builder: (context) => HowWeatherDialog(
-                              titleText: "탈퇴",
-                              contentText: "탈퇴하시겠습니까?\n모든 기록이 사라집니다.",
-                              done: () async {
-                                if (!TapThrottler.canTap('withdraw')) return;
-                                await AuthRepository().withdraw();
-                                ref.resetClothProviders();
-                                ref
-                                    .read(mypageViewModelProvider.notifier)
-                                    .state = const AsyncLoading();
-                                ref.resetCalendarProviders();
-                                ref.invalidate(recordedDaysProvider);
-                                ref.invalidate(similarDaysProvider);
-                                ref.invalidate(weatherByLocationProvider);
-                                ref.invalidate(recordViewModelProvider);
-                                context.go('/');
-                              },
+                        Container(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Divider(
+                            color: HowWeatherColor.primary[900],
+                            height: 1,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            SvgPicture.asset("assets/icons/setting.svg"),
+                            SizedBox(
+                              width: 8,
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                          child: Medium_18px(
-                            text: "탈퇴",
-                            color: HowWeatherColor.neutral[600],
+                            Semibold_20px(text: "설정"),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            context.push('/mypage/notification');
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            child: Medium_18px(
+                              text: "알림 설정",
+                              color: HowWeatherColor.neutral[600],
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 70,
-                      ),
-                    ],
-                  )),
+                        Divider(
+                          color: HowWeatherColor.neutral[200],
+                          height: 1,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            context.push('/mypage/version');
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            child: Medium_18px(
+                              text: "버전 정보",
+                              color: HowWeatherColor.neutral[600],
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          color: HowWeatherColor.neutral[200],
+                          height: 1,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            context.push('/mypage/changePassword');
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            child: Medium_18px(
+                              text: "비밀번호 변경",
+                              color: HowWeatherColor.neutral[600],
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          color: HowWeatherColor.neutral[200],
+                          height: 1,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            if (!TapThrottler.canTap('dialog_confirm')) return;
+                            showDialog(
+                              context: context,
+                              builder: (context) => HowWeatherDialog(
+                                titleText: "로그아웃",
+                                contentText: "로그아웃하시겠습니까?",
+                                done: () async {
+                                  if (!TapThrottler.canTap('logout')) return;
+                                  await AlarmRepository().deleteFCMToken();
+                                  await AuthRepository().logout();
+                                  ref.read(closetProvider.notifier).state =
+                                      const AsyncLoading();
+                                  ref.resetClothProviders();
+                                  ref
+                                      .read(mypageViewModelProvider.notifier)
+                                      .state = const AsyncLoading();
+                                  ref.resetCalendarProviders();
+                                  ref.invalidate(recordedDaysProvider);
+                                  ref.invalidate(similarDaysProvider);
+                                  ref.invalidate(weatherByLocationProvider);
+                                  ref.invalidate(recordViewModelProvider);
+                                  context.go('/');
+                                },
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            child: Medium_18px(
+                              text: "로그아웃",
+                              color: HowWeatherColor.neutral[600],
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          color: HowWeatherColor.neutral[200],
+                          height: 1,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            if (!TapThrottler.canTap('dialog_confirm')) return;
+                            showDialog(
+                              context: context,
+                              builder: (context) => HowWeatherDialog(
+                                titleText: "탈퇴",
+                                contentText: "탈퇴하시겠습니까?\n모든 기록이 사라집니다.",
+                                done: () async {
+                                  if (!TapThrottler.canTap('withdraw')) return;
+                                  await AuthRepository().withdraw();
+                                  ref.resetClothProviders();
+                                  ref
+                                      .read(mypageViewModelProvider.notifier)
+                                      .state = const AsyncLoading();
+                                  ref.resetCalendarProviders();
+                                  ref.invalidate(recordedDaysProvider);
+                                  ref.invalidate(similarDaysProvider);
+                                  ref.invalidate(weatherByLocationProvider);
+                                  ref.invalidate(recordViewModelProvider);
+                                  context.go('/');
+                                },
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 8),
+                            child: Medium_18px(
+                              text: "탈퇴",
+                              color: HowWeatherColor.neutral[600],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+              ),
             ),
     );
   }
