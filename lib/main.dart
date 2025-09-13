@@ -27,6 +27,7 @@ import 'package:client/screens/sign_up/sign_up_password.dart';
 import 'package:client/screens/sign_up/sign_up_personal.dart';
 import 'package:client/screens/sign_up/sign_up_clothes_enroll.dart';
 import 'package:client/screens/splash/splash.dart';
+import 'package:client/screens/today_wear/location_search.dart';
 import 'package:client/screens/today_wear/today_wear.dart';
 import 'package:client/screens/today_weather/today_weather.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -117,6 +118,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signUp/enrollClothes',
         builder: (context, state) => SignUpEnrollClothes(),
+      ),
+      GoRoute(
+        path: '/location-search',
+        builder: (context, state) => const LocationSelectionPage(),
       ),
       GoRoute(
         path: '/calendar/register',

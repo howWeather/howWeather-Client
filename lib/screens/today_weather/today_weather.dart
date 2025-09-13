@@ -58,19 +58,23 @@ class WeatherScreen extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
-          SvgPicture.asset(
-            'assets/icons/bell.svg',
-            color: HowWeatherColor.white,
-          ),
-          SizedBox(
-            width: 8,
-          ),
-          SvgPicture.asset('assets/icons/settings.svg'),
-          SizedBox(
-            width: 24,
-          ),
+          // SvgPicture.asset(
+          //   'assets/icons/bell.svg',
+          //   color: HowWeatherColor.white,
+          // ),
+          // SizedBox(
+          //   width: 8,
+          // ),
+          // GestureDetector(
+          //   child: SvgPicture.asset('assets/icons/settings.svg'),
+          //   onTap: () => context.push('/home/location'),
+          // ),
+          // SizedBox(
+          //   width: 24,
+          // ),
         ],
       ),
       body: SingleChildScrollView(
@@ -224,7 +228,7 @@ class WeatherScreen extends ConsumerWidget {
                       ),
                     ),
                     SizedBox(
-                      height: 70,
+                      height: MediaQuery.of(context).size.height * 0.15,
                     ),
                   ],
                 );
