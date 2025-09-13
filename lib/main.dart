@@ -21,6 +21,7 @@ import 'package:client/screens/sign_in/find_password/send_email.dart';
 import 'package:client/screens/sign_in/sign_in.dart';
 import 'package:client/screens/sign_up/sign_up_check.dart';
 import 'package:client/screens/sign_up/sign_up_email.dart';
+import 'package:client/screens/sign_up/sign_up_email_check.dart';
 import 'package:client/screens/sign_up/sign_up_id.dart';
 import 'package:client/screens/sign_up/sign_up_nickname.dart';
 import 'package:client/screens/sign_up/sign_up_password.dart';
@@ -79,6 +80,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signUp/email',
         builder: (context, state) => SignUpEmail(),
+      ),
+      GoRoute(
+        path: '/signUp/email/check',
+        builder: (context, state) {
+          final signupData = state.extra as SignupData;
+          return SignUpEmailCheck(signupData: signupData);
+        },
       ),
       GoRoute(
         path: '/signUp/id',

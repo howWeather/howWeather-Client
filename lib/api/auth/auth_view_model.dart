@@ -27,6 +27,32 @@ class AuthViewModel extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  /// 이메일 인증 코드 요청
+  Future<String> requestEmailVerificationCode(String email) async {
+    final repo = ref.read(authRepositoryProvider);
+    try {
+      final result = await repo.requestEmailVerificationCode(email);
+      print('✅ 이메일 인증 코드 요청 성공: $result');
+      return result;
+    } catch (e) {
+      print('❌ 이메일 인증 코드 요청 실패: $e');
+      throw e;
+    }
+  }
+
+  /// 이메일 인증 코드 검증
+  Future<String> verifyEmailCode(String email, String code) async {
+    final repo = ref.read(authRepositoryProvider);
+    try {
+      final result = await repo.verifyEmailCode(email, code);
+      print('✅ 이메일 인증 코드 검증 성공: $result');
+      return result;
+    } catch (e) {
+      print('❌ 이메일 인증 코드 검증 실패: $e');
+      throw e;
+    }
+  }
+
   /// 아이디 중복 검증
   Future<void> verifyloginId(String loginId) async {
     final repo = ref.read(authRepositoryProvider);

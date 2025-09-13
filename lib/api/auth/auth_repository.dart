@@ -21,9 +21,66 @@ class AuthRepository {
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       return responseBody['success'];
+    } else if (response.statusCode == 409) {
+      throw '중복된 이메일입니다.';
     } else {
       print(jsonDecode(response.body)['error']['message']);
       throw Exception('이메일 중복 검증 실패: ${response.statusCode}');
+    }
+  }
+
+  /// 이메일 인증 코드 요청
+  Future<String> requestEmailVerificationCode(String email) async {
+    final url = Uri.parse('$_baseUrl/email/code');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+
+    final decodedResponse = utf8.decode(response.bodyBytes);
+    final responseBody = jsonDecode(decodedResponse);
+
+    print('Email Code Request Status Code: ${response.statusCode}');
+    print('Email Code Request Body: $responseBody');
+
+    if (response.statusCode == 200 && responseBody['success'] == true) {
+      return responseBody['result'];
+    } else {
+      final errorMessage = responseBody['error']?['message'] ??
+          responseBody['message'] ??
+          '인증 코드 요청에 실패했습니다.';
+      throw Exception(errorMessage);
+    }
+  }
+
+  /// 이메일 인증 코드 검증
+  Future<String> verifyEmailCode(String email, String code) async {
+    final url = Uri.parse('$_baseUrl/email/verify');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'code': code,
+      }),
+    );
+
+    final decodedResponse = utf8.decode(response.bodyBytes);
+    final responseBody = jsonDecode(decodedResponse);
+
+    print('Email Code Verify Status Code: ${response.statusCode}');
+    print('Email Code Verify Body: $responseBody');
+
+    if (response.statusCode == 200 && responseBody['success'] == true) {
+      return responseBody['result'];
+    } else {
+      final errorMessage = responseBody['error']?['message'] ??
+          responseBody['message'] ??
+          '이메일 인증에 실패했습니다.';
+      throw Exception(errorMessage);
     }
   }
 
