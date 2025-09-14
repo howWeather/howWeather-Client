@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:client/api/network/network_provider.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_navi.dart';
@@ -213,19 +215,30 @@ void main() async {
   KakaoSdk.init(
     nativeAppKey: dotenv.env['KAKAO_API_KEY'],
   );
-  // ✅ 중복 초기화 방지
+
+  // Firebase 초기화
   if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp();
   }
+
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-  // 알림 권한 요청 (iOS 필수)
-  await messaging.requestPermission(alert: true, badge: true, sound: true);
-  // 포그라운드 메시지 수신
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Foreground 알림 수신: ${message.notification?.title}');
-  });
+
+// ✅ iOS에서는 알림 권한 요청 스킵
+  if (!Platform.isIOS) {
+    await messaging.requestPermission(alert: true, badge: true, sound: true);
+
+    // 포그라운드 메시지 수신
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Foreground 알림 수신: ${message.notification?.title}');
+    });
+  } else {
+    print('iOS에서는 알림 권한 요청 건너뜀1');
+  }
+
   globalContainer = ProviderContainer();
-  HomeWidget.registerBackgroundCallback(backgroundCallback);
+  if (Platform.isAndroid) {
+    HomeWidget.registerBackgroundCallback(backgroundCallback);
+  }
   runApp(const ProviderScope(child: HowWeather()));
 }
 
