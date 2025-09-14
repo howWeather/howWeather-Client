@@ -1,6 +1,7 @@
 import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:client/api/record/record_view_model.dart';
+import 'package:client/designs/button.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/api/weather/weather_view_model.dart';
@@ -149,34 +150,33 @@ class _CalendarState extends ConsumerState<Calendar> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 34),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    child: MonthCalendar(),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child: Divider(
-                      height: 1,
-                      color: HowWeatherColor.primary[900],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 34),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      child: MonthCalendar(),
                     ),
-                  ),
-                  DailyHistory(),
-                  SizedBox(
-                    height: 70,
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Divider(
+                        height: 1,
+                        color: HowWeatherColor.neutral[200],
+                      ),
+                    ),
+                    DailyHistory(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -349,6 +349,61 @@ class _CalendarState extends ConsumerState<Calendar> {
                         ),
                         calendarBuilders: CalendarBuilders(
                           // 일정 있을 경우 마크 표시
+                          // markerBuilder: (context, day, events) {
+                          //   if (events.isNotEmpty) {
+                          //     final hasRecord = events.contains('record');
+                          //     final hasSimilar = events.contains('similar');
+
+                          //     return Stack(
+                          //       alignment: Alignment.center,
+                          //       clipBehavior: Clip.none,
+                          //       children: [
+                          //         if (hasSimilar)
+                          //           Positioned(
+                          //             top: -7,
+                          //             child: Container(
+                          //               width: 39,
+                          //               height: 39,
+                          //               decoration: BoxDecoration(
+                          //                 shape: BoxShape.circle,
+                          //                 border: Border.all(
+                          //                   color:
+                          //                       HowWeatherColor.primary[400]!,
+                          //                   width: 3,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         if (hasRecord)
+                          //           Positioned(
+                          //             top: -5,
+                          //             child: Container(
+                          //               width: 35,
+                          //               height: 35,
+                          //               decoration: BoxDecoration(
+                          //                 shape: BoxShape.circle,
+                          //                 border: Border.all(
+                          //                   color:
+                          //                       HowWeatherColor.secondary[400]!,
+                          //                   width: 3,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         Align(
+                          //           alignment: Alignment.topCenter,
+                          //           child: Medium_18px(
+                          //             text: '${day.day}',
+                          //             color: HowWeatherColor.black,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     );
+                          //   }
+                          //   return null;
+                          // },
+                          // Replace the existing markerBuilder in CalendarBuilders with this code:
+
                           markerBuilder: (context, day, events) {
                             if (events.isNotEmpty) {
                               final hasRecord = events.contains('record');
@@ -358,38 +413,26 @@ class _CalendarState extends ConsumerState<Calendar> {
                                 alignment: Alignment.center,
                                 clipBehavior: Clip.none,
                                 children: [
-                                  if (hasSimilar)
-                                    Positioned(
-                                      top: -7,
-                                      child: Container(
-                                        width: 39,
-                                        height: 39,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color:
-                                                HowWeatherColor.primary[400]!,
-                                            width: 3,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                  // History icon for recorded days (center)
                                   if (hasRecord)
                                     Positioned(
-                                      top: -5,
-                                      child: Container(
-                                        width: 35,
-                                        height: 35,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color:
-                                                HowWeatherColor.secondary[400]!,
-                                            width: 3,
-                                          ),
-                                        ),
+                                      top: 0,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/history.svg',
                                       ),
                                     ),
+                                  // Temperature icon for similar days (top-right)
+                                  if (hasSimilar)
+                                    Positioned(
+                                      top: -2,
+                                      right: -2,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/temperature.svg',
+                                        width: 16,
+                                        height: 16,
+                                      ),
+                                    ),
+                                  // Date number
                                   Align(
                                     alignment: Alignment.topCenter,
                                     child: Medium_18px(
@@ -417,9 +460,9 @@ class _CalendarState extends ConsumerState<Calendar> {
                                 ),
                                 Positioned(
                                   top: 28,
-                                  child: Medium_14px(
+                                  child: Semibold_14px(
                                     text: '오늘',
-                                    color: HowWeatherColor.secondary[900],
+                                    color: HowWeatherColor.secondary[600],
                                   ),
                                 ),
                               ],
@@ -432,13 +475,11 @@ class _CalendarState extends ConsumerState<Calendar> {
                               clipBehavior: Clip.none,
                               children: [
                                 Positioned(
-                                  top: -5,
-                                  child: Container(
-                                    width: 35,
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: HowWeatherColor.secondary[700],
+                                  top: -0.5,
+                                  child: Positioned(
+                                    top: 0,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/history-fill.svg',
                                     ),
                                   ),
                                 ),
@@ -695,74 +736,38 @@ Widget historyDialog(BuildContext context, WidgetRef ref) {
         Row(
           children: [
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  context.pop();
-                  ref.read(selectedTimeProvider.notifier).state = null;
-                },
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: HowWeatherColor.neutral[200],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: HowWeatherColor.neutral[200]!, width: 2),
-                  ),
-                  child: Center(
-                      child: Medium_14px(
-                    text: "취소",
-                    color: HowWeatherColor.neutral[700],
-                  )),
-                ),
-              ),
-            ),
+                child: HWButton(
+              enabledColor: HowWeatherColor.neutral[200],
+              enabledTextColor: HowWeatherColor.neutral[600],
+              text: "취소",
+              onTap: () {
+                context.pop();
+                ref.read(selectedTimeProvider.notifier).state = null;
+              },
+            )),
             SizedBox(width: 8),
             Expanded(
-              child: GestureDetector(
-                onTap: isRegisterEnabled
-                    ? () async {
-                        context.push('/calendar/register');
+                child: HWButton(
+              text: "등록",
+              enabled: isRegisterEnabled,
+              onTap: () async {
+                context.push('/calendar/register');
 
-                        ref.read(addressProvider.notifier).state = "";
-                        ref.read(closetProvider.notifier).loadClothes();
-                        // 위치 기반 데이터 로딩
-                        final selectedTime = ref.read(selectedTimeProvider);
-                        final selectedDay = ref.read(selectedDayProvider);
-                        if (selectedTime != null && selectedDay != null) {
-                          await ref
-                              .read(locationViewModelProvider.notifier)
-                              .fetchLocationTemperature(
-                                timeSlot: selectedTime,
-                                date: DateFormat('yyyy-MM-dd')
-                                    .format(selectedDay),
-                              );
-                        }
-                      }
-                    : null,
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isRegisterEnabled
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: isRegisterEnabled
-                            ? HowWeatherColor.primary[900]!
-                            : HowWeatherColor.neutral[200]!,
-                        width: 2),
-                  ),
-                  child: Center(
-                    child: Medium_14px(
-                      text: "등록",
-                      color: isRegisterEnabled
-                          ? HowWeatherColor.white
-                          : HowWeatherColor.neutral[500],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+                ref.read(addressProvider.notifier).state = "";
+                ref.read(closetProvider.notifier).loadClothes();
+
+                final selectedTime = ref.read(selectedTimeProvider);
+                final selectedDay = ref.read(selectedDayProvider);
+                if (selectedTime != null && selectedDay != null) {
+                  await ref
+                      .read(locationViewModelProvider.notifier)
+                      .fetchLocationTemperature(
+                        timeSlot: selectedTime,
+                        date: DateFormat('yyyy-MM-dd').format(selectedDay),
+                      );
+                }
+              },
+            )),
           ],
         ),
       ],

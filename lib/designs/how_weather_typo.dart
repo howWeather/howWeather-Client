@@ -499,3 +499,32 @@ class Medium_14px extends StatelessWidget {
     );
   }
 }
+
+class Semibold_14px extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+  final Color? color;
+  final TextOverflow? overflow;
+
+  const Semibold_14px({
+    Key? key,
+    required this.text,
+    this.color,
+    this.overflow,
+    this.style = const TextStyle(),
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: style.copyWith(
+        color: color ?? HowWeatherColor.neutral[900],
+        fontFamily: 'Pretendard',
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
+      overflow: overflow ?? TextOverflow.clip,
+    );
+  }
+}
