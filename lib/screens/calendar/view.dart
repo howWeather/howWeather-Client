@@ -149,34 +149,33 @@ class _CalendarState extends ConsumerState<Calendar> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 34),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    child: MonthCalendar(),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child: Divider(
-                      height: 1,
-                      color: HowWeatherColor.primary[900],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 34),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      child: MonthCalendar(),
                     ),
-                  ),
-                  DailyHistory(),
-                  SizedBox(
-                    height: 70,
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Divider(
+                        height: 1,
+                        color: HowWeatherColor.neutral[200],
+                      ),
+                    ),
+                    DailyHistory(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -349,6 +348,61 @@ class _CalendarState extends ConsumerState<Calendar> {
                         ),
                         calendarBuilders: CalendarBuilders(
                           // 일정 있을 경우 마크 표시
+                          // markerBuilder: (context, day, events) {
+                          //   if (events.isNotEmpty) {
+                          //     final hasRecord = events.contains('record');
+                          //     final hasSimilar = events.contains('similar');
+
+                          //     return Stack(
+                          //       alignment: Alignment.center,
+                          //       clipBehavior: Clip.none,
+                          //       children: [
+                          //         if (hasSimilar)
+                          //           Positioned(
+                          //             top: -7,
+                          //             child: Container(
+                          //               width: 39,
+                          //               height: 39,
+                          //               decoration: BoxDecoration(
+                          //                 shape: BoxShape.circle,
+                          //                 border: Border.all(
+                          //                   color:
+                          //                       HowWeatherColor.primary[400]!,
+                          //                   width: 3,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         if (hasRecord)
+                          //           Positioned(
+                          //             top: -5,
+                          //             child: Container(
+                          //               width: 35,
+                          //               height: 35,
+                          //               decoration: BoxDecoration(
+                          //                 shape: BoxShape.circle,
+                          //                 border: Border.all(
+                          //                   color:
+                          //                       HowWeatherColor.secondary[400]!,
+                          //                   width: 3,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         Align(
+                          //           alignment: Alignment.topCenter,
+                          //           child: Medium_18px(
+                          //             text: '${day.day}',
+                          //             color: HowWeatherColor.black,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     );
+                          //   }
+                          //   return null;
+                          // },
+                          // Replace the existing markerBuilder in CalendarBuilders with this code:
+
                           markerBuilder: (context, day, events) {
                             if (events.isNotEmpty) {
                               final hasRecord = events.contains('record');
@@ -358,38 +412,26 @@ class _CalendarState extends ConsumerState<Calendar> {
                                 alignment: Alignment.center,
                                 clipBehavior: Clip.none,
                                 children: [
-                                  if (hasSimilar)
-                                    Positioned(
-                                      top: -7,
-                                      child: Container(
-                                        width: 39,
-                                        height: 39,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color:
-                                                HowWeatherColor.primary[400]!,
-                                            width: 3,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                  // History icon for recorded days (center)
                                   if (hasRecord)
                                     Positioned(
-                                      top: -5,
-                                      child: Container(
-                                        width: 35,
-                                        height: 35,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color:
-                                                HowWeatherColor.secondary[400]!,
-                                            width: 3,
-                                          ),
-                                        ),
+                                      top: 0,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/history.svg',
                                       ),
                                     ),
+                                  // Temperature icon for similar days (top-right)
+                                  if (hasSimilar)
+                                    Positioned(
+                                      top: -2,
+                                      right: -2,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/temperature.svg',
+                                        width: 16,
+                                        height: 16,
+                                      ),
+                                    ),
+                                  // Date number
                                   Align(
                                     alignment: Alignment.topCenter,
                                     child: Medium_18px(
@@ -417,9 +459,9 @@ class _CalendarState extends ConsumerState<Calendar> {
                                 ),
                                 Positioned(
                                   top: 28,
-                                  child: Medium_14px(
+                                  child: Semibold_14px(
                                     text: '오늘',
-                                    color: HowWeatherColor.secondary[900],
+                                    color: HowWeatherColor.secondary[600],
                                   ),
                                 ),
                               ],
@@ -432,13 +474,11 @@ class _CalendarState extends ConsumerState<Calendar> {
                               clipBehavior: Clip.none,
                               children: [
                                 Positioned(
-                                  top: -5,
-                                  child: Container(
-                                    width: 35,
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: HowWeatherColor.secondary[700],
+                                  top: -0.5,
+                                  child: Positioned(
+                                    top: 0,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/history-fill.svg',
                                     ),
                                   ),
                                 ),

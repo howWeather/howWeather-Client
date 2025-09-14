@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 final class HowWeatherColor extends Color {
   HowWeatherColor(super.value);
 
-  static const Color black = Color.fromARGB(255, 0, 0, 0);
-  static const Color white = Color.fromARGB(255, 255, 255, 255);
+  static const Color black = Color(0xFF1C1C1C);
+  static const Color white = Color(0xFFFDFDFD);
   static const Color error = Color.fromARGB(255, 240, 58, 46);
 
   static const Map<int, Color> primary = <int, Color>{
