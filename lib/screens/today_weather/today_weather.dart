@@ -56,27 +56,27 @@ class WeatherScreen extends ConsumerWidget {
     final dailyForecast = ref.watch(dailyWeatherProvider);
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        backgroundColor: Colors.transparent,
-        actions: [
-          // SvgPicture.asset(
-          //   'assets/icons/bell.svg',
-          //   color: HowWeatherColor.white,
-          // ),
-          // SizedBox(
-          //   width: 8,
-          // ),
-          // GestureDetector(
-          //   child: SvgPicture.asset('assets/icons/settings.svg'),
-          //   onTap: () => context.push('/home/location'),
-          // ),
-          // SizedBox(
-          //   width: 24,
-          // ),
-        ],
-      ),
+      // extendBodyBehindAppBar: true,
+      // appBar: AppBar(
+      //   scrolledUnderElevation: 0,
+      //   backgroundColor: Colors.transparent,
+      //   actions: [
+      //     // SvgPicture.asset(
+      //     //   'assets/icons/bell.svg',
+      //     //   color: HowWeatherColor.white,
+      //     // ),
+      //     // SizedBox(
+      //     //   width: 8,
+      //     // ),
+      //     // GestureDetector(
+      //     //   child: SvgPicture.asset('assets/icons/settings.svg'),
+      //     //   onTap: () => context.push('/home/location'),
+      //     // ),
+      //     // SizedBox(
+      //     //   width: 24,
+      //     // ),
+      //   ],
+      // ),
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
@@ -95,7 +95,7 @@ class WeatherScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SizedBox(
-                      height: 50,
+                      height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
