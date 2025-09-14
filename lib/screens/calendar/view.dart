@@ -149,6 +149,23 @@ class _CalendarState extends ConsumerState<Calendar> {
           color: HowWeatherColor.black,
         ),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => calendarIconInfoDialog(context),
+                );
+              },
+              child: SvgPicture.asset(
+                'assets/icons/Info.svg',
+                color: HowWeatherColor.neutral[400],
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -178,6 +195,69 @@ class _CalendarState extends ConsumerState<Calendar> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget calendarIconInfoDialog(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: HowWeatherColor.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      titlePadding: EdgeInsets.only(left: 24, right: 16, top: 16, bottom: 8),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Semibold_20px(text: "달력 아이콘 설명"),
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Icon(Icons.close,
+                color: HowWeatherColor.neutral[400], size: 24),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/temperature.svg',
+                width: 24,
+                height: 24,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Medium_14px(text: "오늘의 온도와 비슷한 날씨"),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/history.svg',
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Medium_14px(text: "착장 기록이 있는 날짜"),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/history-fill.svg',
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Medium_14px(text: "내가 선택한 날짜"),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -349,61 +429,6 @@ class _CalendarState extends ConsumerState<Calendar> {
                         ),
                         calendarBuilders: CalendarBuilders(
                           // 일정 있을 경우 마크 표시
-                          // markerBuilder: (context, day, events) {
-                          //   if (events.isNotEmpty) {
-                          //     final hasRecord = events.contains('record');
-                          //     final hasSimilar = events.contains('similar');
-
-                          //     return Stack(
-                          //       alignment: Alignment.center,
-                          //       clipBehavior: Clip.none,
-                          //       children: [
-                          //         if (hasSimilar)
-                          //           Positioned(
-                          //             top: -7,
-                          //             child: Container(
-                          //               width: 39,
-                          //               height: 39,
-                          //               decoration: BoxDecoration(
-                          //                 shape: BoxShape.circle,
-                          //                 border: Border.all(
-                          //                   color:
-                          //                       HowWeatherColor.primary[400]!,
-                          //                   width: 3,
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //           ),
-                          //         if (hasRecord)
-                          //           Positioned(
-                          //             top: -5,
-                          //             child: Container(
-                          //               width: 35,
-                          //               height: 35,
-                          //               decoration: BoxDecoration(
-                          //                 shape: BoxShape.circle,
-                          //                 border: Border.all(
-                          //                   color:
-                          //                       HowWeatherColor.secondary[400]!,
-                          //                   width: 3,
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //           ),
-                          //         Align(
-                          //           alignment: Alignment.topCenter,
-                          //           child: Medium_18px(
-                          //             text: '${day.day}',
-                          //             color: HowWeatherColor.black,
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     );
-                          //   }
-                          //   return null;
-                          // },
-                          // Replace the existing markerBuilder in CalendarBuilders with this code:
-
                           markerBuilder: (context, day, events) {
                             if (events.isNotEmpty) {
                               final hasRecord = events.contains('record');
