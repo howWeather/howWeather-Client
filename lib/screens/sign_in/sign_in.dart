@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:client/api/alarm/alarm_repository.dart';
 import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/api/oauth2/oauth2_view_model.dart';
@@ -94,7 +96,13 @@ class _SignSplashState extends ConsumerState<SignIn> {
 
                           // ✅ 로그인 성공시에만 페이지 이동
                           if (context.mounted) {
-                            await AlarmRepository().saveFCMToken();
+                            // iOS에서는 알림(Firebase) 설정 건너뜀
+                            if (!Platform.isIOS) {
+                              await AlarmRepository().saveFCMToken();
+                            } else {
+                              print('iOS에서는 FCM 토큰 저장 건너뜀3');
+                            }
+
                             context.go('/home');
                           }
                         } catch (e) {
@@ -230,7 +238,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
 
       if (loginState is AsyncData) {
         print('로그인 성공 → 홈으로 이동');
-        await AlarmRepository().saveFCMToken();
+        if (!Platform.isIOS) await AlarmRepository().saveFCMToken();
         context.go('/home');
       } else if (loginState is AsyncError) {
         print('로그인 실패');
@@ -256,7 +264,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
 
       if (loginState is AsyncData) {
         print('로그인 성공 → 홈으로 이동');
-        await AlarmRepository().saveFCMToken();
+        if (!Platform.isIOS) await AlarmRepository().saveFCMToken();
         context.go('/home');
       } else if (loginState is AsyncError) {
         print('로그인 실패');

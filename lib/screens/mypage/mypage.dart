@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:client/api/alarm/alarm_repository.dart';
 import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/api/closet/closet_view_model.dart';
@@ -241,7 +243,8 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 contentText: "로그아웃하시겠습니까?",
                                 done: () async {
                                   if (!TapThrottler.canTap('logout')) return;
-                                  await AlarmRepository().deleteFCMToken();
+                                  if (Platform.isAndroid)
+                                    await AlarmRepository().deleteFCMToken();
                                   await AuthRepository().logout();
                                   ref.read(closetProvider.notifier).state =
                                       const AsyncLoading();
