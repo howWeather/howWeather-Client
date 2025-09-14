@@ -1,6 +1,7 @@
 import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:client/api/record/record_view_model.dart';
+import 'package:client/designs/button.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/api/weather/weather_view_model.dart';
@@ -735,74 +736,38 @@ Widget historyDialog(BuildContext context, WidgetRef ref) {
         Row(
           children: [
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  context.pop();
-                  ref.read(selectedTimeProvider.notifier).state = null;
-                },
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: HowWeatherColor.neutral[200],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: HowWeatherColor.neutral[200]!, width: 2),
-                  ),
-                  child: Center(
-                      child: Medium_14px(
-                    text: "취소",
-                    color: HowWeatherColor.neutral[700],
-                  )),
-                ),
-              ),
-            ),
+                child: HWButton(
+              enabledColor: HowWeatherColor.neutral[200],
+              enabledTextColor: HowWeatherColor.neutral[600],
+              text: "취소",
+              onTap: () {
+                context.pop();
+                ref.read(selectedTimeProvider.notifier).state = null;
+              },
+            )),
             SizedBox(width: 8),
             Expanded(
-              child: GestureDetector(
-                onTap: isRegisterEnabled
-                    ? () async {
-                        context.push('/calendar/register');
+                child: HWButton(
+              text: "등록",
+              enabled: isRegisterEnabled,
+              onTap: () async {
+                context.push('/calendar/register');
 
-                        ref.read(addressProvider.notifier).state = "";
-                        ref.read(closetProvider.notifier).loadClothes();
-                        // 위치 기반 데이터 로딩
-                        final selectedTime = ref.read(selectedTimeProvider);
-                        final selectedDay = ref.read(selectedDayProvider);
-                        if (selectedTime != null && selectedDay != null) {
-                          await ref
-                              .read(locationViewModelProvider.notifier)
-                              .fetchLocationTemperature(
-                                timeSlot: selectedTime,
-                                date: DateFormat('yyyy-MM-dd')
-                                    .format(selectedDay),
-                              );
-                        }
-                      }
-                    : null,
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isRegisterEnabled
-                        ? HowWeatherColor.primary[900]
-                        : HowWeatherColor.neutral[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: isRegisterEnabled
-                            ? HowWeatherColor.primary[900]!
-                            : HowWeatherColor.neutral[200]!,
-                        width: 2),
-                  ),
-                  child: Center(
-                    child: Medium_14px(
-                      text: "등록",
-                      color: isRegisterEnabled
-                          ? HowWeatherColor.white
-                          : HowWeatherColor.neutral[500],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+                ref.read(addressProvider.notifier).state = "";
+                ref.read(closetProvider.notifier).loadClothes();
+
+                final selectedTime = ref.read(selectedTimeProvider);
+                final selectedDay = ref.read(selectedDayProvider);
+                if (selectedTime != null && selectedDay != null) {
+                  await ref
+                      .read(locationViewModelProvider.notifier)
+                      .fetchLocationTemperature(
+                        timeSlot: selectedTime,
+                        date: DateFormat('yyyy-MM-dd').format(selectedDay),
+                      );
+                }
+              },
+            )),
           ],
         ),
       ],

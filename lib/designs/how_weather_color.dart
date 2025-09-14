@@ -33,16 +33,16 @@ final class HowWeatherColor extends Color {
     900: Color(0xFFE5610F),
   };
   static const Map<int, Color> neutral = <int, Color>{
-    50: Color(0xFFFFFFFF),
-    100: Color(0xFFE3E3E3),
-    200: Color(0xFFC6C6C6),
-    300: Color(0xFFAAAAAA),
-    400: Color(0xFF8E8E8E),
-    500: Color(0xFF717171),
-    600: Color(0xFF555555),
-    700: Color(0xFF393939),
-    800: Color(0xFF1C1C1C),
-    900: Color(0xFF000000),
+    50: Color.fromARGB(255, 246, 246, 250),
+    100: Color.fromARGB(255, 242, 242, 244),
+    200: Color.fromARGB(255, 231, 231, 234),
+    300: Color.fromARGB(255, 201, 201, 212),
+    400: Color.fromARGB(255, 180, 180, 194),
+    500: Color.fromARGB(255, 126, 127, 142),
+    600: Color.fromARGB(255, 105, 106, 125),
+    700: Color.fromARGB(255, 71, 71, 86),
+    800: Color.fromARGB(255, 40, 41, 49),
+    900: Color.fromARGB(255, 25, 25, 29),
   };
 
   static const Map<int, Color> colorMap = {
