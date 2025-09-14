@@ -136,7 +136,7 @@ class TodayWearSkeleton extends StatelessWidget {
                         color: Colors.white,
                         colorOpacity: 0.3,
                         child: Container(
-                          width: 120,
+                          width: 100,
                           height: 20,
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.6),
