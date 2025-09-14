@@ -267,6 +267,7 @@ class Profile extends ConsumerWidget {
 
   Widget ContainerCard(text) {
     return Container(
+      height: 44,
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
