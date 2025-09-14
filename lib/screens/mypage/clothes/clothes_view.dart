@@ -23,6 +23,7 @@ class ClothesView extends ConsumerWidget {
         child: Scaffold(
           backgroundColor: HowWeatherColor.white,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             backgroundColor: Colors.transparent,
             title: Medium_18px(text: "의류 조회"),
             centerTitle: true,

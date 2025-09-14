@@ -73,6 +73,7 @@ class ChangePassword extends ConsumerWidget {
         child: Scaffold(
           backgroundColor: HowWeatherColor.white,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             backgroundColor: Colors.transparent,
             title: Medium_18px(text: "비밀번호 변경"),
             centerTitle: true,
@@ -158,6 +159,9 @@ class ChangePassword extends ConsumerWidget {
                       text: "비밀번호가 일치하지 않습니다. 다시 입력해 주세요.",
                       color: HowWeatherColor.error,
                     ),
+                  SizedBox(
+                    height: 122,
+                  )
                 ],
               ),
             ),

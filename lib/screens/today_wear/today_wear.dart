@@ -329,16 +329,16 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                           ),
                         ),
                         Medium_14px(
-                          text: '''기준 지역의 예보 데이터를 이용하여 의상을 추천합니다.
-초기 설정은 서울특별시 용산구입니다.
-오전 04:00 ~ 07:00 동안에는 지역 변경이 불가합니다.
-지역 변경 시 다음 날부터 해당 지역의 예보 데이터로 예측을 진행합니다. ''',
+                          text: '''- 기준 지역의 예보 데이터를 이용하여 의상을 추천합니다.
+- 초기 설정은 서울특별시 용산구입니다.
+- 오전 04:00 ~ 07:00 동안에는 지역 변경이 불가합니다.
+- 지역 변경 시 다음 날부터 해당 지역의 예보 데이터로 예측을 진행합니다. ''',
                           color: HowWeatherColor.white,
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 ],
               ),
             ),

@@ -110,12 +110,12 @@ class HowWeatherDialog extends ConsumerWidget {
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: HowWeatherColor.neutral[600],
+                        color: HowWeatherColor.neutral[200],
                       ),
                       child: Center(
                         child: Semibold_16px(
                           text: "아니요",
-                          color: HowWeatherColor.white,
+                          color: HowWeatherColor.neutral[600],
                         ),
                       ),
                     ),
