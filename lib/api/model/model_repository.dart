@@ -21,6 +21,7 @@ class ModelRepository {
 
     final decodedBody = utf8.decode(response.bodyBytes);
     final jsonBody = jsonDecode(decodedBody);
+    print(jsonBody);
 
     if (response.statusCode == 200 && jsonBody['success'] == true) {
       final resultList = jsonBody['result'] as List;

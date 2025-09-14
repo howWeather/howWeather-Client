@@ -472,57 +472,82 @@ class PerceivedTemperatureChart extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final minTemp = hourlyData.map((e) => e.temperature).reduce(min) - 5;
-    final maxTemp = hourlyData.map((e) => e.temperature).reduce(max) + 5;
     final modelState = ref.watch(modelViewModelProvider);
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: hourlyData.length * columnWidth,
-        child: Stack(
-          children: [
-            // 📌 그래프
-            Positioned(
-              top: 20,
-              left: columnWidth / 2,
-              right: columnWidth / 2,
-              height: graphHeight,
-              child: LineChart(
-                LineChartData(
-                  minY: minTemp,
-                  maxY: maxTemp,
-                  minX: 0,
-                  maxX: (hourlyData.length - 1) * columnWidth,
-                  titlesData: FlTitlesData(show: false),
-                  gridData: FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      isCurved: true,
-                      spots: hourlyData.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final data = entry.value;
-                        return FlSpot(index * columnWidth, data.temperature);
-                      }).toList(),
-                      color: Colors.white,
-                      barWidth: 2,
-                      dotData: FlDotData(
-                        show: true,
-                        getDotPainter: (spot, percent, barData, index) {
-                          return modelState.when(
-                            loading: () => FlDotCirclePainter(
-                              radius: 4,
-                              color: HowWeatherColor.neutral[200]!,
-                              strokeColor: Colors.transparent,
-                            ),
-                            error: (e, _) => FlDotCirclePainter(
-                              radius: 4,
-                              color: HowWeatherColor.neutral[200]!,
-                              strokeColor: Colors.transparent,
-                            ),
-                            data: (recommendations) {
-                              if (recommendations.length < 2) {
+    return modelState.when(
+      loading: () => const CircularProgressIndicator(),
+      error: (e, _) => Text('에러 발생: $e'),
+      data: (recommendations) {
+        if (recommendations.isEmpty || recommendations.length < 2) {
+          return Text(
+            '추천 데이터가 부족합니다.',
+            style: TextStyle(color: HowWeatherColor.white),
+          );
+        }
+
+        // feelingList에서 온도와 체감 정도를 가져옵니다
+        final allFeelingList = [
+          ...recommendations[0].feelingList,
+          ...recommendations[1].feelingList,
+        ];
+
+        // 중복 제거 및 시간 순 정렬 (시간을 기준으로 유니크하게)
+        final Map<int, dynamic> uniqueFeelingsMap = {};
+        for (var feeling in allFeelingList) {
+          uniqueFeelingsMap[feeling.time] = feeling;
+        }
+        final uniqueFeelings = uniqueFeelingsMap.values.toList()
+          ..sort((a, b) => a.time.compareTo(b.time));
+
+        if (uniqueFeelings.isEmpty) {
+          return Text(
+            '추천 데이터가 없습니다.',
+            style: TextStyle(color: HowWeatherColor.white),
+          );
+        }
+
+        // 최소/최대 온도 계산 (추천 데이터 기준)
+        final temperatures =
+            uniqueFeelings.map((e) => e.temperature as double).toList();
+        final minTemp = temperatures.reduce(min) - 5;
+        final maxTemp = temperatures.reduce(max) + 5;
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Container(
+            width: uniqueFeelings.length * columnWidth,
+            child: Stack(
+              children: [
+                // 📌 그래프
+                Positioned(
+                  top: 20,
+                  left: columnWidth / 2,
+                  right: columnWidth / 2,
+                  height: graphHeight,
+                  child: LineChart(
+                    LineChartData(
+                      minY: minTemp,
+                      maxY: maxTemp,
+                      minX: 0,
+                      maxX: (uniqueFeelings.length - 1) * columnWidth,
+                      titlesData: FlTitlesData(show: false),
+                      gridData: FlGridData(show: false),
+                      borderData: FlBorderData(show: false),
+                      lineBarsData: [
+                        LineChartBarData(
+                          isCurved: true,
+                          spots: uniqueFeelings.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final feeling = entry.value;
+                            return FlSpot(
+                                index * columnWidth, feeling.temperature);
+                          }).toList(),
+                          color: Colors.white,
+                          barWidth: 2,
+                          dotData: FlDotData(
+                            show: true,
+                            getDotPainter: (spot, percent, barData, index) {
+                              if (index >= uniqueFeelings.length) {
                                 return FlDotCirclePainter(
                                   radius: 4,
                                   color: HowWeatherColor.neutral[200]!,
@@ -530,28 +555,15 @@ class PerceivedTemperatureChart extends ConsumerWidget {
                                 );
                               }
 
-                              final allFeelingList = [
-                                ...recommendations[0].feelingList,
-                                ...recommendations[1].feelingList,
-                              ];
-
-                              if (index >= allFeelingList.length) {
-                                return FlDotCirclePainter(
-                                  radius: 4,
-                                  color: HowWeatherColor.neutral[200]!,
-                                  strokeColor: Colors.transparent,
-                                );
-                              }
-
-                              final colorIndex = allFeelingList[index].feeling;
+                              final colorIndex = uniqueFeelings[index].feeling;
 
                               late Color color;
                               if (colorIndex == 3) {
-                                color = HowWeatherColor.secondary[800]!;
+                                color = HowWeatherColor.secondary[800]!; // 더움
                               } else if (colorIndex == 2) {
-                                color = HowWeatherColor.secondary[500]!;
+                                color = HowWeatherColor.secondary[500]!; // 적당
                               } else if (colorIndex == 1) {
-                                color = HowWeatherColor.primary[800]!;
+                                color = HowWeatherColor.primary[800]!; // 추움
                               } else {
                                 color = HowWeatherColor.neutral[200]!;
                               }
@@ -562,42 +574,42 @@ class PerceivedTemperatureChart extends ConsumerWidget {
                                 strokeColor: Colors.transparent,
                               );
                             },
-                          );
-                        },
-                      ),
-                      belowBarData: BarAreaData(show: false),
-                    )
-                  ],
-                ),
-              ),
-            ),
-
-            // 📌 텍스트, 아이콘, 온도, 습도
-            Row(
-              children: hourlyData.map((data) {
-                return SizedBox(
-                  width: columnWidth,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Medium_16px(
-                        text: '${data.temperature.toStringAsFixed(0)}°',
-                        color: HowWeatherColor.white,
-                      ),
-                      const SizedBox(height: graphHeight),
-                      Medium_14px(
-                        text: '${data.dateTime.hour}시',
-                        color: HowWeatherColor.white.withOpacity(0.8),
-                      ),
-                    ],
+                          ),
+                          belowBarData: BarAreaData(show: false),
+                        )
+                      ],
+                    ),
                   ),
-                );
-              }).toList(),
+                ),
+
+                // 📌 텍스트, 아이콘, 온도, 습도
+                Row(
+                  children: uniqueFeelings.map((feeling) {
+                    return SizedBox(
+                      width: columnWidth,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Medium_16px(
+                            text: '${feeling.temperature.toStringAsFixed(0)}°',
+                            color: HowWeatherColor.white,
+                          ),
+                          const SizedBox(height: graphHeight),
+                          Medium_14px(
+                            text: '${feeling.time}시',
+                            color: HowWeatherColor.white.withOpacity(0.8),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
