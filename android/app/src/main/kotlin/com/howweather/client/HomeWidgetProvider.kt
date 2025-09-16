@@ -12,6 +12,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import es.antonborri.home_widget.HomeWidgetProvider as HomeWidgetBase
+import es.antonborri.home_widget.HomeWidgetLaunchIntent
+import android.net.Uri
 
 class WeatherHomeWidgetProvider : HomeWidgetBase() {
     override fun onUpdate(
@@ -61,6 +63,13 @@ class WeatherHomeWidgetProvider : HomeWidgetBase() {
                 } else {
                     views.setViewVisibility(R.id.widget_outer_column, View.GONE)
                 }
+
+                val intent = HomeWidgetLaunchIntent.getActivity(
+                    context,
+                    MainActivity::class.java,
+                    Uri.parse("/")
+                )
+                views.setOnClickPendingIntent(R.id.widget_root, intent)
 
                 appWidgetManager.updateAppWidget(widgetId, views)
 

@@ -16,7 +16,7 @@ class LocationRepository {
   }) async {
     final url = '$_baseUrl/temperature';
 
-    final response = await _http.post(
+    final response = await _http.get(
       url,
       body: {
         'latitude': latitude,

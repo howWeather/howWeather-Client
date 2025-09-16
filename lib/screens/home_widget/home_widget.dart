@@ -1,5 +1,6 @@
 import 'package:client/api/weather/weather_repository.dart';
 import 'package:client/api/weather/weather_view_model.dart';
+import 'package:client/main.dart';
 import 'package:client/model/weather.dart';
 import 'package:client/service/location_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:client/api/model/model_view_model.dart';
 import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:workmanager/workmanager.dart';
 
 final container = ProviderContainer();
 
@@ -53,21 +55,34 @@ Future<void> updateHomeWidgetWithAllData() async {
       final recommendations =
           modelState.value; // AsyncData에서 실제 데이터 리스트를 가져옵니다.
       if (recommendations != null && recommendations.isNotEmpty) {
-        final firstRec = recommendations.first;
+        // 아우터가 있는 추천을 찾기 위해 모든 추천을 확인
+        var selectedRecommendation = recommendations.first; // 기본값으로 첫 번째 사용
 
-        // 추천 상의 URL 가져오기
-        if (firstRec.uppersTypeList.isNotEmpty) {
-          final upperType = firstRec.uppersTypeList.first;
+        // 아우터가 있는 추천이 있다면 그것을 사용
+        for (var rec in recommendations) {
+          if (rec.outersTypeList.isNotEmpty) {
+            selectedRecommendation = rec;
+            print('🧥 아우터가 있는 추천을 발견했습니다: ${rec.outersTypeList}');
+            break;
+          }
+        }
+
+        // 선택된 추천에서 상의 URL 가져오기
+        if (selectedRecommendation.uppersTypeList.isNotEmpty) {
+          final upperType = selectedRecommendation.uppersTypeList.first;
           // .future를 사용하여 Provider의 Future 결과를 기다립니다.
           upperUrl =
               await container.read(upperClothImageProvider(upperType).future);
         }
 
-        // 추천 아우터 URL 가져오기
-        if (firstRec.outersTypeList.isNotEmpty) {
-          final outerType = firstRec.outersTypeList.first;
+        // 선택된 추천에서 아우터 URL 가져오기
+        if (selectedRecommendation.outersTypeList.isNotEmpty) {
+          final outerType = selectedRecommendation.outersTypeList.first;
           outerUrl =
               await container.read(outerClothImageProvider(outerType).future);
+          print('🧥 아우터 URL 가져옴: $outerUrl');
+        } else {
+          print('🚫 선택된 추천에 아우터가 없습니다');
         }
       }
     }
@@ -92,6 +107,23 @@ Future<void> updateHomeWidgetWithAllData() async {
 // 백그라운드 콜백은 통합 함수를 호출
 void backgroundCallback(Uri? uri) async {
   print('🏠 HomeWidget 백그라운드 콜백 실행');
+
+  if (uri != null) {
+    if (uri.path == "/") {
+      Future.delayed(const Duration(seconds: 1), () {
+        navigatorKey.currentState?.pushNamed('/home');
+      });
+    }
+  }
+
   await updateHomeWidgetWithAllData();
 }
 
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    print("⏰ 백그라운드 작업 실행: $task");
+
+    await updateHomeWidgetWithAllData();
+    return Future.value(true);
+  });
+}
