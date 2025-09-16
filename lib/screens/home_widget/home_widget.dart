@@ -1,5 +1,6 @@
 import 'package:client/api/weather/weather_repository.dart';
 import 'package:client/api/weather/weather_view_model.dart';
+import 'package:client/main.dart';
 import 'package:client/model/weather.dart';
 import 'package:client/service/location_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,6 +93,14 @@ Future<void> updateHomeWidgetWithAllData() async {
 // 백그라운드 콜백은 통합 함수를 호출
 void backgroundCallback(Uri? uri) async {
   print('🏠 HomeWidget 백그라운드 콜백 실행');
+
+  if (uri != null) {
+    if (uri.path == "/") {
+      Future.delayed(const Duration(seconds: 1), () {
+        navigatorKey.currentState?.pushNamed('/');
+      });
+    }
+  }
+
   await updateHomeWidgetWithAllData();
 }
-
