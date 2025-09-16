@@ -8,7 +8,8 @@ import 'package:client/model/sign_up.dart';
 import 'package:client/screens/calendar/view.dart';
 import 'package:client/screens/exception/no_internet.dart';
 import 'package:client/screens/exception/no_location_permission.dart';
-import 'package:client/screens/home_widget/home_widget.dart';
+import 'package:client/screens/home_widget/home_widget.dart'
+    hide callbackDispatcher;
 import 'package:client/screens/mypage/change_password.dart';
 import 'package:client/screens/mypage/clothes/clothes_delete.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart';
@@ -45,6 +46,7 @@ import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' hide Profile;
+import 'package:workmanager/workmanager.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -226,7 +228,7 @@ void main() async {
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-// ✅ iOS에서는 알림 권한 요청 스킵
+  // iOS에서는 알림 권한 요청 스킵
   if (!Platform.isIOS) {
     await messaging.requestPermission(alert: true, badge: true, sound: true);
 
@@ -241,6 +243,13 @@ void main() async {
   globalContainer = ProviderContainer();
   if (Platform.isAndroid) {
     HomeWidget.registerBackgroundCallback(backgroundCallback);
+    await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+    // 1시간마다 실행
+    await Workmanager().registerPeriodicTask(
+      "updateWidgetTask",
+      "updateWidgetTask",
+      frequency: const Duration(hours: 1),
+    );
   }
   runApp(const ProviderScope(child: HowWeather()));
 }

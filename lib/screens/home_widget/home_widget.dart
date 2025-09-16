@@ -8,6 +8,7 @@ import 'package:client/api/model/model_view_model.dart';
 import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:workmanager/workmanager.dart';
 
 final container = ProviderContainer();
 
@@ -97,10 +98,19 @@ void backgroundCallback(Uri? uri) async {
   if (uri != null) {
     if (uri.path == "/") {
       Future.delayed(const Duration(seconds: 1), () {
-        navigatorKey.currentState?.pushNamed('/');
+        navigatorKey.currentState?.pushNamed('/home');
       });
     }
   }
 
   await updateHomeWidgetWithAllData();
+}
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    print("⏰ 백그라운드 작업 실행: $task");
+
+    await updateHomeWidgetWithAllData();
+    return Future.value(true);
+  });
 }
