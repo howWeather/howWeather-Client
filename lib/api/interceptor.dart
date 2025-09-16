@@ -25,6 +25,7 @@ class HttpInterceptor {
   Future<http.Response> get(
     String endpoint, {
     Map<String, String>? headers,
+    Map<String, dynamic>? body,
     Map<String, String>? queryParams,
     bool useAuth = true,
   }) async {
@@ -36,13 +37,28 @@ class HttpInterceptor {
       url += '?$query';
     }
     final uri = Uri.parse(url);
+
     final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
 
-    final response = await http.get(uri, headers: requestHeaders);
+    // GET + request body 요청 생성
+    final request = http.Request('GET', uri);
+    request.headers.addAll(requestHeaders);
+
+    if (body != null) {
+      request.body = jsonEncode(body);
+    }
+
+    // 요청 전송
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
     return await _handleResponse(
       response,
       () => get(endpoint,
-          headers: headers, queryParams: queryParams, useAuth: useAuth),
+          headers: headers,
+          body: body,
+          queryParams: queryParams,
+          useAuth: useAuth),
     );
   }
 

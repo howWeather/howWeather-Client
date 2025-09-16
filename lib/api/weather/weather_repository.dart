@@ -136,7 +136,7 @@ class WeatherRepository {
 
     final response = await _httpClient.get(
       endpoint,
-      queryParams: {
+      body: {
         'city': city,
         'timeSlot': timeSlot.toString(),
         'date': date,
