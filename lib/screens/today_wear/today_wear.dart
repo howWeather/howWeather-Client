@@ -14,7 +14,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-// ConsumerStatefulWidget으로 변경
 class TodayWear extends ConsumerStatefulWidget {
   const TodayWear({super.key});
 
@@ -26,12 +25,20 @@ class _TodayWearState extends ConsumerState<TodayWear> {
   int currentUpperIndex = 0; // 현재 보고 있는 상의 인덱스
   int currentOuterIndex = 0; // 현재 보고 있는 아우터 인덱스
 
-  // initState에서 API를 한 번만 호출
   @override
   void initState() {
     super.initState();
-    // 위젯이 생성될 때 추천 데이터를 가져옵니다.
-    ref.read(modelViewModelProvider.notifier).fetchRecommendation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeData();
+    });
+  }
+
+  // 초기 데이터 로딩
+  Future<void> _initializeData() async {
+    // 사용자 위치 조회
+    await ref.read(locationViewModelProvider.notifier).fetchUserLocation();
+    // 추천 데이터 조회
+    await ref.read(modelViewModelProvider.notifier).fetchRecommendation();
   }
 
   // 상의 이전 항목으로 이동
@@ -89,8 +96,9 @@ class _TodayWearState extends ConsumerState<TodayWear> {
     return hourlyWeather.when(
       data: (hourlyData) {
         return RefreshIndicator(
-          onRefresh: () =>
-              ref.read(modelViewModelProvider.notifier).fetchRecommendation(),
+          onRefresh: () async {
+            await _initializeData();
+          },
           color: HowWeatherColor.primary[900],
           child: SingleChildScrollView(
             child: Container(
