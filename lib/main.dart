@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:client/api/interceptor.dart';
 import 'package:client/api/network/network_provider.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_navi.dart';
@@ -63,6 +64,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (!isDisconnected && isNoInternetRoute) return '/home';
       return null;
     },
+    navigatorKey: navigatorKey,
     routes: [
       GoRoute(
         path: '/',
@@ -243,11 +245,14 @@ void main() async {
   runApp(const ProviderScope(child: HowWeather()));
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class HowWeather extends ConsumerWidget {
   const HowWeather({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    HttpInterceptor.navigatorKey = navigatorKey;
     final router = ref.watch(routerProvider);
     ref.listen(connectivityProvider, (previous, next) {
       next.whenData((results) {

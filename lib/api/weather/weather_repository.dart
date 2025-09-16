@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/api/howweather_api.dart';
+import 'package:client/api/interceptor.dart';
 import 'package:client/model/weather.dart';
 import 'package:http/http.dart' as http;
 
 class WeatherRepository {
   final String? apiKey;
+  final HttpInterceptor _httpClient = HttpInterceptor();
 
   WeatherRepository({this.apiKey});
 
@@ -38,8 +39,7 @@ class WeatherRepository {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final name = data['name'] ?? '';
-      final koreanName =
-          await fetchKoreanCityName(name); // 위도 기반일 때도 한글 이름으로 변환
+      final koreanName = await fetchKoreanCityName(name);
       return Weather.fromJson(data, koreanName);
     } else {
       throw Exception('위치 기반 날씨 데이터를 가져오지 못했습니다.');
@@ -57,34 +57,11 @@ class WeatherRepository {
       final data = json.decode(body);
       final List list = data['list'];
 
-      // print('=== 전체 날씨 데이터 ===');
-      // print('총 데이터 개수: ${list.length}');
-
-      // 모든 시간별 데이터 출력
-      // for (int i = 0; i < list.length; i++) {
-      //   final item = list[i];
-      //   final dtText = item['dt_txt'];
-      //   final temp = item['main']['temp'];
-      //   final description = item['weather'][0]['description'];
-
-      //   print('[$i] $dtText - ${temp}°C - $description');
-      // }
-
       final now = DateTime.now();
       final tomorrow = now.add(Duration(days: 1));
 
-      // print('\n=== 현재 시간 정보 ===');
-      // print('현재 시간 (KST): $now');
-      // print('내일 날짜: $tomorrow');
-
       final allWeatherData =
           list.map((item) => HourlyWeather.fromJson(item)).toList();
-
-      // print('\n=== 파싱된 HourlyWeather 데이터 ===');
-      // for (int i = 0; i < allWeatherData.length; i++) {
-      //   final weather = allWeatherData[i];
-      //   print('[$i] ${weather.dateTime} - ${weather.temperature}°C');
-      // }
 
       final todayOrTomorrowForecast = allWeatherData.where((weather) {
         final date = weather.dateTime;
@@ -93,28 +70,14 @@ class WeatherRepository {
         final isToday = date.year == now.year &&
             date.month == now.month &&
             date.day == now.day;
-
         final isTomorrow = date.year == tomorrow.year &&
             date.month == tomorrow.month &&
             date.day == tomorrow.day;
 
         final isDesiredHour = [9, 12, 15, 18, 21].contains(hour);
 
-        // 디버깅 정보 출력
-        // if (isToday || isTomorrow) {
-        //   print(
-        //       '날짜 체크: ${date} -> 오늘: $isToday, 내일: $isTomorrow, 시간: $hour, 원하는시간: $isDesiredHour');
-        // }
-
         return (isToday || isTomorrow) && isDesiredHour;
       }).toList();
-
-      // print('\n=== 필터링된 결과 ===');
-      // print('필터링된 데이터 개수: ${todayOrTomorrowForecast.length}');
-      // for (int i = 0; i < todayOrTomorrowForecast.length; i++) {
-      //   final weather = todayOrTomorrowForecast[i];
-      //   print('[$i] ${weather.dateTime} - ${weather.temperature}°C');
-      // }
 
       return todayOrTomorrowForecast;
     } else {
@@ -130,7 +93,7 @@ class WeatherRepository {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final List list = data['list']; // 3시간 간격 데이터
+      final List list = data['list'];
 
       final Map<String, List<Map<String, dynamic>>> groupedByDay = {};
 
@@ -153,7 +116,7 @@ class WeatherRepository {
         return DailyWeather(
           dateTime: date,
           humidity: humidities.reduce((a, b) => a + b) ~/ humidities.length,
-          icon: icons[0], // 첫 시간대 아이콘 사용
+          icon: icons[0],
           maxTemp: temps.reduce(max).toDouble(),
           minTemp: temps.reduce(min).toDouble(),
         );
@@ -169,25 +132,16 @@ class WeatherRepository {
     required int timeSlot,
     required String date,
   }) async {
-    final accessToken = await AuthStorage.getAccessToken();
+    final endpoint = '${API.hostConnect}/api/weather/temp';
 
-    final url = Uri.parse('${API.hostConnect}/api/weather/temp');
-
-    final body = jsonEncode({
-      'city': city,
-      'timeSlot': timeSlot,
-      'date': date,
-    });
-
-    final request = http.Request('GET', url)
-      ..headers.addAll({
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      })
-      ..body = body;
-
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
+    final response = await _httpClient.get(
+      endpoint,
+      queryParams: {
+        'city': city,
+        'timeSlot': timeSlot.toString(),
+        'date': date,
+      },
+    );
 
     final decoded = jsonDecode(utf8.decode(response.bodyBytes));
 

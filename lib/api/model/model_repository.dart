@@ -1,23 +1,14 @@
 import 'dart:convert';
-import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/api/howweather_api.dart';
+import 'package:client/api/interceptor.dart';
 import 'package:client/model/model_recommendation.dart';
-import 'package:http/http.dart' as http;
 
 class ModelRepository {
   final String _baseUrl = '${API.hostConnect}/api/model/recommendation';
+  final HttpInterceptor _http = HttpInterceptor();
 
   Future<List<ModelRecommendation>> fetchModelRecommendation() async {
-    final accessToken = await AuthStorage.getAccessToken();
-
-    final url = Uri.parse(_baseUrl);
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-    );
+    final response = await _http.get(_baseUrl);
 
     final decodedBody = utf8.decode(response.bodyBytes);
     final jsonBody = jsonDecode(decodedBody);
@@ -30,7 +21,8 @@ class ModelRepository {
           .map((item) => ModelRecommendation.fromJson(item))
           .toList();
     } else {
-      throw Exception('모델 추천 결과 불러오기 실패: ${response.statusCode}');
+      final message = jsonBody['error']?['message'] ?? '모델 추천 결과 불러오기 실패';
+      throw Exception(message);
     }
   }
 }

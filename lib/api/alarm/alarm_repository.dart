@@ -1,24 +1,15 @@
 import 'dart:convert';
-import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/api/howweather_api.dart';
+import 'package:client/api/interceptor.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:http/http.dart' as http;
 
 class AlarmRepository {
   final String _baseUrl = '${API.hostConnect}/api/alarm';
+  final HttpInterceptor _http = HttpInterceptor();
 
   /// 알림 설정 조회
   Future<Map<String, bool>> getAlarmSettings() async {
-    final accessToken = await AuthStorage.getAccessToken();
-    final url = Uri.parse(_baseUrl);
-
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-    );
+    final response = await _http.get(_baseUrl);
 
     if (response.statusCode == 200) {
       final decoded = utf8.decode(response.bodyBytes);
@@ -35,16 +26,11 @@ class AlarmRepository {
 
   /// 알림 설정 수정
   Future<void> updateAlarmSettings(Map<String, bool> updatedFields) async {
-    final accessToken = await AuthStorage.getAccessToken();
-    final url = Uri.parse('$_baseUrl/update');
+    final url = '$_baseUrl/update';
 
-    final response = await http.patch(
+    final response = await _http.patch(
       url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(updatedFields),
+      body: updatedFields,
     );
 
     if (response.statusCode != 200) {
@@ -57,8 +43,7 @@ class AlarmRepository {
 
   /// FCM token 등록
   Future<void> saveFCMToken() async {
-    final accessToken = await AuthStorage.getAccessToken();
-    final url = Uri.parse('$_baseUrl/token-save');
+    final url = '$_baseUrl/token-save';
     final fcmToken = await FirebaseMessaging.instance.getToken();
 
     if (fcmToken == null) {
@@ -67,31 +52,26 @@ class AlarmRepository {
     }
     print(fcmToken);
 
-    final response = await http.post(
+    final response = await _http.post(
       url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({"token": fcmToken}),
+      body: {"token": fcmToken},
     );
 
     final decoded = utf8.decode(response.bodyBytes);
     final json = jsonDecode(decoded);
     print('응답 상태 코드: ${response.statusCode}');
-    print('응답 바디: ${json}');
+    print('응답 바디: $json');
 
     if (response.statusCode == 200) {
       print('FCM 토큰 등록 완료');
     } else {
-      print('FCM 토큰 등록 실패: ${json}');
+      print('FCM 토큰 등록 실패: $json');
     }
   }
 
   /// FCM token 제거
   Future<void> deleteFCMToken() async {
-    final accessToken = await AuthStorage.getAccessToken();
-    final url = Uri.parse('$_baseUrl/token-delete');
+    final url = '$_baseUrl/token-delete';
     final fcmToken = await FirebaseMessaging.instance.getToken();
 
     if (fcmToken == null) {
@@ -100,19 +80,14 @@ class AlarmRepository {
     }
     print(fcmToken);
 
-    final response = await http.delete(
+    final response = await _http.delete(
       url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({"token": fcmToken}),
     );
 
     if (response.statusCode == 204) {
       print('FCM 토큰 제거 성공');
     } else {
-      print('FCM 토큰 등록 실패: ${response.body}');
+      print('FCM 토큰 제거 실패: ${response.body}');
     }
   }
 }

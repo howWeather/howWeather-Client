@@ -1,24 +1,23 @@
 import 'dart:convert';
 import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/api/howweather_api.dart';
+import 'package:client/api/interceptor.dart';
 import 'package:http/http.dart' as http;
 
 class Oauth2Repository {
   final String _baseUrl = '${API.hostConnect}/api/oauth';
+  final HttpInterceptor _http = HttpInterceptor();
 
   /// 소셜로그인-카카오
-  Future<Map<String, String>> socialLoginKaKao(
-      {required String kakaoAccessToken}) async {
-    final url = Uri.parse('$_baseUrl/kakao');
+  Future<Map<String, String>> socialLoginKaKao({
+    required String kakaoAccessToken,
+  }) async {
+    final url = '$_baseUrl/kakao';
 
-    final response = await http.post(
+    final response = await _http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'accessToken': kakaoAccessToken,
-      }),
+      body: {'accessToken': kakaoAccessToken},
+      useAuth: false, // 로그인 전에는 토큰 X
     );
 
     final decodedResponse = utf8.decode(response.bodyBytes);
@@ -46,18 +45,15 @@ class Oauth2Repository {
   }
 
   /// 소셜로그인-구글
-  Future<Map<String, String>> socialLoginGoogle(
-      {required String googleAccessToken}) async {
-    final url = Uri.parse('$_baseUrl/google');
+  Future<Map<String, String>> socialLoginGoogle({
+    required String googleAccessToken,
+  }) async {
+    final url = '$_baseUrl/google';
 
-    final response = await http.post(
+    final response = await _http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'accessToken': googleAccessToken,
-      }),
+      body: {'accessToken': googleAccessToken},
+      useAuth: false,
     );
 
     final decodedResponse = utf8.decode(response.bodyBytes);

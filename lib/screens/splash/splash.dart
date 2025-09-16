@@ -1,6 +1,4 @@
-import 'dart:convert';
-import 'dart:io'; // Platform 체크용
-import 'package:client/api/auth/auth_repository.dart';
+import 'dart:io';
 import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
@@ -41,11 +39,8 @@ class _SplashState extends ConsumerState<Splash>
   }
 
   Future<void> _startApp() async {
-    // iOS에서는 알림 권한 요청 건너뛰기
     if (!Platform.isIOS) {
       await requestNotificationPermission();
-    } else {
-      print('iOS에서는 알림 권한 요청 건너뜀2');
     }
 
     await Future.delayed(const Duration(seconds: 2));
@@ -54,50 +49,17 @@ class _SplashState extends ConsumerState<Splash>
     final accessToken = await AuthStorage.getAccessToken();
     final refreshToken = await AuthStorage.getRefreshToken();
 
-    if (!mounted) return;
-
     if (accessToken != null && refreshToken != null) {
-      try {
-        if (!isTokenExpired(accessToken)) {
-          if (mounted) context.pushReplacement('/home');
-        } else {
-          await AuthRepository().reissueToken();
-          if (mounted) context.pushReplacement('/home');
-        }
-      } catch (e) {
-        await AuthStorage.clear();
-        if (mounted) context.pushReplacement('/signIn');
-      }
+      // 토큰 재발급은 HttpInterceptor에서 자동 처리
+      if (mounted) context.pushReplacement('/home');
     } else {
       if (mounted) context.pushReplacement('/signIn');
     }
   }
 
-  // 알림 권한 요청 (Android 전용)
   Future<void> requestNotificationPermission() async {
     print('Android에서만 알림 권한 요청 수행');
-    // 여기에 기존 알림 권한 요청 코드 삽입
-  }
-
-  bool isTokenExpired(String token) {
-    try {
-      final parts = token.split('.');
-      if (parts.length != 3) return true;
-
-      String normalizedPayload = parts[1];
-      while (normalizedPayload.length % 4 != 0) {
-        normalizedPayload += '=';
-      }
-
-      final decodedToken =
-          jsonDecode(utf8.decode(base64Url.decode(normalizedPayload)));
-      final exp = decodedToken['exp'];
-      final currentTime = DateTime.now().millisecondsSinceEpoch / 1000;
-
-      return currentTime > exp;
-    } catch (e) {
-      return true;
-    }
+    // 기존 알림 권한 요청 코드 삽입
   }
 
   @override
