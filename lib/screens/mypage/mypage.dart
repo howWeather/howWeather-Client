@@ -257,7 +257,6 @@ class _MyPageState extends ConsumerState<MyPage> {
                                   ref.invalidate(similarDaysProvider);
                                   ref.invalidate(weatherByLocationProvider);
                                   ref.invalidate(recordViewModelProvider);
-                                  context.go('/');
                                 },
                               ),
                             );
@@ -296,7 +295,6 @@ class _MyPageState extends ConsumerState<MyPage> {
                                   ref.invalidate(similarDaysProvider);
                                   ref.invalidate(weatherByLocationProvider);
                                   ref.invalidate(recordViewModelProvider);
-                                  context.go('/');
                                 },
                               ),
                             );

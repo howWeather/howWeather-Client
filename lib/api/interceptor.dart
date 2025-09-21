@@ -48,15 +48,21 @@ class HttpInterceptor {
   Future<http.Response> _handleResponse(
     http.Response response,
     Future<http.Response> Function() retry, {
-    String? endpoint, // 엔드포인트 정보 추가
+    String? endpoint,
   }) async {
+    // 디버깅 로그 추가
+    print(
+        '_handleResponse 호출 - endpoint: $endpoint, statusCode: ${response.statusCode}');
+
     // 로그아웃/탈퇴 API는 401/403 에러여도 토큰 재발급 로직 건너뛰기
     if (endpoint != null &&
         (endpoint.contains('/logout') || endpoint.contains('/delete'))) {
+      print('로그아웃/탈퇴 API - 토큰 재발급 로직 건너뛰기');
       return response;
     }
 
     if (response.statusCode == 401 || response.statusCode == 403) {
+      print('401/403 에러 - 토큰 재발급 시도');
       if (_isRefreshing) return await _waitForTokenRefresh(retry);
 
       final success = await _attemptTokenRefresh();

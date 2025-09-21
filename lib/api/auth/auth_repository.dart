@@ -3,6 +3,7 @@ import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/api/howweather_api.dart';
 import 'package:client/api/interceptor.dart';
 import 'package:client/model/sign_up.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRepository {
@@ -165,14 +166,23 @@ class AuthRepository {
       endpoint,
     );
 
-    final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-    print(responseBody);
     if (response.statusCode == 200) {
+      final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
       await AuthStorage.clear();
+
+      // 로그아웃 성공 시 즉시 로그인 화면으로 이동
+      final context = HttpInterceptor.navigatorKey?.currentContext;
+      if (context != null && context.mounted) {
+        context.pushReplacement('/signIn');
+      }
+
       return responseBody['success'];
     } else if (response.statusCode == 401) {
-      // 이미 로그아웃된 토큰인 경우에도 로컬 저장소는 정리
       await AuthStorage.clear();
+      final context = HttpInterceptor.navigatorKey?.currentContext;
+      if (context != null && context.mounted) {
+        context.pushReplacement('/signIn');
+      }
     } else {
       throw Exception('로그아웃 실패: ${response.statusCode}');
     }
@@ -199,10 +209,18 @@ class AuthRepository {
 
     if (response.statusCode == 204) {
       await AuthStorage.clear();
+
+      final context = HttpInterceptor.navigatorKey?.currentContext;
+      if (context != null && context.mounted) {
+        context.pushReplacement('/signIn');
+      }
     } else if (response.statusCode == 401 || response.statusCode == 403) {
       // 이미 무효화된 토큰인 경우에도 로컬 저장소는 정리
       await AuthStorage.clear();
-      // 회원탈퇴는 성공으로 간주하거나 별도 처리
+      final context = HttpInterceptor.navigatorKey?.currentContext;
+      if (context != null && context.mounted) {
+        context.pushReplacement('/signIn');
+      }
     } else {
       throw Exception('회원탈퇴 실패: ${response.statusCode}');
     }
