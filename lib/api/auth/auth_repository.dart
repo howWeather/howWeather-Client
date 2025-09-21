@@ -165,10 +165,14 @@ class AuthRepository {
       endpoint,
     );
 
+    final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+    print(responseBody);
     if (response.statusCode == 200) {
-      final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
       await AuthStorage.clear();
       return responseBody['success'];
+    } else if (response.statusCode == 401) {
+      // 이미 로그아웃된 토큰인 경우에도 로컬 저장소는 정리
+      await AuthStorage.clear();
     } else {
       throw Exception('로그아웃 실패: ${response.statusCode}');
     }
@@ -195,6 +199,10 @@ class AuthRepository {
 
     if (response.statusCode == 204) {
       await AuthStorage.clear();
+    } else if (response.statusCode == 401 || response.statusCode == 403) {
+      // 이미 무효화된 토큰인 경우에도 로컬 저장소는 정리
+      await AuthStorage.clear();
+      // 회원탈퇴는 성공으로 간주하거나 별도 처리
     } else {
       throw Exception('회원탈퇴 실패: ${response.statusCode}');
     }
