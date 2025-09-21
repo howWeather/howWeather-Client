@@ -190,22 +190,25 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/home',
-            builder: (context, state) => WeatherScreen(),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: WeatherScreen()),
           ),
           GoRoute(
             path: '/todaywear',
-            builder: (context, state) => TodayWear(),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: TodayWear()),
           ),
           GoRoute(
             path: '/calendar',
-            builder: (context, state) => Calendar(),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: Calendar()),
           ),
           GoRoute(
             path: '/mypage',
-            builder: (context, state) => MyPage(),
+            pageBuilder: (context, state) => NoTransitionPage(child: MyPage()),
           ),
         ],
-      ),
+      )
     ],
   );
 });

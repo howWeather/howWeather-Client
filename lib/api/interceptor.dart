@@ -21,133 +21,6 @@ class HttpInterceptor {
   /// 재발급 대기 요청들
   final List<_PendingRequest> _pendingRequests = [];
 
-  /// GET 요청
-  Future<http.Response> get(
-    String endpoint, {
-    Map<String, String>? headers,
-    Map<String, dynamic>? body,
-    Map<String, String>? queryParams,
-    bool useAuth = true,
-  }) async {
-    String url = endpoint;
-    if (queryParams != null && queryParams.isNotEmpty) {
-      final query = queryParams.entries
-          .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
-          .join('&');
-      url += '?$query';
-    }
-    final uri = Uri.parse(url);
-
-    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
-
-    // GET + request body 요청 생성
-    final request = http.Request('GET', uri);
-    request.headers.addAll(requestHeaders);
-
-    if (body != null) {
-      request.body = jsonEncode(body);
-    }
-
-    // 요청 전송
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
-
-    return await _handleResponse(
-      response,
-      () => get(endpoint,
-          headers: headers,
-          body: body,
-          queryParams: queryParams,
-          useAuth: useAuth),
-    );
-  }
-
-  /// POST 요청
-  Future<http.Response> post(
-    String endpoint, {
-    Map<String, String>? headers,
-    dynamic body,
-    bool useAuth = true,
-  }) async {
-    final uri = Uri.parse(endpoint);
-    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
-    String? requestBody =
-        body != null ? (body is String ? body : jsonEncode(body)) : null;
-
-    final response =
-        await http.post(uri, headers: requestHeaders, body: requestBody);
-    return await _handleResponse(
-      response,
-      () => post(endpoint, headers: headers, body: body, useAuth: useAuth),
-    );
-  }
-
-  /// PUT 요청
-  Future<http.Response> put(
-    String endpoint, {
-    Map<String, String>? headers,
-    dynamic body,
-    bool useAuth = true,
-  }) async {
-    final uri = Uri.parse(endpoint);
-    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
-    String? requestBody =
-        body != null ? (body is String ? body : jsonEncode(body)) : null;
-
-    final response =
-        await http.put(uri, headers: requestHeaders, body: requestBody);
-    return await _handleResponse(
-      response,
-      () => put(endpoint, headers: headers, body: body, useAuth: useAuth),
-    );
-  }
-
-  /// PATCH 요청
-  Future<http.Response> patch(
-    String endpoint, {
-    Map<String, String>? headers,
-    dynamic body,
-    bool useAuth = true,
-  }) async {
-    final uri = Uri.parse(endpoint);
-    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
-    String? requestBody =
-        body != null ? (body is String ? body : jsonEncode(body)) : null;
-
-    final response =
-        await http.patch(uri, headers: requestHeaders, body: requestBody);
-    return await _handleResponse(
-      response,
-      () => patch(endpoint, headers: headers, body: body, useAuth: useAuth),
-    );
-  }
-
-  /// DELETE 요청
-  Future<http.Response> delete(
-    String endpoint, {
-    Map<String, String>? headers,
-    dynamic body,
-    bool useAuth = true,
-  }) async {
-    final uri = Uri.parse(endpoint);
-    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
-
-    // body 지원을 위해 http.Request 사용
-    final request = http.Request('DELETE', uri);
-    request.headers.addAll(requestHeaders);
-    if (body != null) {
-      request.body = body is String ? body : jsonEncode(body);
-    }
-
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
-
-    return await _handleResponse(
-      response,
-      () => delete(endpoint, headers: headers, body: body, useAuth: useAuth),
-    );
-  }
-
   /// 헤더 구성
   Future<Map<String, String>> _buildHeaders(
     Map<String, String>? customHeaders, {
@@ -174,8 +47,15 @@ class HttpInterceptor {
   /// 응답 처리 및 토큰 만료 체크
   Future<http.Response> _handleResponse(
     http.Response response,
-    Future<http.Response> Function() retry,
-  ) async {
+    Future<http.Response> Function() retry, {
+    String? endpoint, // 엔드포인트 정보 추가
+  }) async {
+    // 로그아웃/탈퇴 API는 401/403 에러여도 토큰 재발급 로직 건너뛰기
+    if (endpoint != null &&
+        (endpoint.contains('/logout') || endpoint.contains('/delete'))) {
+      return response;
+    }
+
     if (response.statusCode == 401 || response.statusCode == 403) {
       if (_isRefreshing) return await _waitForTokenRefresh(retry);
 
@@ -185,6 +65,135 @@ class HttpInterceptor {
       return response;
     }
     return response;
+  }
+
+  /// GET 요청 (수정)
+  Future<http.Response> get(
+    String endpoint, {
+    Map<String, String>? headers,
+    Map<String, dynamic>? body,
+    Map<String, String>? queryParams,
+    bool useAuth = true,
+  }) async {
+    String url = endpoint;
+    if (queryParams != null && queryParams.isNotEmpty) {
+      final query = queryParams.entries
+          .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+      url += '?$query';
+    }
+    final uri = Uri.parse(url);
+
+    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
+
+    final request = http.Request('GET', uri);
+    request.headers.addAll(requestHeaders);
+
+    if (body != null) {
+      request.body = jsonEncode(body);
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    return await _handleResponse(
+      response,
+      () => get(endpoint,
+          headers: headers,
+          body: body,
+          queryParams: queryParams,
+          useAuth: useAuth),
+      endpoint: endpoint, // 엔드포인트 정보 전달
+    );
+  }
+
+  /// POST 요청 (수정)
+  Future<http.Response> post(
+    String endpoint, {
+    Map<String, String>? headers,
+    dynamic body,
+    bool useAuth = true,
+  }) async {
+    final uri = Uri.parse(endpoint);
+    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
+    String? requestBody =
+        body != null ? (body is String ? body : jsonEncode(body)) : null;
+
+    final response =
+        await http.post(uri, headers: requestHeaders, body: requestBody);
+    return await _handleResponse(
+      response,
+      () => post(endpoint, headers: headers, body: body, useAuth: useAuth),
+      endpoint: endpoint, // 엔드포인트 정보 전달
+    );
+  }
+
+  /// PUT 요청 (수정)
+  Future<http.Response> put(
+    String endpoint, {
+    Map<String, String>? headers,
+    dynamic body,
+    bool useAuth = true,
+  }) async {
+    final uri = Uri.parse(endpoint);
+    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
+    String? requestBody =
+        body != null ? (body is String ? body : jsonEncode(body)) : null;
+
+    final response =
+        await http.put(uri, headers: requestHeaders, body: requestBody);
+    return await _handleResponse(
+      response,
+      () => put(endpoint, headers: headers, body: body, useAuth: useAuth),
+      endpoint: endpoint, // 엔드포인트 정보 전달
+    );
+  }
+
+  /// PATCH 요청 (수정)
+  Future<http.Response> patch(
+    String endpoint, {
+    Map<String, String>? headers,
+    dynamic body,
+    bool useAuth = true,
+  }) async {
+    final uri = Uri.parse(endpoint);
+    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
+    String? requestBody =
+        body != null ? (body is String ? body : jsonEncode(body)) : null;
+
+    final response =
+        await http.patch(uri, headers: requestHeaders, body: requestBody);
+    return await _handleResponse(
+      response,
+      () => patch(endpoint, headers: headers, body: body, useAuth: useAuth),
+      endpoint: endpoint, // 엔드포인트 정보 전달
+    );
+  }
+
+  /// DELETE 요청 (수정)
+  Future<http.Response> delete(
+    String endpoint, {
+    Map<String, String>? headers,
+    dynamic body,
+    bool useAuth = true,
+  }) async {
+    final uri = Uri.parse(endpoint);
+    final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
+
+    final request = http.Request('DELETE', uri);
+    request.headers.addAll(requestHeaders);
+    if (body != null) {
+      request.body = body is String ? body : jsonEncode(body);
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    return await _handleResponse(
+      response,
+      () => delete(endpoint, headers: headers, body: body, useAuth: useAuth),
+      endpoint: endpoint, // 엔드포인트 정보 전달
+    );
   }
 
   /// 토큰 재발급 시도
