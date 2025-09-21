@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:client/api/auth/auth_storage.dart';
 import 'package:client/api/howweather_api.dart';
 import 'package:client/api/interceptor.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -71,23 +72,41 @@ class AlarmRepository {
 
   /// FCM token 제거
   Future<void> deleteFCMToken() async {
-    final url = '$_baseUrl/token-delete';
-    final fcmToken = await FirebaseMessaging.instance.getToken();
+    try {
+      final url = '$_baseUrl/token-delete';
+      final fcmToken = await FirebaseMessaging.instance.getToken();
 
-    if (fcmToken == null) {
-      print('FCM 토큰을 가져올 수 없음');
-      return;
-    }
-    print(fcmToken);
+      if (fcmToken == null) {
+        print('FCM 토큰을 가져올 수 없음');
+        return;
+      }
+      print('삭제 요청할 FCM 토큰: $fcmToken');
 
-    final response = await _http.delete(
-      url,
-    );
+      final response = await _http.delete(
+        url,
+        body: {"token": fcmToken},
+        useAuth: true,
+      );
 
-    if (response.statusCode == 204) {
-      print('FCM 토큰 제거 성공');
-    } else {
-      print('FCM 토큰 제거 실패: ${response.body}');
+      print('FCM 토큰 삭제 응답 상태: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        print('✅ FCM 토큰 제거 성공');
+      } else {
+        if (response.body.isNotEmpty) {
+          try {
+            final decoded = utf8.decode(response.bodyBytes);
+            final json = jsonDecode(decoded);
+            print('❌ FCM 토큰 제거 실패: ${response.statusCode} $json');
+          } catch (e) {
+            print('❌ FCM 토큰 제거 실패: ${response.statusCode} (응답 본문 파싱 실패)');
+          }
+        } else {
+          print('❌ FCM 토큰 제거 실패: ${response.statusCode} (응답 본문 없음)');
+        }
+      }
+    } catch (e) {
+      print('FCM 토큰 제거 중 오류 발생: $e');
     }
   }
 }
