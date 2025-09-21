@@ -100,9 +100,11 @@ class _TodayWearState extends ConsumerState<TodayWear> {
             await _initializeData();
           },
           color: HowWeatherColor.primary[900],
-          child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [const Color(0xFF4093EB), const Color(0xFFABDAEF)],
@@ -110,251 +112,300 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                   end: Alignment.bottomCenter,
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 50),
-                  Semibold_24px(
-                    text: "오늘 날씨에 추천하는 옷이에요!",
-                    color: HowWeatherColor.white,
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height - 40,
                   ),
-                  SizedBox(height: 20),
-                  modelState.when(
-                    loading: () => const CircularProgressIndicator(),
-                    error: (e, _) {
-                      print(e);
-                      return SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.215,
-                      );
-                    },
-                    data: (recommendations) {
-                      if (recommendations.isEmpty) {
-                        return Semibold_18px(
-                          text: "추천 가능한 옷이 없습니다. 새로운 옷을 추가해 보세요.",
-                          color: HowWeatherColor.white,
-                        );
-                      }
-
-                      // 모든 추천에서 상의와 아우터 타입들을 수집
-                      final allUpperTypes = getAllUpperTypes(recommendations);
-                      final allOuterTypes = getAllOuterTypes(recommendations);
-
-                      // 인덱스 초기화 (타입이 변경되었을 때)
-                      if (currentUpperIndex >= allUpperTypes.length) {
-                        currentUpperIndex = 0;
-                      }
-                      if (currentOuterIndex >= allOuterTypes.length) {
-                        currentOuterIndex = 0;
-                      }
-
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 상의 섹션
-                          if (allUpperTypes.isNotEmpty)
-                            Expanded(
-                              child: _buildClothSection(
-                                title: "추천 상의",
-                                clothTypes: allUpperTypes,
-                                currentIndex: currentUpperIndex,
-                                onPrevious: () =>
-                                    previousUpper(allUpperTypes.length),
-                                onNext: () => nextUpper(allUpperTypes.length),
-                                isUpper: true,
-                              ),
-                            ),
-                          // 아우터 섹션
-                          if (allOuterTypes.isNotEmpty) ...[
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: _buildClothSection(
-                                title: "추천 아우터",
-                                clothTypes: allOuterTypes,
-                                currentIndex: currentOuterIndex,
-                                onPrevious: () =>
-                                    previousOuter(allOuterTypes.length),
-                                onNext: () => nextOuter(allOuterTypes.length),
-                                isUpper: false,
-                              ),
-                            ),
-                          ]
-                        ],
-                      );
-                    },
-                  ),
-                  SizedBox(height: 40),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: HowWeatherColor.black.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Medium_16px(
-                              text: '체감별 날씨 그래프',
-                              color: HowWeatherColor.white,
-                            ),
-                            Spacer(),
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: HowWeatherColor.secondary[800],
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            Medium_14px(
-                              text: "더움",
-                              color: HowWeatherColor.white,
-                            ),
-                            SizedBox(width: 12),
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: HowWeatherColor.secondary[500],
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            Medium_14px(
-                              text: "적당",
-                              color: HowWeatherColor.white,
-                            ),
-                            SizedBox(width: 12),
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: HowWeatherColor.primary[800],
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            Medium_14px(
-                              text: "추움",
-                              color: HowWeatherColor.white,
-                            ),
-                          ],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 50),
+                      Semibold_24px(
+                        text: "오늘 날씨에 추천하는 옷이에요!",
+                        color: HowWeatherColor.white,
+                      ),
+                      SizedBox(height: 20),
+                      modelState.when(
+                        loading: () => Container(
+                          height: MediaQuery.of(context).size.height * 0.3,
+                          child:
+                              const Center(child: CircularProgressIndicator()),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: Divider(
-                            height: 1,
-                            color: HowWeatherColor.white.withOpacity(0.5),
-                          ),
-                        ),
-                        PerceivedTemperatureChart(hourlyData: hourlyData),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: HowWeatherColor.black.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Semibold_16px(
-                              text: '기준 지역',
-                              color: HowWeatherColor.white,
+                        error: (e, _) {
+                          print(e);
+                          return Container(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            child: Center(
+                              child: Semibold_18px(
+                                text: "데이터를 불러오는 중 오류가 발생했습니다.",
+                                color: HowWeatherColor.white,
+                              ),
                             ),
-                            GestureDetector(
-                              onTap: () async {
-                                final selectedLocation =
-                                    await context.push('/location-search');
-                                if (selectedLocation != null &&
-                                    selectedLocation is String) {
-                                  try {
-                                    await ref
-                                        .read(
-                                            locationViewModelProvider.notifier)
-                                        .updateUserLocation(selectedLocation);
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              '위치가 "$selectedLocation"로 설정되었습니다.'),
-                                          backgroundColor:
-                                              HowWeatherColor.primary[600],
-                                        ),
-                                      );
-                                    }
-                                  } catch (e) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              '위치 설정에 실패했습니다: ${e.toString()}'),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
-                                    }
-                                  }
-                                }
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 4, horizontal: 8),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
+                          );
+                        },
+                        data: (recommendations) {
+                          if (recommendations.isEmpty) {
+                            return Container(
+                              height: MediaQuery.of(context).size.height * 0.3,
+                              child: Center(
+                                child: Semibold_18px(
+                                  text: "추천 가능한 옷이 없습니다. 새로운 옷을 추가해 보세요.",
                                   color: HowWeatherColor.white,
                                 ),
-                                child: Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                        'assets/icons/locator.svg'),
-                                    SizedBox(width: 4),
-                                    Semibold_16px(
-                                      text: currentUserLocation ?? '서울특별시 용산구',
-                                    ),
-                                  ],
+                              ),
+                            );
+                          }
+
+                          // 모든 추천에서 상의와 아우터 타입들을 수집
+                          final allUpperTypes =
+                              getAllUpperTypes(recommendations);
+                          final allOuterTypes =
+                              getAllOuterTypes(recommendations);
+
+                          // 인덱스 초기화 (타입이 변경되었을 때)
+                          if (currentUpperIndex >= allUpperTypes.length) {
+                            currentUpperIndex = 0;
+                          }
+                          if (currentOuterIndex >= allOuterTypes.length) {
+                            currentOuterIndex = 0;
+                          }
+
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 상의 섹션
+                              if (allUpperTypes.isNotEmpty)
+                                Expanded(
+                                  child: _buildClothSection(
+                                    title: "추천 상의",
+                                    clothTypes: allUpperTypes,
+                                    currentIndex: currentUpperIndex,
+                                    onPrevious: () =>
+                                        previousUpper(allUpperTypes.length),
+                                    onNext: () =>
+                                        nextUpper(allUpperTypes.length),
+                                    isUpper: true,
+                                  ),
                                 ),
+                              // 아우터 섹션
+                              if (allOuterTypes.isNotEmpty) ...[
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildClothSection(
+                                    title: "추천 아우터",
+                                    clothTypes: allOuterTypes,
+                                    currentIndex: currentOuterIndex,
+                                    onPrevious: () =>
+                                        previousOuter(allOuterTypes.length),
+                                    onNext: () =>
+                                        nextOuter(allOuterTypes.length),
+                                    isUpper: false,
+                                  ),
+                                ),
+                              ]
+                            ],
+                          );
+                        },
+                      ),
+                      SizedBox(height: 40),
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: HowWeatherColor.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Medium_16px(
+                                  text: '체감별 날씨 그래프',
+                                  color: HowWeatherColor.white,
+                                ),
+                                Spacer(),
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: HowWeatherColor.secondary[800],
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                Medium_14px(
+                                  text: "더움",
+                                  color: HowWeatherColor.white,
+                                ),
+                                SizedBox(width: 12),
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: HowWeatherColor.secondary[500],
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                Medium_14px(
+                                  text: "적당",
+                                  color: HowWeatherColor.white,
+                                ),
+                                SizedBox(width: 12),
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: HowWeatherColor.primary[800],
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                Medium_14px(
+                                  text: "추움",
+                                  color: HowWeatherColor.white,
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Divider(
+                                height: 1,
+                                color: HowWeatherColor.white.withOpacity(0.5),
                               ),
                             ),
+                            PerceivedTemperatureChart(hourlyData: hourlyData),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: Divider(
-                            height: 1,
-                            color: HowWeatherColor.white.withOpacity(0.5),
-                          ),
+                      ),
+                      SizedBox(height: 16),
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: HowWeatherColor.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        Medium_14px(
-                          text: '''- 기준 지역의 예보 데이터를 이용하여 의상을 추천합니다.
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Semibold_16px(
+                                  text: '기준 지역',
+                                  color: HowWeatherColor.white,
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    final selectedLocation =
+                                        await context.push('/location-search');
+                                    if (selectedLocation != null &&
+                                        selectedLocation is String) {
+                                      try {
+                                        await ref
+                                            .read(locationViewModelProvider
+                                                .notifier)
+                                            .updateUserLocation(
+                                                selectedLocation);
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  '위치가 "$selectedLocation"로 설정되었습니다.'),
+                                              backgroundColor:
+                                                  HowWeatherColor.primary[600],
+                                            ),
+                                          );
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  '위치 설정에 실패했습니다: ${e.toString()}'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 4, horizontal: 8),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: HowWeatherColor.white,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                            'assets/icons/locator.svg'),
+                                        SizedBox(width: 4),
+                                        Semibold_16px(
+                                          text: currentUserLocation ??
+                                              '서울특별시 용산구',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Divider(
+                                height: 1,
+                                color: HowWeatherColor.white.withOpacity(0.5),
+                              ),
+                            ),
+                            Medium_14px(
+                              text: '''- 기준 지역의 예보 데이터를 이용하여 의상을 추천합니다.
 - 초기 설정은 서울특별시 용산구입니다.
 - 오전 04:00 ~ 07:00 동안에는 지역 변경이 불가합니다.
 - 지역 변경 시 다음 날부터 해당 지역의 예보 데이터로 예측을 진행합니다. ''',
-                          color: HowWeatherColor.white,
+                              color: HowWeatherColor.white,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      // Spacer를 추가하여 남은 공간을 채움
+                      SizedBox(height: 40),
+                    ],
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                ],
+                ),
               ),
             ),
           ),
         );
       },
       loading: () => TodayWearSkeleton(),
-      error: (e, st) => Text('에러 발생: $e'),
+      error: (e, st) => Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [const Color(0xFF4093EB), const Color(0xFFABDAEF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            '에러 발생: $e',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
     );
   }
 
