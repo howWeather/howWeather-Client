@@ -126,15 +126,25 @@ class HttpInterceptor {
   Future<http.Response> delete(
     String endpoint, {
     Map<String, String>? headers,
+    dynamic body,
     bool useAuth = true,
   }) async {
     final uri = Uri.parse(endpoint);
     final requestHeaders = await _buildHeaders(headers, useAuth: useAuth);
 
-    final response = await http.delete(uri, headers: requestHeaders);
+    // body 지원을 위해 http.Request 사용
+    final request = http.Request('DELETE', uri);
+    request.headers.addAll(requestHeaders);
+    if (body != null) {
+      request.body = body is String ? body : jsonEncode(body);
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
     return await _handleResponse(
       response,
-      () => delete(endpoint, headers: headers, useAuth: useAuth),
+      () => delete(endpoint, headers: headers, body: body, useAuth: useAuth),
     );
   }
 
