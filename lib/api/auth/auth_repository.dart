@@ -160,69 +160,70 @@ class AuthRepository {
 
   /// 로그아웃
   Future<void> logout() async {
+    // 먼저 로컬 토큰을 클리어하여 다른 요청들이 토큰 재발급을 시도하지 않도록 함
+    await AuthStorage.clear();
+
     final endpoint = '$_baseUrl/logout';
 
-    final response = await _httpClient.post(
-      endpoint,
-    );
+    try {
+      final response = await _httpClient.post(endpoint);
 
-    if (response.statusCode == 200) {
-      final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-      await AuthStorage.clear();
-
-      // 로그아웃 성공 시 즉시 로그인 화면으로 이동
-      final context = HttpInterceptor.navigatorKey?.currentContext;
-      if (context != null && context.mounted) {
-        context.pushReplacement('/signIn');
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        // 로그아웃 성공 시 즉시 로그인 화면으로 이동
+        final context = HttpInterceptor.navigatorKey?.currentContext;
+        if (context != null && context.mounted) {
+          context.pushReplacement('/signIn');
+        }
+        return responseBody['success'];
       }
+    } catch (e) {
+      print('로그아웃 API 호출 실패: $e');
+    }
 
-      return responseBody['success'];
-    } else if (response.statusCode == 401) {
-      await AuthStorage.clear();
-      final context = HttpInterceptor.navigatorKey?.currentContext;
-      if (context != null && context.mounted) {
-        context.pushReplacement('/signIn');
-      }
-    } else {
-      throw Exception('로그아웃 실패: ${response.statusCode}');
+    // API 호출 실패해도 로컬 토큰은 이미 클리어했으므로 로그인 화면으로 이동
+    final context = HttpInterceptor.navigatorKey?.currentContext;
+    if (context != null && context.mounted) {
+      context.pushReplacement('/signIn');
     }
   }
 
   /// 회원탈퇴
   Future<void> withdraw() async {
+    // 먼저 로컬 토큰을 클리어하여 다른 요청들이 토큰 재발급을 시도하지 않도록 함
     final loginType = await AuthStorage.getLoginType();
-    final headers = <String, String>{};
+    final socialToken = await AuthStorage.getSocialToken();
 
-    if (loginType == 'social') {
-      final socialToken = await AuthStorage.getSocialToken();
-      if (socialToken != null) {
-        headers["Social-Access-Token"] = socialToken;
-      }
+    // 토큰 정보를 미리 저장한 후 클리어
+    await AuthStorage.clear();
+
+    final headers = <String, String>{};
+    if (loginType == 'social' && socialToken != null) {
+      headers["Social-Access-Token"] = socialToken;
     }
 
     final endpoint = '$_baseUrl/delete';
 
-    final response = await _httpClient.delete(
-      endpoint,
-      headers: headers,
-    );
+    try {
+      final response = await _httpClient.delete(
+        endpoint,
+        headers: headers,
+      );
 
-    if (response.statusCode == 204) {
-      await AuthStorage.clear();
+      if (response.statusCode == 204) {
+        final context = HttpInterceptor.navigatorKey?.currentContext;
+        if (context != null && context.mounted) {
+          context.pushReplacement('/signIn');
+        }
+      }
+    } catch (e) {
+      print('탈퇴 API 호출 실패: $e');
+    }
 
-      final context = HttpInterceptor.navigatorKey?.currentContext;
-      if (context != null && context.mounted) {
-        context.pushReplacement('/signIn');
-      }
-    } else if (response.statusCode == 401 || response.statusCode == 403) {
-      // 이미 무효화된 토큰인 경우에도 로컬 저장소는 정리
-      await AuthStorage.clear();
-      final context = HttpInterceptor.navigatorKey?.currentContext;
-      if (context != null && context.mounted) {
-        context.pushReplacement('/signIn');
-      }
-    } else {
-      throw Exception('회원탈퇴 실패: ${response.statusCode}');
+    // API 호출 실패해도 로컬 토큰은 이미 클리어했으므로 로그인 화면으로 이동
+    final context = HttpInterceptor.navigatorKey?.currentContext;
+    if (context != null && context.mounted) {
+      context.pushReplacement('/signIn');
     }
   }
 

@@ -10,6 +10,7 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_dialog.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/providers/calendar_providers.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/skeleton/mypage_skeleton.dart';
@@ -243,9 +244,8 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 contentText: "로그아웃하시겠습니까?",
                                 done: () async {
                                   if (!TapThrottler.canTap('logout')) return;
-                                  if (Platform.isAndroid)
-                                    await AlarmRepository().deleteFCMToken();
-                                  await AuthRepository().logout();
+
+                                  // 1. 먼저 상태를 초기화
                                   ref.read(closetProvider.notifier).state =
                                       const AsyncLoading();
                                   ref.resetClothProviders();
@@ -257,6 +257,13 @@ class _MyPageState extends ConsumerState<MyPage> {
                                   ref.invalidate(similarDaysProvider);
                                   ref.invalidate(weatherByLocationProvider);
                                   ref.invalidate(recordViewModelProvider);
+
+                                  // 2. FCM 토큰 삭제
+                                  if (Platform.isAndroid)
+                                    await AlarmRepository().deleteFCMToken();
+
+                                  // 3. 로그아웃 API 호출
+                                  await AuthRepository().logout();
                                 },
                               ),
                             );
@@ -285,7 +292,10 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 contentText: "탈퇴하시겠습니까?\n모든 기록이 사라집니다.",
                                 done: () async {
                                   if (!TapThrottler.canTap('withdraw')) return;
-                                  await AuthRepository().withdraw();
+
+                                  // 1. 먼저 상태를 초기화
+                                  ref.read(closetProvider.notifier).state =
+                                      const AsyncLoading();
                                   ref.resetClothProviders();
                                   ref
                                       .read(mypageViewModelProvider.notifier)
@@ -295,6 +305,9 @@ class _MyPageState extends ConsumerState<MyPage> {
                                   ref.invalidate(similarDaysProvider);
                                   ref.invalidate(weatherByLocationProvider);
                                   ref.invalidate(recordViewModelProvider);
+
+                                  // 2. 탈퇴 처리
+                                  await AuthRepository().withdraw();
                                 },
                               ),
                             );
