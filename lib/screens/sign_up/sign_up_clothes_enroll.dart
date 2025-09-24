@@ -3,6 +3,7 @@ import 'package:client/designs/Palette.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:client/screens/mypage/clothes/clothes_enroll.dart'
     hide selectedEnrollClothProvider;
@@ -44,7 +45,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Divider(
-                      color: HowWeatherColor.primary[900],
+                      color: HowWeatherColor.neutral[200],
                       height: 1,
                     ),
                   ),
@@ -155,6 +156,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
           ? () {
               if (!TapThrottler.canTap('signup_clothes')) return;
               context.push('/');
+              HowWeatherToast.show(context, '회원가입 성공!', false);
             }
           : null,
       child: Container(
@@ -167,6 +169,8 @@ class SignUpEnrollClothes extends ConsumerWidget {
                 onTap: () {
                   if (!TapThrottler.canTap('signup_clothes')) return;
                   context.push('/');
+                  HowWeatherToast.show(
+                      context, '회원가입 성공!\n의류는 마이페이지에서 등록할 수 있어요.', false);
                 },
                 child: Medium_20px(text: '나중에 등록하기'),
               ),
@@ -175,7 +179,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               color: HowWeatherColor.white,
               child: Container(
-                height: 72,
+                height: 56,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: isAllValid
@@ -183,9 +187,11 @@ class SignUpEnrollClothes extends ConsumerWidget {
                       : HowWeatherColor.neutral[200],
                 ),
                 child: Center(
-                  child: Semibold_24px(
+                  child: Semibold_18px(
                     text: "다음",
-                    color: HowWeatherColor.white,
+                    color: isAllValid
+                        ? HowWeatherColor.white
+                        : HowWeatherColor.neutral[400],
                   ),
                 ),
               ),

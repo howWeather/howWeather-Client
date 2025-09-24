@@ -1,5 +1,6 @@
 import 'package:client/designs/how_weather_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,14 +33,18 @@ class _HowWeatherNaviShellState extends State<HowWeatherNaviShell> {
   @override
   Widget build(BuildContext context) {
     final selectedIndex = _getSelectedIndex(context);
-    return Container(
-      color: HowWeatherColor.white,
-      child: SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: widget.child,
-          bottomNavigationBar: _buildRoundedBottomNavigationBar(selectedIndex),
-          extendBody: true,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Container(
+        color: HowWeatherColor.white,
+        child: SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: widget.child,
+            bottomNavigationBar:
+                _buildRoundedBottomNavigationBar(selectedIndex),
+            extendBody: true,
+          ),
         ),
       ),
     );

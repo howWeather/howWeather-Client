@@ -74,16 +74,18 @@ class SendEmail extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SvgPicture.asset(
+                width: 20,
                 'assets/icons/Info.svg',
-                color: HowWeatherColor.neutral[600],
+                color: HowWeatherColor.neutral[500],
+                fit: BoxFit.scaleDown,
               ),
               SizedBox(
-                width: 5,
+                width: 4,
               ),
               Expanded(
                   child: Medium_14px(
                 text: '메일이 오지 않은 경우 스팸함을 확인해주세요.',
-                color: HowWeatherColor.neutral[600],
+                color: HowWeatherColor.neutral[700],
               )),
             ],
           ),
@@ -94,16 +96,18 @@ class SendEmail extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SvgPicture.asset(
+                width: 20,
                 'assets/icons/Info.svg',
-                color: HowWeatherColor.neutral[600],
+                color: HowWeatherColor.neutral[500],
+                fit: BoxFit.scaleDown,
               ),
               SizedBox(
-                width: 5,
+                width: 4,
               ),
               Expanded(
                 child: Medium_14px(
                   text: '임시 비밀번호로 로그인 후 보안을 위해 비밀번호를 변경해주세요.',
-                  color: HowWeatherColor.neutral[600],
+                  color: HowWeatherColor.neutral[700],
                 ),
               ),
             ],
@@ -116,17 +120,15 @@ class SendEmail extends ConsumerWidget {
               context.push('/signIn');
             },
             child: Container(
-              child: Container(
-                height: 72,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: HowWeatherColor.primary[900],
-                ),
-                child: Center(
-                  child: Semibold_24px(
-                    text: "임시 비밀번호로 로그인 하기",
-                    color: HowWeatherColor.white,
-                  ),
+              height: 56,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: HowWeatherColor.primary[900],
+              ),
+              child: Center(
+                child: Semibold_18px(
+                  text: "임시 비밀번호로 로그인 하기",
+                  color: HowWeatherColor.white,
                 ),
               ),
             ),

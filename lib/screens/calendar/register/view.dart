@@ -4,6 +4,7 @@ import 'package:client/designs/cloth_modal.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/providers/calendar_providers.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:client/providers/location_provider.dart';
@@ -197,11 +198,11 @@ class Register extends ConsumerWidget {
         data: (temp) => Bold_24px(text: '${temp.toStringAsFixed(1)}°'),
         loading: () => SizedBox(
           width: 50,
-          child: Medium_14px(text: '로딩중...'),
+          child: Medium_14px(text: ''),
         ),
         error: (e, _) => SizedBox(
           width: 50,
-          child: Medium_14px(text: '오류'),
+          child: Medium_14px(text: '지원 불가'),
         ),
       );
     } else {
@@ -215,10 +216,10 @@ class Register extends ConsumerWidget {
           );
         },
         loading: () {
-          return Medium_14px(text: '...');
+          return Medium_14px(text: '');
         },
         error: (e, _) {
-          return Medium_14px(text: '실패');
+          return Medium_14px(text: '현재 위치는 날씨 데이터를\n제공하지 않아요. 🥹');
         },
       );
     }
@@ -248,17 +249,19 @@ class Register extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         color: HowWeatherColor.white,
         child: Container(
-          height: 72,
+          height: 56,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: isAllValid
                 ? HowWeatherColor.primary[900]
                 : HowWeatherColor.neutral[200],
           ),
-          child: const Center(
-            child: Semibold_24px(
+          child: Center(
+            child: Semibold_18px(
               text: "등록하기",
-              color: HowWeatherColor.white,
+              color: isAllValid
+                  ? HowWeatherColor.white
+                  : HowWeatherColor.neutral[400],
             ),
           ),
         ),
@@ -276,22 +279,22 @@ class Register extends ConsumerWidget {
     final selectedDay = ref.read(selectedDayProvider);
 
     if (timeSlot == null) {
-      _showSnackBar(context, '시간을 선택해주세요.', Colors.red);
+      HowWeatherToast.show(context, '시간을 선택해주세요.', true);
       return;
     }
 
     if (feeling == null) {
-      _showSnackBar(context, '체감온도를 선택해주세요.', Colors.red);
+      HowWeatherToast.show(context, '체감온도를 선택해주세요.', true);
       return;
     }
 
     if (selectedDay == null) {
-      _showSnackBar(context, '날짜를 선택해주세요.', Colors.red);
+      HowWeatherToast.show(context, '날짜를 선택해주세요.', true);
       return;
     }
 
     if (upperInfo == null && outerInfo == null) {
-      _showSnackBar(context, '상의 또는 아우터 중 하나 이상을 선택해주세요.', Colors.red);
+      HowWeatherToast.show(context, '상의 또는 아우터 중 하나 이상을 선택해주세요.', true);
       return;
     }
 
@@ -321,20 +324,11 @@ class Register extends ConsumerWidget {
             DateFormat('yyyy-MM').format(selectedDay));
       });
 
-      _showSnackBar(context, '기록이 성공적으로 저장되었어요!', Colors.green);
+      HowWeatherToast.show(context, '기록이 성공적으로 저장되었어요!', false);
     } catch (e) {
-      _showSnackBar(context, '$e', Colors.red);
+      HowWeatherToast.show(
+          context, '${e.toString().replaceAll('Exception: ', '')}', true);
     }
-  }
-
-  void _showSnackBar(BuildContext context, String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   Widget TemperatureButton(int value, WidgetRef ref) {

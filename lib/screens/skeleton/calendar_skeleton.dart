@@ -35,10 +35,10 @@ class CalendarSkeleton extends StatelessWidget {
                     child: _buildCalendarSkeleton(),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Divider(
                       height: 1,
-                      color: HowWeatherColor.primary[900],
+                      color: HowWeatherColor.neutral[200],
                     ),
                   ),
                   _buildDailyHistorySkeleton(context),

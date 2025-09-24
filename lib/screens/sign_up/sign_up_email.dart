@@ -1,6 +1,7 @@
 import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,8 +79,8 @@ class SignUpEmail extends ConsumerWidget {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: HowWeatherColor.neutral[100]!,
-                              width: 3,
+                              color: HowWeatherColor.neutral[200]!,
+                              width: 2,
                             ),
                           ),
                           filled: true,
@@ -87,8 +88,8 @@ class SignUpEmail extends ConsumerWidget {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: HowWeatherColor.neutral[200]!,
-                              width: 3,
+                              color: HowWeatherColor.primary[900]!,
+                              width: 2,
                             ),
                           ),
                           floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -97,7 +98,7 @@ class SignUpEmail extends ConsumerWidget {
                             fontFamily: 'Pretendard',
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: HowWeatherColor.neutral[200],
+                            color: HowWeatherColor.neutral[400],
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
@@ -108,7 +109,7 @@ class SignUpEmail extends ConsumerWidget {
                         margin: EdgeInsets.symmetric(horizontal: 8),
                         child: Semibold_20px(
                           text: "@",
-                          color: HowWeatherColor.neutral[200],
+                          color: HowWeatherColor.neutral[700],
                         )),
                     Expanded(
                       flex: 1,
@@ -124,8 +125,8 @@ class SignUpEmail extends ConsumerWidget {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: HowWeatherColor.neutral[100]!,
-                              width: 3,
+                              color: HowWeatherColor.neutral[200]!,
+                              width: 2,
                             ),
                           ),
                           filled: true,
@@ -133,8 +134,8 @@ class SignUpEmail extends ConsumerWidget {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: HowWeatherColor.neutral[200]!,
-                              width: 3,
+                              color: HowWeatherColor.primary[900]!,
+                              width: 2,
                             ),
                           ),
                           floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -143,7 +144,7 @@ class SignUpEmail extends ConsumerWidget {
                             fontFamily: 'Pretendard',
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: HowWeatherColor.neutral[200],
+                            color: HowWeatherColor.neutral[400],
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
@@ -174,12 +175,7 @@ class SignUpEmail extends ConsumerWidget {
                 final signupData = SignupData(email: email);
                 context.push('/signUp/email/check', extra: signupData);
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('이메일 중복 검증 실패: ${e.toString()}'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                HowWeatherToast.show(context, '${e.toString()}', true);
               }
             }
           : null,
@@ -188,7 +184,7 @@ class SignUpEmail extends ConsumerWidget {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         color: HowWeatherColor.white,
         child: Container(
-          height: 72,
+          height: 56,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: isAllValid
@@ -196,9 +192,11 @@ class SignUpEmail extends ConsumerWidget {
                 : HowWeatherColor.neutral[200],
           ),
           child: Center(
-            child: Semibold_24px(
+            child: Semibold_18px(
               text: "다음",
-              color: HowWeatherColor.white,
+              color: isAllValid
+                  ? HowWeatherColor.white
+                  : HowWeatherColor.neutral[400],
             ),
           ),
         ),

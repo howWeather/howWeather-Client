@@ -79,8 +79,8 @@ class FindPassword extends ConsumerWidget {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: HowWeatherColor.neutral[100]!,
-                              width: 3,
+                              color: HowWeatherColor.neutral[200]!,
+                              width: 2,
                             ),
                           ),
                           filled: true,
@@ -88,8 +88,8 @@ class FindPassword extends ConsumerWidget {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: HowWeatherColor.neutral[200]!,
-                              width: 3,
+                              color: HowWeatherColor.primary[900]!,
+                              width: 2,
                             ),
                           ),
                           floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -98,7 +98,7 @@ class FindPassword extends ConsumerWidget {
                             fontFamily: 'Pretendard',
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: HowWeatherColor.neutral[200],
+                            color: HowWeatherColor.neutral[400],
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
@@ -145,7 +145,7 @@ class FindPassword extends ConsumerWidget {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         color: HowWeatherColor.white,
         child: Container(
-          height: 72,
+          height: 56,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: isAllValid
@@ -153,9 +153,11 @@ class FindPassword extends ConsumerWidget {
                 : HowWeatherColor.neutral[200],
           ),
           child: Center(
-            child: Semibold_24px(
+            child: Semibold_18px(
               text: "다음",
-              color: HowWeatherColor.white,
+              color: isAllValid
+                  ? HowWeatherColor.white
+                  : HowWeatherColor.neutral[400],
             ),
           ),
         ),

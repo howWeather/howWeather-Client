@@ -51,7 +51,7 @@ class Version extends ConsumerWidget {
                         Medium_18px(text: "날씨어때"),
                         SizedBox(height: 4),
                         Medium_16px(
-                            text: "1.0.0", color: HowWeatherColor.neutral[400]),
+                            text: "1.0.0", color: HowWeatherColor.neutral[600]),
                       ],
                     ),
                     Spacer(),
@@ -80,7 +80,7 @@ class Version extends ConsumerWidget {
                     Spacer(),
                     Medium_16px(
                         text: "howWeather2025@gmail.com",
-                        color: HowWeatherColor.neutral[400]),
+                        color: HowWeatherColor.neutral[600]),
                   ],
                 ),
               ],

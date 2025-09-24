@@ -51,8 +51,8 @@ class ClothCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
-                ? HowWeatherColor.neutral[200]!
-                : HowWeatherColor.neutral[100]!,
+                ? HowWeatherColor.primary[400]!
+                : HowWeatherColor.neutral[200]!,
             width: 2,
           ),
         ),

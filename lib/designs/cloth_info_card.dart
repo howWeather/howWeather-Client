@@ -4,6 +4,7 @@ import 'package:client/designs/cloth_card.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/model/cloth_item.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:flutter/material.dart';
@@ -115,8 +116,8 @@ Widget ClothInfoCard({
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isRegistered
-              ? HowWeatherColor.neutral[700]!
-              : HowWeatherColor.neutral[100]!,
+              ? HowWeatherColor.primary[400]!
+              : HowWeatherColor.neutral[200]!,
           width: 2,
         ),
       ),
@@ -150,7 +151,7 @@ Widget ClothInfoCard({
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
             decoration: BoxDecoration(
-              color: HowWeatherColor.primary[600],
+              color: HowWeatherColor.primary[400],
               borderRadius: BorderRadius.circular(10),
             ),
             child: Medium_14px(
@@ -180,9 +181,6 @@ Widget deleteDialog(
       mainAxisSize: MainAxisSize.min,
       children: [
         Medium_18px(text: "의류를 삭제하시겠습니까?"),
-        SizedBox(
-          height: 12,
-        ),
         Align(
           alignment: Alignment.centerLeft,
           child: Medium_14px(text: clothTypeToKorean(category, selectedItemId)),
@@ -190,16 +188,19 @@ Widget deleteDialog(
         SizedBox(
           height: 8,
         ),
-        ClothInfoCard(
-          context: context,
-          ref: ref,
-          color: color,
-          thicknessLabel: thickness,
-          havePalette: false,
-          haveDelete: false,
-          selectedItemId: selectedItemId,
-          selectedItem: selectedItem,
-          category: category,
+        IgnorePointer(
+          ignoring: true,
+          child: ClothInfoCard(
+            context: context,
+            ref: ref,
+            color: color,
+            thicknessLabel: thickness,
+            havePalette: false,
+            haveDelete: false,
+            selectedItemId: selectedItemId,
+            selectedItem: selectedItem,
+            category: category,
+          ),
         ),
         SizedBox(
           height: 12,
@@ -215,7 +216,11 @@ Widget deleteDialog(
                     color: HowWeatherColor.neutral[200],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(child: Medium_14px(text: "취소")),
+                  child: Center(
+                      child: Medium_14px(
+                    text: "취소",
+                    color: HowWeatherColor.neutral[600],
+                  )),
                 ),
               ),
             ),
@@ -234,12 +239,13 @@ Widget deleteDialog(
                         .read(closetProvider.notifier)
                         .deleteOuterCloth(clothId: selectedItemId);
                   }
+                  HowWeatherToast.show(context, '의류를 삭제했어요.', true);
                   context.pop();
                 },
                 child: Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: HowWeatherColor.secondary[900],
+                    color: HowWeatherColor.error,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(

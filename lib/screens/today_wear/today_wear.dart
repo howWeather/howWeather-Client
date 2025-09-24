@@ -4,9 +4,11 @@ import 'package:client/api/cloth/cloth_view_model.dart';
 import 'package:client/api/model/model_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/model/weather.dart';
 import 'package:client/api/weather/weather_view_model.dart';
 import 'package:client/providers/location_provider.dart';
+import 'package:client/screens/home_widget/home_widget.dart';
 import 'package:client/screens/skeleton/wear_skeleton.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -124,23 +126,23 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                     children: [
                       SizedBox(height: 50),
                       Semibold_24px(
-                        text: "오늘 날씨에 추천하는 옷이에요!",
+                        text: "오늘 날씨에 추천하는 의류예요!",
                         color: HowWeatherColor.white,
                       ),
                       SizedBox(height: 20),
                       modelState.when(
                         loading: () => Container(
-                          height: MediaQuery.of(context).size.height * 0.3,
+                          height: MediaQuery.of(context).size.height * 0.2,
                           child:
                               const Center(child: CircularProgressIndicator()),
                         ),
                         error: (e, _) {
                           print(e);
                           return Container(
-                            height: MediaQuery.of(context).size.height * 0.3,
+                            height: MediaQuery.of(context).size.height * 0.2,
                             child: Center(
                               child: Semibold_18px(
-                                text: "데이터를 불러오는 중 오류가 발생했습니다.",
+                                text: "데이터를 불러오는 중 오류가 발생했어요.",
                                 color: HowWeatherColor.white,
                               ),
                             ),
@@ -149,11 +151,32 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                         data: (recommendations) {
                           if (recommendations.isEmpty) {
                             return Container(
-                              height: MediaQuery.of(context).size.height * 0.3,
-                              child: Center(
-                                child: Semibold_18px(
-                                  text: "추천 가능한 옷이 없습니다. 새로운 옷을 추가해 보세요.",
-                                  color: HowWeatherColor.white,
+                              height: MediaQuery.of(context).size.height * 0.25,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: HowWeatherColor.black.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(
+                                      width: 40,
+                                      'assets/icons/closet-off2.svg',
+                                      color: HowWeatherColor.white,
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Medium_16px(
+                                      text:
+                                          "추천 가능한 의류가 없어요...😦\n[마이페이지-나의 옷장]에서 새로운 의류를 추가해 보세요!",
+                                      color: HowWeatherColor.white,
+                                    ),
+                                  ],
                                 ),
                               ),
                             );
@@ -315,26 +338,15 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                                             .updateUserLocation(
                                                 selectedLocation);
                                         if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  '위치가 "$selectedLocation"로 설정되었습니다.'),
-                                              backgroundColor:
-                                                  HowWeatherColor.primary[600],
-                                            ),
-                                          );
+                                          HowWeatherToast.show(
+                                              context,
+                                              '위치가 $selectedLocation으로 설정됐어요.',
+                                              false);
                                         }
                                       } catch (e) {
                                         if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  '위치 설정에 실패했습니다: ${e.toString()}'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
+                                          HowWeatherToast.show(
+                                              context, '${e.toString()}', true);
                                         }
                                       }
                                     }
@@ -379,8 +391,7 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                           ],
                         ),
                       ),
-                      // Spacer를 추가하여 남은 공간을 채움
-                      SizedBox(height: 40),
+                      SizedBox(height: 60),
                     ],
                   ),
                 ),
@@ -539,7 +550,7 @@ class PerceivedTemperatureChart extends ConsumerWidget {
       data: (recommendations) {
         if (recommendations.isEmpty || recommendations.length < 2) {
           return Text(
-            '추천 데이터가 부족합니다.',
+            '추천 데이터가 부족해요.',
             style: TextStyle(color: HowWeatherColor.white),
           );
         }
@@ -560,7 +571,7 @@ class PerceivedTemperatureChart extends ConsumerWidget {
 
         if (uniqueFeelings.isEmpty) {
           return Text(
-            '추천 데이터가 없습니다.',
+            '추천 데이터가 없어요.',
             style: TextStyle(color: HowWeatherColor.white),
           );
         }
