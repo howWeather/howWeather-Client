@@ -3,6 +3,7 @@ import 'dart:async'; // Timer를 사용하기 위해 import 합니다.
 import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -137,19 +138,9 @@ class _SignUpEmailCheckState extends ConsumerState<SignUpEmailCheck> {
 
                         startTimer();
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(result),
-                            backgroundColor: HowWeatherColor.primary[900],
-                          ),
-                        );
+                        HowWeatherToast.show(context, result, false);
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('인증 코드 전송에 실패했습니다: ${e.toString()}'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                        HowWeatherToast.show(context, '${e.toString()}', true);
                       }
                     },
                     child: Container(
@@ -199,16 +190,16 @@ class _SignUpEmailCheckState extends ConsumerState<SignUpEmailCheck> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                  color: HowWeatherColor.neutral[100]!,
-                                  width: 3),
+                                  color: HowWeatherColor.neutral[200]!,
+                                  width: 2),
                             ),
                             filled: true,
                             fillColor: HowWeatherColor.neutral[50],
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                  color: HowWeatherColor.neutral[200]!,
-                                  width: 3),
+                                  color: HowWeatherColor.primary[900]!,
+                                  width: 2),
                             ),
                             floatingLabelBehavior: FloatingLabelBehavior.never,
                             labelText: "6자리 인증코드",
@@ -216,7 +207,7 @@ class _SignUpEmailCheckState extends ConsumerState<SignUpEmailCheck> {
                               fontFamily: 'Pretendard',
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: HowWeatherColor.neutral[200],
+                              color: HowWeatherColor.neutral[400],
                             ),
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
@@ -250,12 +241,7 @@ class _SignUpEmailCheckState extends ConsumerState<SignUpEmailCheck> {
                                           verificationMessageProvider.notifier)
                                       .state = result;
                                   _timer?.cancel();
-
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(result),
-                                        backgroundColor: Colors.green),
-                                  );
+                                  HowWeatherToast.show(context, result, false);
                                 } catch (e) {
                                   ref
                                       .read(isVerificationSuccessProvider
@@ -268,11 +254,9 @@ class _SignUpEmailCheckState extends ConsumerState<SignUpEmailCheck> {
                                       .read(
                                           verificationMessageProvider.notifier)
                                       .state = errorMessage;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(errorMessage),
-                                        backgroundColor: Colors.red),
-                                  );
+
+                                  HowWeatherToast.show(
+                                      context, errorMessage, true);
                                 }
                               }
                             : null,
@@ -288,7 +272,10 @@ class _SignUpEmailCheckState extends ConsumerState<SignUpEmailCheck> {
                           child: Center(
                             child: Medium_16px(
                               text: '확인',
-                              color: HowWeatherColor.neutral[50],
+                              color:
+                                  verificationCode.length == 6 && isTimerRunning
+                                      ? HowWeatherColor.white
+                                      : HowWeatherColor.neutral[400],
                             ),
                           ),
                         ),
@@ -326,7 +313,7 @@ class _SignUpEmailCheckState extends ConsumerState<SignUpEmailCheck> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         color: HowWeatherColor.white,
         child: Container(
-          height: 72,
+          height: 56,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: isVerificationSuccess
@@ -334,9 +321,11 @@ class _SignUpEmailCheckState extends ConsumerState<SignUpEmailCheck> {
                 : HowWeatherColor.neutral[200],
           ),
           child: Center(
-            child: Semibold_24px(
+            child: Semibold_18px(
               text: "다음",
-              color: HowWeatherColor.white,
+              color: isVerificationSuccess
+                  ? HowWeatherColor.white
+                  : HowWeatherColor.neutral[400],
             ),
           ),
         ),

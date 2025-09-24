@@ -16,9 +16,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-// ✅ Provider들을 클래스 외부로 이동 (전역 상수로)
-final calendarFormatProvider =
-    StateProvider<CalendarFormat>((ref) => CalendarFormat.month);
 final focusedDayProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 class Calendar extends ConsumerStatefulWidget {
@@ -113,7 +110,6 @@ class _CalendarState extends ConsumerState<Calendar> {
 
   @override
   Widget build(BuildContext context) {
-    final calendarFormat = ref.watch(calendarFormatProvider);
     final focusedDay = ref.watch(focusedDayProvider);
     final selectedDay = ref.watch(selectedDayProvider);
     final monthString = DateFormat('yyyy-MM').format(focusedDay);
@@ -161,7 +157,7 @@ class _CalendarState extends ConsumerState<Calendar> {
               },
               child: SvgPicture.asset(
                 'assets/icons/Info.svg',
-                color: HowWeatherColor.neutral[400],
+                color: HowWeatherColor.neutral[500],
               ),
             ),
           ),
@@ -265,7 +261,6 @@ class _CalendarState extends ConsumerState<Calendar> {
   Widget MonthCalendar() {
     return Consumer(
       builder: (context, ref, _) {
-        final calendarFormat = ref.watch(calendarFormatProvider);
         final focusedDay = ref.watch(focusedDayProvider);
         final selectedDay = ref.watch(selectedDayProvider);
         final monthString = DateFormat('yyyy-MM').format(focusedDay);
@@ -390,6 +385,10 @@ class _CalendarState extends ConsumerState<Calendar> {
                       }
 
                       return TableCalendar(
+                        calendarFormat: CalendarFormat.month, // 기본: 월간 달력
+                        availableCalendarFormats: const {
+                          CalendarFormat.month: 'Month',
+                        }, // ← 다른 포맷 제거
                         headerVisible: false,
                         daysOfWeekHeight: 55,
                         // 요일
@@ -592,11 +591,6 @@ class _CalendarState extends ConsumerState<Calendar> {
                           }
                         },
 
-                        onFormatChanged: (format) {
-                          ref.read(calendarFormatProvider.notifier).state =
-                              format;
-                        },
-
                         onPageChanged: (focused) {
                           // 페이지 변경 시 날짜 범위 체크
                           if (focused.year < 2025 ||
@@ -612,8 +606,6 @@ class _CalendarState extends ConsumerState<Calendar> {
                           // _setupSubscription에서 자동으로 처리됨
                           ref.read(focusedDayProvider.notifier).state = focused;
                         },
-
-                        calendarFormat: calendarFormat,
                         eventLoader: (day) {
                           return events[
                                   DateTime.utc(day.year, day.month, day.day)] ??
@@ -682,10 +674,12 @@ Widget historyDialog(BuildContext context, WidgetRef ref) {
           padding: EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: isSelected
-                ? HowWeatherColor.primary[400]
+                ? HowWeatherColor.primary[200]
                 : HowWeatherColor.white,
             border: Border.all(
-              color: HowWeatherColor.neutral[200]!,
+              color: isSelected
+                  ? HowWeatherColor.primary[400]!
+                  : HowWeatherColor.neutral[200]!,
               width: 2,
             ),
             borderRadius: BorderRadius.circular(12),
@@ -694,7 +688,7 @@ Widget historyDialog(BuildContext context, WidgetRef ref) {
             child: Medium_14px(
               text: label,
               color: isEnabled
-                  ? (isSelected ? HowWeatherColor.white : HowWeatherColor.black)
+                  ? (HowWeatherColor.black)
                   : HowWeatherColor.neutral[300],
             ),
           ),
@@ -878,7 +872,7 @@ class _DailyHistoryState extends State<DailyHistory> {
               data: (records) {
                 if (records == null || records.isEmpty) {
                   return Center(
-                    child: const Bold_20px(text: "기록이 없습니다."),
+                    child: const Medium_18px(text: "기록이 없어요."),
                   );
                 }
 

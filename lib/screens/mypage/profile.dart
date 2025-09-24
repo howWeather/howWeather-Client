@@ -2,6 +2,7 @@ import 'package:client/api/mypage/mypage_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -102,120 +103,123 @@ class Profile extends ConsumerWidget {
             ),
           ),
           body: profileState.when(
-            data: (profile) => Container(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  titleCard(
-                    context,
-                    ref,
-                    "닉네임",
-                    "닉네임 변경",
-                    (setState) => changeNickname(ref),
-                    () async {
-                      final viewModel =
-                          ref.read(mypageViewModelProvider.notifier);
-                      final value = ref.read(nicknameProvider);
-                      await viewModel.updateNickname(value);
-                      // 프로필 상태 새로고침
-                      ref.invalidate(mypageViewModelProvider);
-                    },
-                  ),
-                  ContainerCard(profile?.nickname),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: Medium_18px(text: "이메일"),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          flex: 2,
-                          child: ContainerCard(getEmailFront(profile?.email))),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Medium_18px(
-                          text: "@",
-                          color: HowWeatherColor.neutral[200],
+            data: (profile) => SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleCard(
+                      context,
+                      ref,
+                      "닉네임",
+                      "닉네임 변경",
+                      (setState) => changeNickname(ref),
+                      () async {
+                        final viewModel =
+                            ref.read(mypageViewModelProvider.notifier);
+                        final value = ref.read(nicknameProvider);
+                        await viewModel.updateNickname(value);
+                        // 프로필 상태 새로고침
+                        ref.invalidate(mypageViewModelProvider);
+                      },
+                    ),
+                    ContainerCard(profile?.nickname),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: Medium_18px(text: "이메일"),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 3,
+                            child:
+                                ContainerCard(getEmailFront(profile?.email))),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Medium_18px(
+                            text: "@",
+                            color: HowWeatherColor.neutral[700],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                          flex: 1,
-                          child: ContainerCard(getEmailBack(profile?.email))),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: Medium_18px(text: "아이디"),
-                  ),
-                  ContainerCard(profile?.loginId),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  titleCard(
-                    context,
-                    ref,
-                    "체질",
-                    "체질 변경",
-                    (setState) => changeTemperament(),
-                    () async {
-                      final viewModel =
-                          ref.read(mypageViewModelProvider.notifier);
-                      final value =
-                          ref.read(temperamentProvider.notifier).state;
-                      await viewModel
-                          .updateConstitution(value! + 1); // 1부터 시작하므로 +1 추가
-                      // 프로필 상태 새로고침
-                      ref.invalidate(mypageViewModelProvider);
-                    },
-                  ),
-                  ContainerCard(getTemperamentText(profile?.constitution)),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  titleCard(
-                    context,
-                    ref,
-                    "성별",
-                    "성별 변경",
-                    (setState) => changeGender(),
-                    () async {
-                      final viewModel =
-                          ref.read(mypageViewModelProvider.notifier);
-                      final value = ref.read(genderProvider.notifier).state;
-                      await viewModel
-                          .updateGender(value! + 1); // 1부터 시작하므로 +1 추가
-                      // 프로필 상태 새로고침
-                      ref.invalidate(mypageViewModelProvider);
-                    },
-                  ),
-                  ContainerCard(getGenderText(profile?.gender)),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  titleCard(
-                    context,
-                    ref,
-                    "나이",
-                    "나이 변경",
-                    (setState) => changeAge(),
-                    () async {
-                      final viewModel =
-                          ref.read(mypageViewModelProvider.notifier);
-                      final value = ref.read(ageProvider.notifier).state;
-                      await viewModel.updateAge(value!);
-                      // 프로필 상태 새로고침
-                      ref.invalidate(mypageViewModelProvider);
-                    },
-                  ),
-                  ContainerCard(getAgeText(profile?.ageGroup)),
-                ],
+                        Expanded(
+                            flex: 2,
+                            child: ContainerCard(getEmailBack(profile?.email))),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: Medium_18px(text: "아이디"),
+                    ),
+                    ContainerCard(profile?.loginId),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    titleCard(
+                      context,
+                      ref,
+                      "체질",
+                      "체질 변경",
+                      (setState) => changeTemperament(),
+                      () async {
+                        final viewModel =
+                            ref.read(mypageViewModelProvider.notifier);
+                        final value =
+                            ref.read(temperamentProvider.notifier).state;
+                        await viewModel
+                            .updateConstitution(value! + 1); // 1부터 시작하므로 +1 추가
+                        // 프로필 상태 새로고침
+                        ref.invalidate(mypageViewModelProvider);
+                      },
+                    ),
+                    ContainerCard(getTemperamentText(profile?.constitution)),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    titleCard(
+                      context,
+                      ref,
+                      "성별",
+                      "성별 변경",
+                      (setState) => changeGender(),
+                      () async {
+                        final viewModel =
+                            ref.read(mypageViewModelProvider.notifier);
+                        final value = ref.read(genderProvider.notifier).state;
+                        await viewModel
+                            .updateGender(value! + 1); // 1부터 시작하므로 +1 추가
+                        // 프로필 상태 새로고침
+                        ref.invalidate(mypageViewModelProvider);
+                      },
+                    ),
+                    ContainerCard(getGenderText(profile?.gender)),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    titleCard(
+                      context,
+                      ref,
+                      "나이",
+                      "나이 변경",
+                      (setState) => changeAge(),
+                      () async {
+                        final viewModel =
+                            ref.read(mypageViewModelProvider.notifier);
+                        final value = ref.read(ageProvider.notifier).state;
+                        await viewModel.updateAge(value!);
+                        // 프로필 상태 새로고침
+                        ref.invalidate(mypageViewModelProvider);
+                      },
+                    ),
+                    ContainerCard(getAgeText(profile?.ageGroup)),
+                  ],
+                ),
               ),
             ),
             loading: () => Center(
@@ -271,10 +275,11 @@ class Profile extends ConsumerWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
-        border: Border.all(color: HowWeatherColor.neutral[100]!, width: 3),
+        border: Border.all(color: HowWeatherColor.neutral[200]!, width: 2),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Medium_16px(text: text),
+      child: Align(
+          alignment: Alignment.centerLeft, child: Medium_16px(text: text)),
     );
   }
 
@@ -310,7 +315,11 @@ class Profile extends ConsumerWidget {
                           color: HowWeatherColor.neutral[200],
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Center(child: Medium_14px(text: "취소")),
+                        child: Center(
+                            child: Medium_14px(
+                          text: "취소",
+                          color: HowWeatherColor.neutral[600],
+                        )),
                       ),
                     ),
                   ),
@@ -320,6 +329,7 @@ class Profile extends ConsumerWidget {
                       onTap: () async {
                         if (!TapThrottler.canTap('profile_change')) return;
                         Navigator.pop(context); // 다이얼로그를 먼저 닫음
+                        HowWeatherToast.show(context, '$title 성공!', false);
                         await onConfirm(); // 업데이트 함수 실행
                       },
                       child: Container(
@@ -359,8 +369,8 @@ class Profile extends ConsumerWidget {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: HowWeatherColor.neutral[100]!,
-            width: 3,
+            color: HowWeatherColor.neutral[200]!,
+            width: 2,
           ),
         ),
         filled: true,
@@ -368,17 +378,17 @@ class Profile extends ConsumerWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: HowWeatherColor.neutral[200]!,
-            width: 3,
+            color: HowWeatherColor.primary[900]!,
+            width: 2,
           ),
         ),
         floatingLabelBehavior: FloatingLabelBehavior.never,
         labelText: "한글, 영문, 숫자, 특수문자 사용 가능, 2~10자 이내",
         labelStyle: TextStyle(
           fontFamily: 'Pretendard',
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: HowWeatherColor.neutral[200],
+          color: HowWeatherColor.neutral[400],
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       ),
@@ -492,20 +502,62 @@ Widget buildDropdown({
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
         decoration: BoxDecoration(
-          border: Border.all(color: HowWeatherColor.primary[200]!),
-          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          border: Border.all(
+            color: selectedValue != null
+                ? HowWeatherColor.primary[200]!
+                : Colors.grey[300]!,
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<int>(
             value: selectedValue,
-            hint: Text("선택하세요", style: TextStyle(color: Colors.grey)),
             isExpanded: true,
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: selectedValue != null
+                  ? HowWeatherColor.primary[200]!
+                  : Colors.grey[500]!,
+              size: 24,
+            ),
+            hint: Text(
+              "선택하세요",
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+            dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            elevation: 8,
             items: options.map((value) {
+              final isSelected = value == selectedValue;
               return DropdownMenuItem<int>(
                 value: value,
-                child: Text(displayMap[value]!),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    displayMap[value]!,
+                    style: TextStyle(
+                      color: isSelected
+                          ? HowWeatherColor.primary[200]!
+                          : Colors.black87,
+                      fontSize: 16,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ),
               );
             }).toList(),
             onChanged: (newValue) {

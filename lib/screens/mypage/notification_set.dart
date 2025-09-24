@@ -3,6 +3,7 @@ import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +33,7 @@ class _NotificationSetState extends ConsumerState<NotificationSet> {
     return Scaffold(
       backgroundColor: HowWeatherColor.white,
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         backgroundColor: Colors.transparent,
         title: Medium_18px(text: "알림 설정"),
         centerTitle: true,

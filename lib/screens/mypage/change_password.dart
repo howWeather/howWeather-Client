@@ -2,6 +2,7 @@ import 'package:client/api/auth/auth_repository.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -107,7 +108,7 @@ class ChangePassword extends ConsumerWidget {
                     children: [
                       SvgPicture.asset(
                         'assets/icons/Info.svg',
-                        color: HowWeatherColor.neutral[600],
+                        color: HowWeatherColor.neutral[400],
                       ),
                       SizedBox(
                         width: 8,
@@ -125,13 +126,12 @@ class ChangePassword extends ConsumerWidget {
                           padding:
                               EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                  color: HowWeatherColor.neutral[500]!,
-                                  width: 1)),
+                            color: HowWeatherColor.primary[900],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           child: Medium_14px(
                             text: '비밀번호 찾기',
-                            color: HowWeatherColor.neutral[500],
+                            color: HowWeatherColor.white,
                           ),
                         ),
                       ),
@@ -189,8 +189,8 @@ class ChangePassword extends ConsumerWidget {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: HowWeatherColor.neutral[100]!,
-            width: 3,
+            color: HowWeatherColor.neutral[200]!,
+            width: 2,
           ),
         ),
         filled: true,
@@ -198,8 +198,8 @@ class ChangePassword extends ConsumerWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: HowWeatherColor.neutral[200]!,
-            width: 3,
+            color: HowWeatherColor.primary[900]!,
+            width: 2,
           ),
         ),
         floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -208,7 +208,7 @@ class ChangePassword extends ConsumerWidget {
           fontFamily: 'Pretendard',
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: HowWeatherColor.neutral[200],
+          color: HowWeatherColor.neutral[400],
         ),
         suffixIcon: (password.isNotEmpty)
             ? IconButton(
@@ -246,8 +246,8 @@ class ChangePassword extends ConsumerWidget {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: HowWeatherColor.neutral[100]!,
-            width: 3,
+            color: HowWeatherColor.neutral[200]!,
+            width: 2,
           ),
         ),
         filled: true,
@@ -255,8 +255,8 @@ class ChangePassword extends ConsumerWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: HowWeatherColor.neutral[200]!,
-            width: 3,
+            color: HowWeatherColor.primary[900]!,
+            width: 2,
           ),
         ),
         floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -265,7 +265,7 @@ class ChangePassword extends ConsumerWidget {
           fontFamily: 'Pretendard',
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: HowWeatherColor.neutral[200],
+          color: HowWeatherColor.neutral[400],
         ),
         suffixIcon: (password.isNotEmpty)
             ? IconButton(
@@ -381,8 +381,8 @@ class ChangePassword extends ConsumerWidget {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: HowWeatherColor.neutral[100]!,
-            width: 3,
+            color: HowWeatherColor.neutral[200]!,
+            width: 2,
           ),
         ),
         filled: true,
@@ -390,8 +390,8 @@ class ChangePassword extends ConsumerWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: HowWeatherColor.neutral[200]!,
-            width: 3,
+            color: HowWeatherColor.primary[900]!,
+            width: 2,
           ),
         ),
         floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -400,7 +400,7 @@ class ChangePassword extends ConsumerWidget {
           fontFamily: 'Pretendard',
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: HowWeatherColor.neutral[200],
+          color: HowWeatherColor.neutral[400],
         ),
         suffixIcon: (checkPassword.isNotEmpty)
             ? Row(
@@ -452,11 +452,11 @@ class ChangePassword extends ConsumerWidget {
                   ref.watch(passwordProvider),
                   ref.watch(checkPasswordProvider),
                 );
+                HowWeatherToast.show(context, '비밀번호 변경 성공!', false);
                 context.go('/');
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('$e')),
-                );
+                HowWeatherToast.show(context,
+                    '${e.toString().replaceAll('Exception: ', '')}', true);
               }
             }
           : null,
@@ -472,7 +472,7 @@ class ChangePassword extends ConsumerWidget {
               height: 12,
             ),
             Container(
-              height: 72,
+              height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: isAllValid
@@ -480,9 +480,11 @@ class ChangePassword extends ConsumerWidget {
                     : HowWeatherColor.neutral[200],
               ),
               child: Center(
-                child: Semibold_24px(
+                child: Semibold_18px(
                   text: "비밀번호 변경하기",
-                  color: HowWeatherColor.white,
+                  color: isAllValid
+                      ? HowWeatherColor.white
+                      : HowWeatherColor.neutral[400],
                 ),
               ),
             ),

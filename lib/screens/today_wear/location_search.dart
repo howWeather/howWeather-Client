@@ -295,6 +295,7 @@ class _LocationSelectionPageState extends ConsumerState<LocationSelectionPage> {
         child: Scaffold(
           backgroundColor: HowWeatherColor.white,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             backgroundColor: Colors.transparent,
             title: Medium_18px(text: "위치 선택"),
             centerTitle: true,
@@ -351,8 +352,8 @@ class _LocationSelectionPageState extends ConsumerState<LocationSelectionPage> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: HowWeatherColor.neutral[100]!,
-                        width: 3,
+                        color: HowWeatherColor.neutral[200]!,
+                        width: 2,
                       ),
                     ),
                     floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -362,19 +363,19 @@ class _LocationSelectionPageState extends ConsumerState<LocationSelectionPage> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                         color: HowWeatherColor.neutral[200]!,
-                        width: 3,
+                        width: 2,
                       ),
                     ),
                     labelStyle: TextStyle(
                       fontFamily: 'Pretendard',
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: HowWeatherColor.neutral[300],
+                      color: HowWeatherColor.neutral[400],
                     ),
                     prefixIcon: SvgPicture.asset(
                       "assets/icons/locator.svg",
                       fit: BoxFit.scaleDown,
-                      color: HowWeatherColor.neutral[300],
+                      color: HowWeatherColor.neutral[400],
                     ),
                   ),
                 ),

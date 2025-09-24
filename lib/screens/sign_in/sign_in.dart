@@ -6,6 +6,7 @@ import 'package:client/api/oauth2/oauth2_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,182 +43,185 @@ class _SignSplashState extends ConsumerState<SignIn> {
     final isAllValid = ref.watch(isAllValidProvider);
 
     return Scaffold(
-        body: Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      color: HowWeatherColor.primary[700],
-      child: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1), // 여유공간
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Image.asset("assets/images/logo.png"),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Text(
-                style: TextStyle(
-                  color: HowWeatherColor.white,
-                  fontFamily: "BagelFatOne",
-                  fontSize: 40,
-                ),
-                "날씨어때",
-              ),
-              Medium_16px(
-                text: "체감 온도 학습 기반 개인화 의상 추천 서비스",
-                color: HowWeatherColor.white,
-              ),
-              SizedBox(
-                height: 24,
-              ),
-              IdTextField(ref),
-              SizedBox(
-                height: 8,
-              ),
-              PasswordTextField(ref),
-              SizedBox(
-                height: 12,
-              ),
-              InkWell(
-                onTap: isAllValid
-                    ? () async {
-                        try {
-                          if (!TapThrottler.canTap('login')) return;
-                          final username = ref.read(idProvider);
-                          final password = ref.read(passwordProvider);
-                          await ref
-                              .read(authViewModelProvider.notifier)
-                              .login(username, password);
+        backgroundColor: HowWeatherColor.primary[700],
+        body: SafeArea(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                        height:
+                            MediaQuery.of(context).size.height * 0.1), // 여유공간
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: Image.asset("assets/images/logo.png"),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Text(
+                      style: TextStyle(
+                        color: HowWeatherColor.white,
+                        fontFamily: "BagelFatOne",
+                        fontSize: 40,
+                      ),
+                      "날씨어때",
+                    ),
+                    Medium_16px(
+                      text: "체감 온도 학습 기반 개인화 의상 추천 서비스",
+                      color: HowWeatherColor.white,
+                    ),
+                    SizedBox(
+                      height: 24,
+                    ),
+                    IdTextField(ref),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    PasswordTextField(ref),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    InkWell(
+                      onTap: isAllValid
+                          ? () async {
+                              try {
+                                if (!TapThrottler.canTap('login')) return;
+                                final username = ref.read(idProvider);
+                                final password = ref.read(passwordProvider);
+                                await ref
+                                    .read(authViewModelProvider.notifier)
+                                    .login(username, password);
 
-                          // ✅ 로그인 성공시에만 페이지 이동
-                          if (context.mounted) {
-                            // iOS에서는 알림(Firebase) 설정 건너뜀
-                            if (!Platform.isIOS) {
-                              await AlarmRepository().saveFCMToken();
-                            } else {
-                              print('iOS에서는 FCM 토큰 저장 건너뜀3');
+                                // ✅ 로그인 성공시에만 페이지 이동
+                                if (context.mounted) {
+                                  // iOS에서는 알림(Firebase) 설정 건너뜀
+                                  if (!Platform.isIOS) {
+                                    await AlarmRepository().saveFCMToken();
+                                  } else {
+                                    print('iOS에서는 FCM 토큰 저장 건너뜀3');
+                                  }
+
+                                  HowWeatherToast.show(
+                                      context, '로그인 성공!', false);
+
+                                  context.go('/home');
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  HowWeatherToast.show(
+                                      context,
+                                      '${e.toString().replaceAll('Exception: ', '')}',
+                                      true);
+                                }
+                              }
                             }
-
-                            context.go('/home');
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '로그인 실패: ${e.toString().replaceAll('Exception: ', '')}',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor: Colors.redAccent,
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    : null,
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: HowWeatherColor.secondary[500],
-                  ),
-                  child: Center(
-                    child: Bold_22px(
-                      text: "로그인",
-                      color: HowWeatherColor.neutral[50],
+                          : null,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: HowWeatherColor.secondary[500],
+                        ),
+                        child: Center(
+                          child: Bold_22px(
+                            text: "로그인",
+                            color: HowWeatherColor.white,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            context.push('/signUp/email');
+                          },
+                          child: Medium_18px(
+                            text: "회원가입",
+                            color: HowWeatherColor.white,
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            context.push('/signIn/findPassword');
+                          },
+                          child: Medium_18px(
+                            text: "비밀번호 찾기",
+                            color: HowWeatherColor.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            color: HowWeatherColor.neutral[50],
+                            height: 1,
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 8),
+                          child: Medium_16px(
+                            text: "SNS계정으로 로그인",
+                            color: HowWeatherColor.neutral[50],
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            color: HowWeatherColor.neutral[50],
+                            height: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                            onTap: () async {
+                              if (!TapThrottler.canTap('login_kakao')) return;
+                              await kakaoSignIn();
+                            },
+                            child: SvgPicture.asset(
+                                "assets/icons/kakao-icon.svg")),
+                        SizedBox(
+                          width: 24,
+                        ),
+                        GestureDetector(
+                            onTap: () async {
+                              if (!TapThrottler.canTap('logint_google')) return;
+                              await googleSignIn();
+                            },
+                            child: SvgPicture.asset(
+                                "assets/icons/google-icon.svg")),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 24,
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 12,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      context.push('/signUp/email');
-                    },
-                    child: Medium_18px(
-                      text: "회원가입",
-                      color: HowWeatherColor.white,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      context.push('/signIn/findPassword');
-                    },
-                    child: Medium_18px(
-                      text: "비밀번호 찾기",
-                      color: HowWeatherColor.white,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      color: HowWeatherColor.neutral[50],
-                      height: 1,
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 8),
-                    child: Medium_16px(
-                      text: "SNS계정으로 로그인",
-                      color: HowWeatherColor.neutral[50],
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      color: HowWeatherColor.neutral[50],
-                      height: 1,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 12,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                      onTap: () async {
-                        if (!TapThrottler.canTap('login_kakao')) return;
-                        await kakaoSignIn();
-                      },
-                      child: SvgPicture.asset("assets/icons/kakao-icon.svg")),
-                  SizedBox(
-                    width: 24,
-                  ),
-                  GestureDetector(
-                      onTap: () async {
-                        if (!TapThrottler.canTap('logint_google')) return;
-                        await googleSignIn();
-                      },
-                      child: SvgPicture.asset("assets/icons/google-icon.svg")),
-                ],
-              ),
-              SizedBox(
-                height: 24,
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 
   Future<void> kakaoSignIn() async {
@@ -239,12 +243,11 @@ class _SignSplashState extends ConsumerState<SignIn> {
       if (loginState is AsyncData) {
         print('로그인 성공 → 홈으로 이동');
         if (!Platform.isIOS) await AlarmRepository().saveFCMToken();
+        HowWeatherToast.show(context, '카카오 로그인 성공!', false);
         context.go('/home');
       } else if (loginState is AsyncError) {
         print('로그인 실패');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('소셜 로그인 실패: ${loginState.error}')),
-        );
+        HowWeatherToast.show(context, '${loginState.error}', true);
       }
     } catch (e) {
       print('카카오 로그인 실패: $e');
@@ -265,12 +268,11 @@ class _SignSplashState extends ConsumerState<SignIn> {
       if (loginState is AsyncData) {
         print('로그인 성공 → 홈으로 이동');
         if (!Platform.isIOS) await AlarmRepository().saveFCMToken();
+        HowWeatherToast.show(context, '구글 로그인 성공!', false);
         context.go('/home');
       } else if (loginState is AsyncError) {
         print('로그인 실패');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('소셜 로그인 실패: ${loginState.error}')),
-        );
+        HowWeatherToast.show(context, '${loginState.error}', true);
       }
     } else {
       print("구글계정으로 로그인 실패");
@@ -291,8 +293,8 @@ class _SignSplashState extends ConsumerState<SignIn> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: HowWeatherColor.neutral[100]!,
-                width: 3,
+                color: HowWeatherColor.neutral[200]!,
+                width: 2,
               ),
             ),
             filled: true,
@@ -300,8 +302,8 @@ class _SignSplashState extends ConsumerState<SignIn> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: HowWeatherColor.neutral[200]!,
-                width: 3,
+                color: HowWeatherColor.secondary[700]!,
+                width: 2,
               ),
             ),
             floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -310,7 +312,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
               fontFamily: 'Pretendard',
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: HowWeatherColor.neutral[300],
+              color: HowWeatherColor.neutral[400],
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           ),
@@ -345,14 +347,14 @@ class _SignSplashState extends ConsumerState<SignIn> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                    BorderSide(color: HowWeatherColor.neutral[100]!, width: 3),
+                    BorderSide(color: HowWeatherColor.neutral[200]!, width: 2),
               ),
               filled: true,
               fillColor: HowWeatherColor.white,
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    BorderSide(color: HowWeatherColor.neutral[300]!, width: 3),
+                borderSide: BorderSide(
+                    color: HowWeatherColor.secondary[700]!, width: 2),
               ),
               floatingLabelBehavior: FloatingLabelBehavior.never,
               labelText: "비밀번호 입력",
@@ -360,7 +362,7 @@ class _SignSplashState extends ConsumerState<SignIn> {
                 fontFamily: 'Pretendard',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: HowWeatherColor.neutral[300],
+                color: HowWeatherColor.neutral[400],
               ),
               suffixIcon: (isFocused || password.isNotEmpty)
                   ? IconButton(

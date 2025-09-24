@@ -187,19 +187,62 @@ class SignUpPersonal extends ConsumerWidget {
         Semibold_18px(text: title),
         SizedBox(height: 16),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
           decoration: BoxDecoration(
-            border: Border.all(color: HowWeatherColor.primary[200]!),
-            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            border: Border.all(
+              color: selectedValue != null
+                  ? HowWeatherColor.primary[200]!
+                  : Colors.grey[300]!,
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: selectedValue,
-              hint: Text("선택하세요", style: TextStyle(color: Colors.grey)),
+              isExpanded: true,
+              icon: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: selectedValue != null
+                    ? HowWeatherColor.primary[200]!
+                    : Colors.grey[500]!,
+                size: 24,
+              ),
+              hint: Text(
+                "선택하세요",
+                style: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              elevation: 8,
               items: options.map((value) {
+                final isSelected = value == selectedValue;
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        color: isSelected
+                            ? HowWeatherColor.primary[200]!
+                            : Colors.black87,
+                        fontSize: 16,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                  ),
                 );
               }).toList(),
               onChanged: (newValue) {
@@ -235,7 +278,7 @@ class SignUpPersonal extends ConsumerWidget {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         color: HowWeatherColor.white,
         child: Container(
-          height: 72,
+          height: 56,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: isAllValid
@@ -243,9 +286,11 @@ class SignUpPersonal extends ConsumerWidget {
                 : HowWeatherColor.neutral[200],
           ),
           child: Center(
-            child: Semibold_24px(
+            child: Semibold_18px(
               text: "다음",
-              color: HowWeatherColor.white,
+              color: isAllValid
+                  ? HowWeatherColor.white
+                  : HowWeatherColor.neutral[400],
             ),
           ),
         ),

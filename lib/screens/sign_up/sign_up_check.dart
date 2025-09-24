@@ -2,6 +2,7 @@ import 'package:client/api/auth/auth_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/model/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -130,15 +131,8 @@ class SignUpCheck extends ConsumerWidget {
                     .signUpWithFullData(signupData);
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        e.toString().replaceAll('Exception: ', ''),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      backgroundColor: Colors.redAccent,
-                    ),
-                  );
+                  HowWeatherToast.show(context,
+                      '${e.toString().replaceAll('Exception: ', '')}', true);
                 }
                 return; // 회원가입 실패시 여기서 중단
               }
@@ -155,15 +149,8 @@ class SignUpCheck extends ConsumerWidget {
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        '로그인 실패: ${e.toString().replaceAll('Exception: ', '')}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      backgroundColor: Colors.redAccent,
-                    ),
-                  );
+                  HowWeatherToast.show(context,
+                      '${e.toString().replaceAll('Exception: ', '')}', true);
                 }
               }
             }
@@ -197,7 +184,7 @@ class SignUpCheck extends ConsumerWidget {
               height: 24,
             ),
             Container(
-              height: 72,
+              height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: isCheck
@@ -205,9 +192,11 @@ class SignUpCheck extends ConsumerWidget {
                     : HowWeatherColor.neutral[200],
               ),
               child: Center(
-                child: Semibold_24px(
+                child: Semibold_18px(
                   text: "회원가입",
-                  color: HowWeatherColor.white,
+                  color: isCheck
+                      ? HowWeatherColor.white
+                      : HowWeatherColor.neutral[400],
                 ),
               ),
             ),

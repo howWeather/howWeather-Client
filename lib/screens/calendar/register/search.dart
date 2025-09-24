@@ -296,6 +296,7 @@ class _AddressSearchPageState extends ConsumerState<AddressSearchPage> {
         child: Scaffold(
           backgroundColor: HowWeatherColor.white,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             backgroundColor: Colors.transparent,
             title: Medium_18px(text: "주소 검색"),
             centerTitle: true,

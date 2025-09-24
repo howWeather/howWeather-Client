@@ -7,6 +7,8 @@ final class HowWeatherColor extends Color {
   static const Color black = Color(0xFF1C1C1C);
   static const Color white = Color(0xFFFDFDFD);
   static const Color error = Color.fromARGB(255, 240, 58, 46);
+  static const Color systemRed = Color.fromARGB(255, 251, 232, 232);
+  static const Color systemGreen = Color.fromARGB(255, 222, 245, 226);
 
   static const Map<int, Color> primary = <int, Color>{
     50: Color(0xFFE5F1FF),

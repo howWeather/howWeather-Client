@@ -2,6 +2,7 @@ import 'package:client/api/closet/closet_view_model.dart';
 import 'package:client/designs/how_weather_color.dart';
 import 'package:client/designs/how_weather_typo.dart';
 import 'package:client/designs/throttle_util.dart';
+import 'package:client/designs/toast.dart';
 import 'package:client/providers/cloth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,7 +72,11 @@ class _PaletteState extends ConsumerState<Palette> {
                       color: HowWeatherColor.neutral[200],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Center(child: Medium_14px(text: "취소")),
+                    child: Center(
+                        child: Medium_14px(
+                      text: "취소",
+                      color: HowWeatherColor.neutral[600],
+                    )),
                   ),
                 ),
               ),
@@ -110,14 +115,13 @@ class _PaletteState extends ConsumerState<Palette> {
                         }
 
                         context.pop();
-                        ScaffoldMessenger.of(this.context).showSnackBar(
-                          SnackBar(content: Text('의상이 등록되었습니다.')),
-                        );
+                        HowWeatherToast.show(context, '의류를 등록했어요!', false);
                       } catch (e) {
-                        ScaffoldMessenger.of(this.context).showSnackBar(
-                          SnackBar(content: Text('등록 실패: $e')),
-                        );
+                        HowWeatherToast.show(
+                            context, '의류를 등록하지 못했어요.\n$e', true);
                       }
+                      ref.read(colorProvider.notifier).state = 1;
+                      ref.read(thicknessProvider.notifier).state = 1;
                     }
                     if (widget.text == "수정") {
                       try {
@@ -138,16 +142,14 @@ class _PaletteState extends ConsumerState<Palette> {
                                 thickness: selectedThickness,
                               );
                         }
-
                         context.pop();
-                        ScaffoldMessenger.of(this.context).showSnackBar(
-                          SnackBar(content: Text('의상이 수정되었습니다.')),
-                        );
+                        HowWeatherToast.show(context, '의류를 수정했어요!', false);
                       } catch (e) {
-                        ScaffoldMessenger.of(this.context).showSnackBar(
-                          SnackBar(content: Text('등록 실패: $e')),
-                        );
+                        HowWeatherToast.show(
+                            context, '의류를 수정하지 못했어요.\n$e', true);
                       }
+
+                      ref.resetClothInfoProviders();
                     }
                   },
                   child: Container(
@@ -177,7 +179,7 @@ class _PaletteState extends ConsumerState<Palette> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-          border: Border.all(color: HowWeatherColor.neutral[100]!, width: 1),
+          border: Border.all(color: HowWeatherColor.neutral[200]!, width: 2),
           borderRadius: BorderRadius.circular(12)),
       child: Wrap(
         spacing: 4,
@@ -204,7 +206,7 @@ class _PaletteState extends ConsumerState<Palette> {
                   ? SvgPicture.asset(
                       "assets/icons/select.svg",
                       color: selectedColor == 9
-                          ? HowWeatherColor.neutral[500]
+                          ? HowWeatherColor.neutral[400]
                           : HowWeatherColor.white,
                       fit: BoxFit.scaleDown,
                     )
@@ -239,7 +241,7 @@ class _PaletteState extends ConsumerState<Palette> {
                     : HowWeatherColor.white,
                 borderRadius: BorderRadius.circular(8),
                 border: isSelected
-                    ? Border.all(color: HowWeatherColor.primary[900]!, width: 2)
+                    ? Border.all(color: HowWeatherColor.primary[400]!, width: 2)
                     : Border.all(
                         color: HowWeatherColor.neutral[200]!, width: 2),
               ),

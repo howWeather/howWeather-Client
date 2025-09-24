@@ -150,21 +150,23 @@ class ClothesEnroll extends ConsumerWidget {
               Map<String, int?>.from(ref.read(selectedEnrollClothProvider));
           resetMap[category] = null;
           ref.read(selectedEnrollClothProvider.notifier).state = resetMap;
-          ref.read(colorProvider.notifier).state = 1;
-          ref.read(thicknessProvider.notifier).state = 1;
         });
       },
       child: Container(
         decoration: BoxDecoration(
           color:
-              isSelected ? HowWeatherColor.primary[900] : HowWeatherColor.white,
-          border: Border.all(color: HowWeatherColor.neutral[200]!, width: 1),
+              isSelected ? HowWeatherColor.primary[200] : HowWeatherColor.white,
+          border: Border.all(
+              color: isSelected
+                  ? HowWeatherColor.primary[400]!
+                  : HowWeatherColor.neutral[200]!,
+              width: 2),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
           child: Medium_16px(
             text: label,
-            color: isSelected ? HowWeatherColor.white : HowWeatherColor.black,
+            color: HowWeatherColor.black,
           ),
         ),
       ),

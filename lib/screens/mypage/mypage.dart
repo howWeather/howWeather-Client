@@ -120,7 +120,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 vertical: 12, horizontal: 8),
                             child: Medium_18px(
                               text: "의류 조회",
-                              color: HowWeatherColor.neutral[600],
+                              color: HowWeatherColor.neutral[700],
                             ),
                           ),
                         ),
@@ -139,7 +139,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 vertical: 12, horizontal: 8),
                             child: Medium_18px(
                               text: "의류 삭제",
-                              color: HowWeatherColor.neutral[600],
+                              color: HowWeatherColor.neutral[700],
                             ),
                           ),
                         ),
@@ -157,7 +157,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 vertical: 12, horizontal: 8),
                             child: Medium_18px(
                               text: "의류 등록",
-                              color: HowWeatherColor.neutral[600],
+                              color: HowWeatherColor.neutral[700],
                             ),
                           ),
                         ),
@@ -190,7 +190,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 vertical: 12, horizontal: 8),
                             child: Medium_18px(
                               text: "알림 설정",
-                              color: HowWeatherColor.neutral[600],
+                              color: HowWeatherColor.neutral[700],
                             ),
                           ),
                         ),
@@ -208,7 +208,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 vertical: 12, horizontal: 8),
                             child: Medium_18px(
                               text: "버전 정보",
-                              color: HowWeatherColor.neutral[600],
+                              color: HowWeatherColor.neutral[700],
                             ),
                           ),
                         ),
@@ -226,7 +226,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 vertical: 12, horizontal: 8),
                             child: Medium_18px(
                               text: "비밀번호 변경",
-                              color: HowWeatherColor.neutral[600],
+                              color: HowWeatherColor.neutral[700],
                             ),
                           ),
                         ),
@@ -264,6 +264,9 @@ class _MyPageState extends ConsumerState<MyPage> {
 
                                   // 3. 로그아웃 API 호출
                                   await AuthRepository().logout();
+
+                                  HowWeatherToast.show(
+                                      context, '로그아웃 성공', false);
                                 },
                               ),
                             );
@@ -274,7 +277,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 vertical: 12, horizontal: 8),
                             child: Medium_18px(
                               text: "로그아웃",
-                              color: HowWeatherColor.neutral[600],
+                              color: HowWeatherColor.neutral[700],
                             ),
                           ),
                         ),
@@ -308,6 +311,9 @@ class _MyPageState extends ConsumerState<MyPage> {
 
                                   // 2. 탈퇴 처리
                                   await AuthRepository().withdraw();
+
+                                  HowWeatherToast.show(context,
+                                      '탈퇴 성공\n날씨어때를 다시 찾아주세요 🥹', false);
                                 },
                               ),
                             );
@@ -318,7 +324,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                 vertical: 12, horizontal: 8),
                             child: Medium_18px(
                               text: "탈퇴",
-                              color: HowWeatherColor.neutral[600],
+                              color: HowWeatherColor.neutral[700],
                             ),
                           ),
                         ),
