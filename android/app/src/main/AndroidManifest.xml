@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.howweather.client">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.howweather.client">
     <application
         android:label="날씨어때"
         android:name="${applicationName}"
@@ -61,18 +61,6 @@
             <meta-data
                 android:name="es.antonborri.home_widget.provider"
                 android:value="true" />
-        </receiver>
-
-        <!-- WorkManager 백그라운드 실행 -->
-        <receiver
-            android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
-            android:enabled="true"
-            android:exported="false"
-            tools:replace="android:enabled">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-            </intent-filter>
         </receiver>
 
     </application>
