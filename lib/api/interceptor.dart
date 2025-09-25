@@ -264,11 +264,12 @@ class HttpInterceptor {
     final context = navigatorKey?.currentContext;
     if (context != null && context.mounted) {
       // Flutter Toast로 메시지 표시
-      Fluttertoast.showToast(
-        msg: "세션 만료: 로그인이 만료되었습니다.\n다시 로그인해 주세요.",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-      );
+      // Fluttertoast.showToast(
+      //   msg: "세션 만료: 로그인이 만료되었습니다.\n다시 로그인해 주세요.",
+      //   toastLength: Toast.LENGTH_LONG,
+      //   gravity: ToastGravity.BOTTOM,
+      // );
+      print('세션 만료: 로그인이 만료되었습니다.\n다시 로그인해 주세요.');
 
       // 로그인 화면으로 이동
       context.pushReplacement('/signIn');
