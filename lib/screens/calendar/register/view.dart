@@ -159,13 +159,13 @@ class Register extends ConsumerWidget {
                       children: [
                         _buildClothWidget(
                           context,
-                          "상의",
+                          "상의류",
                           ref,
                           "uppers",
                         ),
                         _buildClothWidget(
                           context,
-                          "아우터",
+                          "아우터류",
                           ref,
                           "outers",
                         ),
@@ -294,7 +294,7 @@ class Register extends ConsumerWidget {
     }
 
     if (upperInfo == null && outerInfo == null) {
-      HowWeatherToast.show(context, '상의 또는 아우터 중 하나 이상을 선택해주세요.', true);
+      HowWeatherToast.show(context, '상의 또는 아우터 종류 중 하나 이상을 선택해주세요.', true);
       return;
     }
 
