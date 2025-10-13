@@ -332,11 +332,18 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                                     if (selectedLocation != null &&
                                         selectedLocation is String) {
                                       try {
+                                        // 1. 위치 업데이트
                                         await ref
                                             .read(locationViewModelProvider
                                                 .notifier)
                                             .updateUserLocation(
                                                 selectedLocation);
+                                        // 2. 추천 데이터 재조회 (위치 변경 후)
+                                        await ref
+                                            .read(
+                                                modelViewModelProvider.notifier)
+                                            .fetchRecommendation();
+
                                         if (context.mounted) {
                                           HowWeatherToast.show(
                                               context,

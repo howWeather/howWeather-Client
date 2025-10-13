@@ -1,3 +1,5 @@
+// closet_repository.dart 수정
+
 import 'dart:convert';
 import 'package:client/api/howweather_api.dart';
 import 'package:client/api/interceptor.dart';
@@ -22,7 +24,7 @@ class ClosetRepository {
     }
   }
 
-  /// 의류 등록
+  /// 의류 등록 (추천 모델 재실행 포함)
   Future<String> registerClothes({
     required List<Map<String, dynamic>> uppers,
     required List<Map<String, dynamic>> outers,
@@ -41,6 +43,8 @@ class ClosetRepository {
     if (response.statusCode == 200) {
       if (data["success"] == true) {
         print(data);
+        // 의류 등록 후 추천 모델 재실행
+        await _triggerRecommendation();
         return data["result"];
       } else {
         throw Exception("등록 실패: ${data["error"] ?? '알 수 없는 오류'}");
@@ -50,7 +54,7 @@ class ClosetRepository {
     }
   }
 
-  /// 상의 수정
+  /// 상의 수정 (추천 모델 재실행 포함)
   Future<String> updateUpperCloth({
     required int clothId,
     int? color,
@@ -70,6 +74,8 @@ class ClosetRepository {
     if (response.statusCode == 200) {
       if (data["success"] == true) {
         print(data);
+        // 상의 수정 후 추천 모델 재실행
+        await _triggerRecommendation();
         return data["result"];
       } else {
         throw Exception("수정 실패: ${data["error"] ?? '알 수 없는 오류'}");
@@ -79,7 +85,7 @@ class ClosetRepository {
     }
   }
 
-  /// 아우터 수정
+  /// 아우터 수정 (추천 모델 재실행 포함)
   Future<String> updateOuterCloth({
     required int clothId,
     int? color,
@@ -99,6 +105,8 @@ class ClosetRepository {
     if (response.statusCode == 200) {
       if (data["success"] == true) {
         print(data);
+        // 아우터 수정 후 추천 모델 재실행
+        await _triggerRecommendation();
         return data["result"];
       } else {
         throw Exception("수정 실패: ${data["error"] ?? '알 수 없는 오류'}");
@@ -108,13 +116,15 @@ class ClosetRepository {
     }
   }
 
-  /// 상의 삭제
+  /// 상의 삭제 (추천 모델 재실행 포함)
   Future<void> deleteUpperCloth({required int clothId}) async {
     final url = '$_baseUrl/delete-upper/$clothId';
 
     final response = await _http.delete(url);
 
     if (response.statusCode == 204) {
+      // 상의 삭제 후 추천 모델 재실행
+      await _triggerRecommendation();
       return;
     } else {
       final decodedResponse = utf8.decode(response.bodyBytes);
@@ -124,19 +134,41 @@ class ClosetRepository {
     }
   }
 
-  /// 아우터 삭제
+  /// 아우터 삭제 (추천 모델 재실행 포함)
   Future<void> deleteOuterCloth({required int clothId}) async {
     final url = '$_baseUrl/delete-outer/$clothId';
 
     final response = await _http.delete(url);
 
     if (response.statusCode == 204) {
+      // 아우터 삭제 후 추천 모델 재실행
+      await _triggerRecommendation();
       return;
     } else {
       final decodedResponse = utf8.decode(response.bodyBytes);
       final data = jsonDecode(decodedResponse);
       final message = data['error']?['message'] ?? '아우터 삭제 실패';
       throw Exception(message);
+    }
+  }
+
+  /// 추천 모델 재실행 트리거 (private 메서드)
+  Future<void> _triggerRecommendation() async {
+    final url = '${API.hostConnect}/api/model/recommendation';
+
+    try {
+      final response = await _http.get(url);
+      final decodedBody = utf8.decode(response.bodyBytes);
+      final jsonBody = jsonDecode(decodedBody);
+
+      if (response.statusCode == 200 && jsonBody['success'] == true) {
+        print('✅ 추천 모델 재실행 완료');
+      } else {
+        print('⚠️ 추천 모델 재실행 실패: ${jsonBody['error']?['message']}');
+      }
+    } catch (e) {
+      print('⚠️ 추천 모델 재실행 중 오류: $e');
+      // 추천 모델 실패는 메인 작업(등록/수정/삭제)에 영향을 주지 않도록 에러를 throw하지 않음
     }
   }
 }
