@@ -39,7 +39,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  sectionTitle("상의", "assets/icons/clothes-upper.svg"),
+                  sectionTitle("상의류", "assets/icons/clothes-upper.svg"),
                   const SizedBox(height: 12),
                   buildGrid(context, ref, "uppers", upperMap),
                   Container(
@@ -49,7 +49,7 @@ class SignUpEnrollClothes extends ConsumerWidget {
                       height: 1,
                     ),
                   ),
-                  sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
+                  sectionTitle("아우터류", "assets/icons/clothes-outer.svg"),
                   const SizedBox(height: 12),
                   buildGrid(context, ref, "outers", outerMap),
                 ],

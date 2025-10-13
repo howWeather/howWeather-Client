@@ -59,7 +59,7 @@ class ClothesView extends ConsumerWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      sectionTitle("상의", "assets/icons/clothes-upper.svg"),
+                      sectionTitle("상의류", "assets/icons/clothes-upper.svg"),
                       itemList(context, ref, uppers.clothList, "uppers"),
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 24),
@@ -68,7 +68,7 @@ class ClothesView extends ConsumerWidget {
                           height: 1,
                         ),
                       ),
-                      sectionTitle("아우터", "assets/icons/clothes-outer.svg"),
+                      sectionTitle("아우터류", "assets/icons/clothes-outer.svg"),
                       itemList(context, ref, outers.clothList, "outers"),
                     ],
                   ),

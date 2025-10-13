@@ -204,7 +204,7 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                               if (allUpperTypes.isNotEmpty)
                                 Expanded(
                                   child: _buildClothSection(
-                                    title: "추천 상의",
+                                    title: "추천 상의류",
                                     clothTypes: allUpperTypes,
                                     currentIndex: currentUpperIndex,
                                     onPrevious: () =>
@@ -219,7 +219,7 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                                 SizedBox(width: 16),
                                 Expanded(
                                   child: _buildClothSection(
-                                    title: "추천 아우터",
+                                    title: "추천 아우터류",
                                     clothTypes: allOuterTypes,
                                     currentIndex: currentOuterIndex,
                                     onPrevious: () =>
@@ -383,9 +383,7 @@ class _TodayWearState extends ConsumerState<TodayWear> {
                             ),
                             Medium_14px(
                               text: '''- 기준 지역의 예보 데이터를 이용하여 의상을 추천합니다.
-- 초기 설정은 서울특별시 용산구입니다.
-- 오전 04:00 ~ 07:00 동안에는 지역 변경이 불가합니다.
-- 지역 변경 시 다음 날부터 해당 지역의 예보 데이터로 예측을 진행합니다. ''',
+- 초기 설정은 서울특별시 용산구입니다.''',
                               color: HowWeatherColor.white,
                             ),
                           ],
