@@ -274,24 +274,29 @@ class HowWeather extends ConsumerWidget {
       });
     });
 
-    return MaterialApp.router(
-      title: 'HowWeather',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: HowWeatherColor.white),
-        appBarTheme: AppBarTheme(
-            // systemOverlayStyle: SystemUiOverlayStyle(
-            //   statusBarColor: Colors.transparent,
-            //   statusBarIconBrightness: Brightness.light,
-            // ),
-            ),
-        textSelectionTheme: TextSelectionThemeData(
-          cursorColor: HowWeatherColor.neutral[700],
-          selectionColor: HowWeatherColor.neutral[700],
-          selectionHandleColor: HowWeatherColor.neutral[700],
-        ),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaleFactor: 0.9,
       ),
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
+      child: MaterialApp.router(
+        title: 'HowWeather',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: HowWeatherColor.white),
+          appBarTheme: AppBarTheme(
+              // systemOverlayStyle: SystemUiOverlayStyle(
+              //   statusBarColor: Colors.transparent,
+              //   statusBarIconBrightness: Brightness.light,
+              // ),
+              ),
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: HowWeatherColor.neutral[700],
+            selectionColor: HowWeatherColor.neutral[700],
+            selectionHandleColor: HowWeatherColor.neutral[700],
+          ),
+        ),
+        routerConfig: router,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

@@ -61,7 +61,7 @@ class SignUpPersonal extends ConsumerWidget {
                   SizedBox(
                     height: 32,
                   ),
-                  Semibold_24px(text: "더욱 효과적인 의상 추천을 위해\n아래 내용에 답변해주세요"),
+                  Semibold_24px(text: "더욱 효과적인 의상 종류 추천을 위해\n아래 내용에 답변해주세요"),
                   SizedBox(
                     height: 20,
                   ),
@@ -72,7 +72,7 @@ class SignUpPersonal extends ConsumerWidget {
                         width: 12,
                       ),
                       Medium_14px(
-                          text: "알려주신 내용을 기반으로 AI가 학습을 진행해 의상을\n추천해드립니다!"),
+                          text: "알려주신 내용을 기반으로 AI가 학습을 진행해 의류를\n추천해드립니다!"),
                     ],
                   ),
                   SizedBox(
